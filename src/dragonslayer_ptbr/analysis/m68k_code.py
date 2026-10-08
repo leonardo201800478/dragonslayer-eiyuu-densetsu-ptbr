@@ -121,6 +121,50 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
 
     op = _word(data, offset)
 
+    # Instruções de controle/sistema que aparecem no bootstrap.
+    # Elas não introduzem novos destinos no CFG, mas precisam consumir
+    # exatamente o tamanho correto para manter o alinhamento.
+    if op in (0x4E60, 0x4E61, 0x4E62, 0x4E63):
+        return M68KInstruction(offset, 2, "MOVE USP")
+    if op in (0x4E64, 0x4E65):
+        return M68KInstruction(offset, 2, "RESET")
+    if op == 0x4E66:
+        return M68KInstruction(offset, 2, "NOP-like 0x4E66")
+    if op == 0x4E67:
+        return M68KInstruction(offset, 2, "NOP-like 0x4E67")
+    if (op & 0xFFF8) == 0x4E40:
+        return M68KInstruction(offset, 2, "TRAP")
+    if op == 0x4E72:
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "STOP")
+    if op == 0x4E74:
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "RTD")
+    if op == 0x4E7A or op == 0x4E7B:
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "MOVEC")
+    if (op & 0xFFF8) == 0x4E50:
+        if offset + 2 > len(data):
+            return None
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "LINK")
+    if (op & 0xFFF8) == 0x4E58:
+        return M68KInstruction(offset, 2, "UNLK")
+    if (op & 0xFFC0) == 0x46C0:
+        extension = _ea_extension_size((op >> 3) & 0x7, op & 0x7, 2, source=True)
+        if extension is None:
+            return None
+        return M68KInstruction(offset, 2 + extension, "MOVE.W <EA>,SR")
+    if (op & 0xFFC0) == 0x44C0:
+        extension = _ea_extension_size((op >> 3) & 0x7, op & 0x7, 2, source=True)
+        if extension is None:
+            return None
+        return M68KInstruction(offset, 2 + extension, "MOVE.W <EA>,CCR")
+
     if op == 0x4E71:
         return M68KInstruction(offset, 2, "NOP")
     if op == 0x4E75:
