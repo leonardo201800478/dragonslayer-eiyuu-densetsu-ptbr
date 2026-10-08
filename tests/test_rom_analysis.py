@@ -178,3 +178,49 @@ def test_text_region_scanner_rejects_invalid_parameters():
 
     with pytest.raises(ValueError, match="delimiters"):
         scan_text_regions(b"ABC", delimiters=())
+
+
+def test_script_tokenizer_decodes_shift_jis_and_preserves_controls():
+    """Verifica Shift-JIS e o controle estendido sem atribuir semântica."""
+    from dragonslayer_ptbr.text.script_codec import (
+        render_script,
+        tokenize_script,
+    )
+
+    data = "テスト".encode("shift_jis") + b"\x01" + b"ABC" + b"\x06\xFE\x0E" + b"\x00"
+
+    tokens = tokenize_script(data, stop_at_terminator=True)
+
+    assert [token.kind for token in tokens] == [
+        "text",
+        "text",
+        "text",
+        "control",
+        "text",
+        "text",
+        "text",
+        "control",
+        "terminator",
+    ]
+    assert render_script(tokens).startswith("テスト<CTRL 01>ABC<CTRL 06 FE 0E><END>")
+
+
+def test_script_tokenizer_preserves_invalid_bytes():
+    """Garante que bytes não reconhecidos não sejam silenciosamente descartados."""
+    from dragonslayer_ptbr.text.script_codec import tokenize_script
+
+    tokens = tokenize_script(b"A\xFFB")
+
+    assert [token.kind for token in tokens] == ["text", "raw", "text"]
+    assert tokens[1].raw == b"\xFF"
+
+
+def test_script_tokenizer_rejects_invalid_control_configuration():
+    """Garante validação dos parâmetros do tokenizer."""
+    from dragonslayer_ptbr.text.script_codec import tokenize_script
+
+    with pytest.raises(ValueError, match="extended_control"):
+        tokenize_script(b"A", extended_control=0x100)
+
+    with pytest.raises(ValueError, match="terminator"):
+        tokenize_script(b"A", terminator=0x100)
