@@ -145,6 +145,14 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
             return None
         return M68KInstruction(offset, 4, "MOVEA.W d16(An),A3")
 
+    # LEA d16(PC),An — modo usado pelo bootstrap da ROM.
+    if (op & 0xF1FF) == 0x4BFA:
+        if offset + 4 > len(data):
+            return None
+        displacement = _signed16(_word(data, offset + 2))
+        target = offset + 4 + displacement
+        return M68KInstruction(offset, 4, "LEA d16(PC),An", target)
+
     if (op & 0xF1C0) == 0x41C0:
         if offset + 4 > len(data):
             return None
