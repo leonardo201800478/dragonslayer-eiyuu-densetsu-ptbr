@@ -77,21 +77,21 @@ def test_decode_move_word_register_indirect():
 def test_decode_move_byte_d16_address_register():
     instruction = decode_instruction(bytes.fromhex("10 29 EF 01"), 0)
     assert instruction is not None
-    assert instruction.mnemonic == "MOVE.B"
+    assert instruction.mnemonic == "MOVE.B d16(An),Dn"
     assert instruction.size == 4
 
 
 def test_decode_move_word_register_to_register():
     instruction = decode_instruction(bytes.fromhex("38 85"), 0)
     assert instruction is not None
-    assert instruction.mnemonic == "MOVE.W"
+    assert instruction.mnemonic == "MOVE.W Dn,(An)"
     assert instruction.size == 2
 
 
 def test_decode_move_long_postincrement_to_address_register():
     instruction = decode_instruction(bytes.fromhex("28 9D"), 0)
     assert instruction is not None
-    assert instruction.mnemonic == "MOVE.L"
+    assert instruction.mnemonic == "MOVE.L (An)+,(An)"
     assert instruction.size == 2
 
 
