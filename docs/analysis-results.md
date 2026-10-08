@@ -1532,3 +1532,35 @@ reports/latin-character-analysis.md
 ```
 
 Nenhuma dessas alterações modifica a ROM original.
+
+
+---
+
+## 38. Roadmap operacional até o primeiro teste PT-BR
+
+O projeto agora possui um roadmap formal em:
+
+`docs/project-roadmap.md`
+
+A sequência obrigatória é:
+
+1. **Integridade/baseline** — hashes, testes e proteção da ROM original.
+2. **Inventário completo de texto** — transformar as regiões encontradas em entradas lógicas.
+3. **Protocolo de script** — determinar a gramática real de caracteres, controles e terminadores.
+4. **Engine 68000** — localizar a cadeia de execução que lê o script e acessa a fonte.
+5. **Fonte + encoder** — fechar o mapeamento código → glifo e implementar round-trip sem perda.
+6. **Ponteiros/seleção** — comprovar como cada script é localizado.
+7. **Realocação** — somente após provar escrita segura; primeiro testar realocação de texto japonês.
+8. **Vertical slice PT-BR** — alterar uma única entrada pequena e totalmente compreendida.
+9. **Validação no emulador** — verificar inicialização, mensagem traduzida, controles, texto seguinte e continuidade do jogo.
+10. **Expansão gradual** — somente depois do primeiro teste executável.
+
+### Gate para iniciar a tradução de fato
+
+A tradução PT-BR só começa quando houver, para pelo menos uma entrada:
+
+`extração → decode → tradução → encode → referência/realocação → patch → validação → execução`.
+
+O primeiro teste será chamado **M1 — Primeiro Texto PT-BR Executável**.
+
+Até esse marco, o código de escrita deve permanecer separado das ferramentas de análise e nenhuma alteração deve ser aplicada à ROM original.
