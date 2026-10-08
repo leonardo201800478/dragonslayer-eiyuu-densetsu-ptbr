@@ -7,6 +7,8 @@ import zlib
 from pathlib import Path
 from typing import Any
 
+from .pointers import scan_pointer_candidates
+
 
 DEFAULT_BLOCK_SIZE = 0x100
 
@@ -187,6 +189,7 @@ def analyze_rom(
             "summary": _summarize_blocks(blocks),
             "blocks": blocks,
         },
+        "pointer_candidates": scan_pointer_candidates(data),
         "candidate_regions": _runs(data),
         "notes": [
             "Candidatos são heurísticos; não representam texto confirmado.",
