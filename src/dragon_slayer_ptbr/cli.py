@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 from .patch import PatchError, apply_manifest
@@ -26,7 +27,7 @@ def main() -> int:
     try:
         count = apply_manifest(args.rom, args.manifest, args.output)
     except PatchError as exc:
-        print(f"Erro: {exc}", file=__import__("sys").stderr)
+        print(f"Erro: {exc}", file=sys.stderr)
         return 1
     print(f"Patch aplicado: {count} alteração(ões) gravada(s) em {args.output}.")
     return 0
