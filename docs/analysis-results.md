@@ -792,3 +792,50 @@ Shift-JIS
 Isso é muito mais útil para a análise estática do que procurar somente sequências de caracteres japoneses.
 
 O próximo alvo técnico passa a ser a **rotina 68000 que interpreta essa assinatura**.
+
+
+---
+
+## 26. Início da análise estática 68000
+
+A investigação passou a uma etapa dedicada a referências do código Motorola 68000.
+
+Foi criada:
+
+    src/dragonslayer_ptbr/analysis/m68k_references.py
+
+A ferramenta procura representações big-endian dos dois alvos confirmados mais importantes:
+
+    0x01626B  região da abertura/script investigada
+    0x1A551A  tabela de caracteres Shift-JIS
+
+São examinadas representações de 24 e 32 bits. Quando os dois bytes imediatamente anteriores aos quatro bytes do alvo correspondem a um opcode absoluto conhecido, a ocorrência recebe uma classificação instrucional.
+
+Formatos atualmente reconhecidos:
+
+    LEA abs.l
+    PEA abs.l
+    JSR abs.l
+    JMP abs.l
+    MOVEA.L #imm,An
+
+### Estado
+
+**CONFIRMADO:** a ferramenta de busca está implementada no projeto.
+
+**AINDA NÃO CONFIRMADO:** quais ocorrências encontradas na ROM pertencem efetivamente ao engine de texto.
+
+A ROM original não está armazenada no GitHub e permanece local. Portanto, a execução da nova análise deve ser feita sobre o mesmo dump local já validado anteriormente.
+
+### Comando
+
+    python -m dragonslayer_ptbr scan-refs --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-references.md
+
+O relatório produzido deverá ser analisado procurando principalmente:
+
+- referências instrucionais à abertura;
+- referências instrucionais à tabela 0x1A551A;
+- proximidade entre referências;
+- possíveis blocos de código compartilhando essas referências.
+
+A ferramenta é deliberadamente conservadora: uma referência literal não é considerada automaticamente ponteiro de script, e o scanner não substitui um desassembler.
