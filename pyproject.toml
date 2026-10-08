@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dragon-slayer-eiyuu-densetsu-ptbr"
+version = "0.1.0"
+description = "Ferramentas para patches da tradução PT-BR de Dragon Slayer: Eiyuu Densetsu (Mega Drive)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Leonardo Paiva" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+dslayer-ptbr = "dragon_slayer_ptbr.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
