@@ -251,3 +251,51 @@ A investigação deixa de priorizar heurísticas genéricas de ponteiros e passa
 8. possivelmente consulta a tabela de caracteres em `0x1A551A`.
 
 O objetivo imediato é identificar o **engine real de processamento de texto**, antes de implementar encoder, realocação ou patching.
+
+
+## 26. Ferramenta inicial de referências 68000
+
+Foi adicionada a ferramenta:
+
+src/dragonslayer_ptbr/analysis/m68k_references.py
+
+e o comando:
+
+    python -m dragonslayer_ptbr scan-refs --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-references.md
+
+O scanner procura os alvos confirmados:
+
+    0x01626B  abertura / região de script investigada
+    0x1A551A  tabela de caracteres Shift-JIS
+
+em representações:
+
+- 24-bit big-endian;
+- 32-bit big-endian.
+
+Quando os quatro bytes imediatamente anteriores a uma referência formam um opcode 68000 reconhecido de forma inequívoca, o relatório também registra a classificação, incluindo:
+
+    LEA abs.l
+    PEA abs.l
+    JSR abs.l
+    JMP abs.l
+    MOVEA.L #imm,An
+
+### Limite metodológico
+
+Esta ferramenta não é um desassembler.
+
+Uma ocorrência literal de 01 62 6B ou 00 1A 55 1A pode estar em dados, gráficos, código ou estruturas não relacionadas. Mesmo uma instrução reconhecida não prova, isoladamente, que aquele caminho é executado como rotina de texto.
+
+O objetivo é reduzir o espaço de busca e produzir evidência para a análise seguinte.
+
+### Próximo passo após executar o scanner
+
+Os resultados mais importantes serão:
+
+1. referências ao 0x01626B classificadas como instrução 68000;
+2. referências ao 0x1A551A classificadas como LEA, MOVEA, JSR ou JMP;
+3. proximidade dessas referências entre si;
+4. blocos de código que contenham testes/leituras próximos aos controles 0x01, 0x06 e 0x0E.
+
+A partir daí será possível escolher pontos de entrada para uma análise 68000 mais profunda, em vez de procurar cegamente por toda a ROM.
