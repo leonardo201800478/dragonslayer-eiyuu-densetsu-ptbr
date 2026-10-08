@@ -424,3 +424,16 @@ CANDIDATO: 0x02B344 merece rastreamento adicional porque há alteração explíc
 CANDIDATO: 0x026ADA–0x026AE0 demonstra uma cadeia completa de definição de A3 → leitura → despacho, mas ainda não foi ligada ao texto.
 
 O próximo passo deve ser encontrar os chamadores indiretos ou tabelas de entrada dessas rotinas e, principalmente, verificar se A3 pode ser alimentado por dados derivados da região 0x01626B.
+
+
+## Atualização — checkpoint do fluxo 68000
+
+A análise passou a utilizar o vetor de reset real como ponto de entrada e agora possui um CFG conservador com 43 blocos e 155 instruções reconhecidas no último relatório analisado.
+
+Chamadas relevantes incluem 0x0109AA → 0x010AF2, três chamadas de 0x0109xx para 0x00B53E e uma chamada para 0x00B536. Algumas rotinas alcançadas terminam em RTS, permitindo acompanhar chamadas e retornos.
+
+O decoder foi ampliado somente quando os bytes reais encontrados no fluxo exigiram cobertura. Nesta etapa foram adicionados BTST imediato, MOVE.W SR,<EA> e NEGX.B/W/L, além do suporte anterior a LEA absoluto para todos os registradores de endereço.
+
+A presença isolada de MOVE.B (An)+,Dn ou CMPI.B #imm,Dn continua insuficiente para classificar uma rotina como parser. A promoção exige uma cadeia de execução que conecte dados de script, leitura sequencial, identificação de caracteres/controles e processamento/renderização.
+
+O próximo passo permanece o rastreamento de A0–A3, leituras de bytes e chamadas dentro dos blocos alcançáveis, cruzando os resultados com as regiões textuais e a tabela 0x1A551A.
