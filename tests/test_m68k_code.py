@@ -209,3 +209,19 @@ def test_cfg_continues_after_bsr_call():
     assert 0x20 in by_start
     assert by_start[0x10].end == 0x14
     assert by_start[0x14].instructions[0].offset == 0x14
+
+
+
+def test_decode_move_byte_immediate_consumes_four_bytes():
+    rom = bytes.fromhex("10 3C 00 00 4E B9 00 00 94 08")
+    instruction = decode_instruction(rom, 0)
+
+    assert instruction is not None
+    assert instruction.size == 4
+    assert instruction.mnemonic == "MOVE.B #imm,Dn"
+
+    jsr = decode_instruction(rom, 4)
+    assert jsr is not None
+    assert jsr.size == 6
+    assert jsr.mnemonic == "JSR abs.l"
+    assert jsr.target == 0x00009408
