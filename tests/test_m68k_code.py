@@ -121,3 +121,40 @@ def test_decode_bootstrap_system_instructions():
     assert decode_instruction(rom, 8).mnemonic == "RTD"
     assert decode_instruction(rom, 12).mnemonic == "LINK"
     assert decode_instruction(rom, 16).mnemonic == "UNLK"
+
+
+
+def test_cfg_splits_conditional_branch_target_into_basic_blocks():
+    rom = bytearray(0x30)
+    rom[4:8] = (0x10).to_bytes(4, "big")
+    # 0x10: BNE 0x16
+    rom[0x10:0x12] = bytes.fromhex("66 04")
+    rom[0x12:0x14] = bytes.fromhex("4E 71")
+    rom[0x14:0x16] = bytes.fromhex("4E 71")
+    rom[0x16:0x18] = bytes.fromhex("4E 75")
+
+    blocks = build_control_flow_graph(bytes(rom))
+    by_start = {block.start: block for block in blocks}
+
+    assert 0x10 in by_start
+    assert 0x12 in by_start
+    assert 0x16 in by_start
+    assert by_start[0x10].end == 0x12
+    assert by_start[0x12].end == 0x16
+    assert by_start[0x16].end == 0x18
+
+
+def test_cfg_blocks_do_not_overlap_instruction_ranges():
+    rom = bytearray(0x30)
+    rom[4:8] = (0x10).to_bytes(4, "big")
+    rom[0x10:0x12] = bytes.fromhex("66 04")
+    rom[0x12:0x14] = bytes.fromhex("4E 71")
+    rom[0x14:0x16] = bytes.fromhex("4E 71")
+    rom[0x16:0x18] = bytes.fromhex("4E 75")
+
+    blocks = build_control_flow_graph(bytes(rom))
+    ranges = [(block.start, block.end) for block in blocks]
+
+    for index, (start, end) in enumerate(ranges):
+        for other_start, other_end in ranges[index + 1 :]:
+            assert end <= other_start or other_end <= start
