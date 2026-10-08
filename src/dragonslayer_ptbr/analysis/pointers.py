@@ -11,7 +11,9 @@ def _read_uint(data: bytes, offset: int, width: int) -> int:
 
 def _pointer_target(value: int, rom_size: int, width: int) -> int | None:
     """Converte um valor candidato em offset de ROM quando ele for válido."""
-    if 0 <= value < rom_size:
+    # Zero e valores de preenchimento não são úteis como candidatos: em regiões
+    # vazias eles dominariam a contagem sem representar referências reais.
+    if 0 < value < rom_size:
         return value
 
     # Alguns formatos podem armazenar o endereço lógico com bit de mapeamento.
@@ -84,6 +86,7 @@ def scan_pointer_candidates(
     return {
         "notes": [
             "Candidatos são heurísticos e não representam ponteiros confirmados.",
+            "O alvo zero é excluído para evitar falsos positivos causados por regiões preenchidas com 00.",
             "A análise usa big-endian, coerente com a representação binária usual do 68000.",
             "Valores coincidentes com offsets válidos podem ser dados comuns, não ponteiros.",
         ],
