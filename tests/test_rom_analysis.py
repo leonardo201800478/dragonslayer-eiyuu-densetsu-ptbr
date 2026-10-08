@@ -251,3 +251,30 @@ def test_script_control_scan_rejects_negative_base_offset():
 
     with pytest.raises(ValueError, match="base_offset"):
         scan_script_controls(b"\x01", base_offset=-1)
+
+
+def test_script_control_scan_preserves_absolute_offsets():
+    """Verifica o mapeamento de controles com offset absoluto."""
+    from dragonslayer_ptbr.analysis.script_controls import scan_script_controls
+
+    data = "テスト".encode("shift_jis") + b"\x01ABC\x06\xFE\x0E\x00"
+    occurrences = scan_script_controls(data, base_offset=0x1626B)
+
+    assert [item.offset for item in occurrences] == [
+        0x16271,
+        0x16275,
+        0x16278,
+    ]
+    assert [item.raw for item in occurrences] == [
+        b"\x01",
+        b"\x06\xFE\x0E",
+        b"\x00",
+    ]
+
+
+def test_script_control_scan_rejects_negative_base_offset():
+    """Garante validação do offset absoluto."""
+    from dragonslayer_ptbr.analysis.script_controls import scan_script_controls
+
+    with pytest.raises(ValueError, match="base_offset"):
+        scan_script_controls(b"\x01", base_offset=-1)
