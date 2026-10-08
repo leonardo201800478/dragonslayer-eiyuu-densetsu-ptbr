@@ -196,6 +196,22 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         if extension is None:
             return None
         return M68KInstruction(offset, 2 + extension, "MOVE.W <EA>,CCR")
+    # NEGX.B/W/L <EA>: complemento com extensão (68000).
+    # As formas imediatas não são válidas para esta instrução.
+    if (op & 0xFFC0) in (0x4000, 0x4040, 0x4080):
+        mode = (op >> 3) & 0x7
+        register = op & 0x7
+        size = {0x4000: 1, 0x4040: 2, 0x4080: 4}[op & 0xFFC0]
+        extension = _ea_extension_size(mode, register, size, source=False)
+        if extension is None:
+            return None
+        suffix = {1: "B", 2: "W", 4: "L"}[size]
+        return M68KInstruction(
+            offset,
+            2 + extension,
+            f"NEGX.{suffix} <EA>",
+        )
+
     if (op & 0xFFC0) == 0x40C0:
         extension = _ea_extension_size((op >> 3) & 0x7, op & 0x7, 2, source=False)
         if extension is None:
