@@ -4,7 +4,6 @@ import math
 from collections import Counter
 from typing import Any
 
-
 DEFAULT_MIN_REGION_SIZE = 4
 DEFAULT_MAX_REGION_SIZE = 512
 DEFAULT_MIN_CANDIDATE_SCORE = 0.55

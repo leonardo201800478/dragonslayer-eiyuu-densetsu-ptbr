@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
-
 MIN_ROM_TARGET = 0x200
 MAX_TABLE_TARGET_DELTA = 0x4000
 

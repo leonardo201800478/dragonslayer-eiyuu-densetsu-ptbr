@@ -284,7 +284,7 @@ def test_cli_module_compiles():
     """Garante que a CLI publicada não contém erro de sintaxe."""
     import py_compile
 
-    import dragonslayer_ptbr.cli as cli
+    from dragonslayer_ptbr import cli
 
     py_compile.compile(cli.__file__, doraise=True)
 

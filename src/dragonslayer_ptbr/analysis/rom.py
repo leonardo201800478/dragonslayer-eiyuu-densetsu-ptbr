@@ -10,7 +10,6 @@ from typing import Any
 from .pointers import scan_pointer_candidates
 from .text_regions import scan_text_regions
 
-
 DEFAULT_BLOCK_SIZE = 0x100
 
 

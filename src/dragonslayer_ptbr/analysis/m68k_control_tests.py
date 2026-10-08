@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-
 CONTROL_VALUES = (0x01, 0x06, 0x0E, 0x00)
 
 

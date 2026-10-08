@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-
 CHARACTER_TABLE_OFFSET = 0x1A551A
 CHARACTER_TABLE_END = 0x1A62D2
 
