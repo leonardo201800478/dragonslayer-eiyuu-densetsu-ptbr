@@ -102,10 +102,44 @@ def _decode_move(data: bytes, offset: int, op: int) -> M68KInstruction | None:
     if destination_extension is None or source_extension is None:
         return None
 
+    size_name = {1: "MOVE.B", 2: "MOVE.L", 3: "MOVE.W"}[top]
+    source_name = {
+        0: "Dn",
+        2: "(An)",
+        3: "(An)+",
+        4: "-(An)",
+        5: "d16(An)",
+        6: "d8(An,Xn)",
+        7: "xxx",
+    }.get(source_mode)
+    destination_name = {
+        0: "Dn",
+        2: "(An)",
+        3: "(An)+",
+        4: "-(An)",
+        5: "d16(An)",
+        6: "d8(An,Xn)",
+        7: "xxx",
+    }.get(destination_mode)
+
+    mnemonic = size_name
+    if source_name is not None and destination_name is not None:
+        if source_mode == 7 and source_register == 4:
+            source_name = "#imm"
+        elif source_mode == 7 and source_register == 0:
+            source_name = "(xxx).W"
+        elif source_mode == 7 and source_register == 1:
+            source_name = "(xxx).L"
+        mnemonic = f"{size_name} {source_name},{destination_name}"
+
+    target = None
+    if destination_mode == 7 and (op >> 9) & 0x7 == 0 and (op & 0x3F) == 0x39:
+        target = int.from_bytes(data[offset + 2 + source_extension:offset + 4 + source_extension], "big")
     return M68KInstruction(
         offset,
         2 + source_extension + destination_extension,
-        {1: "MOVE.B", 2: "MOVE.L", 3: "MOVE.W"}[top],
+        mnemonic,
+        target,
     )
 
 
