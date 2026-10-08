@@ -109,3 +109,20 @@ src/dragonslayer_ptbr/
 ├── profiles/       # conhecimento específico do jogo
 └── cli.py
 ```
+
+
+## Ponto de parada atual
+
+A análise M68K avançou para um CFG conservador baseado no vetor de reset real da ROM.
+
+- vetor de reset: 0x010620;
+- último relatório analisado: 43 blocos / 155 instruções reconhecidas;
+- chamadas JSR abs.l e destinos acompanhados;
+- várias rotinas com RTS identificadas;
+- decoder ampliado incrementalmente conforme os opcodes reais foram confirmados.
+
+Suporte/testes adicionados nesta etapa incluem BTST #imm,<EA>, MOVE.W SR,<EA>, NEGX.B/W/L <EA> e LEA abs.l para A0–A7.
+
+Isso ainda não significa que o engine de texto foi localizado. A próxima investigação continua sendo o rastreamento de registradores, leituras de bytes, controles e chamadas até chegar à fonte/renderização.
+
+O projeto permanece em análise somente leitura; a ROM japonesa original não é modificada nem distribuída.
