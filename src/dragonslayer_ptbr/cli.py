@@ -20,6 +20,7 @@ from .analysis.m68k_indexed_reads import (
     scan_indexed_byte_reads,
     write_indexed_byte_report,
 )
+from .analysis.japanese_text import scan_japanese_text, write_japanese_text_report
 from .text.script_codec import render_script, tokenize_script
 
 
@@ -32,21 +33,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub = parser.add_subparsers(dest="command", required=True)
 
-    command = sub.add_parser(
-        "analyze",
-        help="analisa uma ROM sem modificá-la",
-    )
+    command = sub.add_parser("analyze", help="analisa uma ROM sem modificá-la")
     command.add_argument("--rom", required=True, type=Path)
-    command.add_argument(
-        "--report",
-        type=Path,
-        default=Path("reports/rom-analysis.json"),
-    )
+    command.add_argument("--report", type=Path, default=Path("reports/rom-analysis.json"))
     command.add_argument(
         "--block-size",
         type=lambda value: int(value, 0),
         default=DEFAULT_BLOCK_SIZE,
-        help="tamanho dos blocos em bytes; aceita decimal ou hexadecimal (padrão: 0x100)",
+        help="tamanho dos blocos em bytes; aceita decimal ou hexadecimal",
     )
 
     controls = sub.add_parser(
@@ -54,23 +48,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="mapeia controles de uma região de script sem atribuir semântica",
     )
     controls.add_argument("--rom", required=True, type=Path)
+    controls.add_argument("--offset", required=True, type=lambda value: int(value, 0))
+    controls.add_argument("--size", required=True, type=lambda value: int(value, 0))
     controls.add_argument(
-        "--offset",
-        required=True,
-        type=lambda value: int(value, 0),
-        help="offset inicial em bytes; aceita decimal ou hexadecimal",
-    )
-    controls.add_argument(
-        "--size",
-        required=True,
-        type=lambda value: int(value, 0),
-        help="quantidade de bytes; aceita decimal ou hexadecimal",
-    )
-    controls.add_argument(
-        "--output",
-        type=Path,
-        default=Path("reports/script-controls.md"),
-        help="relatório Markdown de saída",
+        "--output", type=Path, default=Path("reports/script-controls.md")
     )
 
     decode = sub.add_parser(
@@ -78,47 +59,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="decodifica uma região confirmada do script sem modificar a ROM",
     )
     decode.add_argument("--rom", required=True, type=Path)
-    decode.add_argument(
-        "--offset",
-        required=True,
-        type=lambda value: int(value, 0),
-        help="offset inicial em bytes; aceita decimal ou hexadecimal",
-    )
-    decode.add_argument(
-        "--size",
-        required=True,
-        type=lambda value: int(value, 0),
-        help="quantidade de bytes; aceita decimal ou hexadecimal",
-    )
-    decode.add_argument(
-        "--output",
-        type=Path,
-        help="arquivo de saída UTF-8; se omitido, escreve no console",
-    )
-    decode.add_argument(
-        "--stop-at-terminator",
-        action="store_true",
-        help="para no primeiro terminador 0x00",
-    )
-
+    decode.add_argument("--offset", required=True, type=lambda value: int(value, 0))
+    decode.add_argument("--size", required=True, type=lambda value: int(value, 0))
+    decode.add_argument("--output", type=Path)
+    decode.add_argument("--stop-at-terminator", action="store_true")
 
     refs = sub.add_parser(
         "scan-refs",
         help="procura referências 68000 a offsets confirmados da ROM",
     )
     refs.add_argument("--rom", required=True, type=Path)
-    refs.add_argument(
-        "--output",
-        type=Path,
-        default=Path("reports/m68k-references.md"),
-    )
-    refs.add_argument(
-        "--context",
-        type=lambda value: int(value, 0),
-        default=8,
-        help="bytes de contexto em cada lado (padrão: 8)",
-    )
-
+    refs.add_argument("--output", type=Path, default=Path("reports/m68k-references.md"))
+    refs.add_argument("--context", type=lambda value: int(value, 0), default=8)
 
     control_tests = sub.add_parser(
         "scan-control-tests",
@@ -126,73 +78,45 @@ def build_parser() -> argparse.ArgumentParser:
     )
     control_tests.add_argument("--rom", required=True, type=Path)
     control_tests.add_argument(
-        "--output",
-        type=Path,
-        default=Path("reports/m68k-control-tests.md"),
+        "--output", type=Path, default=Path("reports/m68k-control-tests.md")
     )
-    control_tests.add_argument(
-        "--context",
-        type=lambda value: int(value, 0),
-        default=12,
-        help="bytes de contexto em cada lado (padrão: 12)",
-    )
+    control_tests.add_argument("--context", type=lambda value: int(value, 0), default=12)
 
     parser_candidates = sub.add_parser(
         "scan-text-parser-candidates",
         help="localiza leitura de byte seguida de comparação de controle",
     )
     parser_candidates.add_argument("--rom", required=True, type=Path)
-    parser_candidates.add_argument(
-        "--output",
-        type=Path,
-        default=Path("reports/m68k-text-parser-candidates.md"),
-    )
-    parser_candidates.add_argument(
-        "--max-distance",
-        type=lambda value: int(value, 0),
-        default=16,
-        help="distância máxima entre leitura e teste (padrão: 16)",
-    )
-    parser_candidates.add_argument(
-        "--context",
-        type=lambda value: int(value, 0),
-        default=16,
-        help="bytes de contexto em cada lado (padrão: 16)",
-    )
+    parser_candidates.add_argument("--output", type=Path, default=Path(
+        "reports/m68k-text-parser-candidates.md"
+    ))
+    parser_candidates.add_argument("--max-distance", type=lambda value: int(value, 0), default=16)
+    parser_candidates.add_argument("--context", type=lambda value: int(value, 0), default=16)
 
-    a3_flow = sub.add_parser(
-        "scan-a3-flow",
-        help="mapeia definições e leituras do registrador A3",
-    )
+    a3_flow = sub.add_parser("scan-a3-flow", help="mapeia definições e leituras do registrador A3")
     a3_flow.add_argument("--rom", required=True, type=Path)
-    a3_flow.add_argument(
-        "--output",
-        type=Path,
-        default=Path("reports/m68k-a3-flow.md"),
-    )
-    a3_flow.add_argument(
-        "--context",
-        type=lambda value: int(value, 0),
-        default=12,
-        help="bytes de contexto em cada lado (padrão: 12)",
-    )
+    a3_flow.add_argument("--output", type=Path, default=Path("reports/m68k-a3-flow.md"))
+    a3_flow.add_argument("--context", type=lambda value: int(value, 0), default=12)
 
     indexed = sub.add_parser(
         "scan-indexed-reads",
         help="localiza leituras MOVE.B com endereçamento indexado",
     )
     indexed.add_argument("--rom", required=True, type=Path)
-    indexed.add_argument(
-        "--output",
-        type=Path,
-        default=Path("reports/m68k-indexed-reads.md"),
+    indexed.add_argument("--output", type=Path, default=Path("reports/m68k-indexed-reads.md"))
+    indexed.add_argument("--context", type=lambda value: int(value, 0), default=16)
+
+    japanese = sub.add_parser(
+        "scan-japanese-text",
+        help="localiza regiões reais de texto japonês Shift-JIS",
     )
-    indexed.add_argument(
-        "--context",
-        type=lambda value: int(value, 0),
-        default=16,
-        help="bytes de contexto em cada lado (padrão: 16)",
+    japanese.add_argument("--rom", required=True, type=Path)
+    japanese.add_argument(
+        "--output", type=Path, default=Path("reports/japanese-text-regions.md")
     )
+    japanese.add_argument("--minimum-characters", type=int, default=12)
+    japanese.add_argument("--minimum-japanese-ratio", type=float, default=0.65)
+    japanese.add_argument("--maximum-region-size", type=lambda value: int(value, 0), default=0x1000)
 
     return parser
 
@@ -204,10 +128,29 @@ def main() -> int:
     if not args.rom.is_file():
         raise SystemExit(f"ROM não encontrada: {args.rom}")
 
+    if args.command == "scan-japanese-text":
+        if args.minimum_characters < 1:
+            raise SystemExit("minimum-characters deve ser maior que zero")
+        if not 0.0 <= args.minimum_japanese_ratio <= 1.0:
+            raise SystemExit("minimum-japanese-ratio deve estar entre 0 e 1")
+        if args.maximum_region_size < 1:
+            raise SystemExit("maximum-region-size deve ser maior que zero")
+
+        data = args.rom.read_bytes()
+        regions = scan_japanese_text(
+            data,
+            minimum_characters=args.minimum_characters,
+            minimum_japanese_ratio=args.minimum_japanese_ratio,
+            maximum_region_size=args.maximum_region_size,
+        )
+        write_japanese_text_report(regions, args.output)
+        print(f"Regiões de texto japonês encontradas: {len(regions)}")
+        print(f"Relatório: {args.output}")
+        return 0
+
     if args.command == "scan-indexed-reads":
         if args.context < 0:
             raise SystemExit("context deve ser maior ou igual a zero")
-
         data = args.rom.read_bytes()
         occurrences = scan_indexed_byte_reads(data, context_size=args.context)
         write_indexed_byte_report(occurrences, args.output)
@@ -218,7 +161,6 @@ def main() -> int:
     if args.command == "scan-a3-flow":
         if args.context < 0:
             raise SystemExit("context deve ser maior ou igual a zero")
-
         data = args.rom.read_bytes()
         definitions = scan_a3_definitions(data, context_size=args.context)
         uses = scan_a3_byte_reads(data, context_size=args.context)
@@ -229,16 +171,11 @@ def main() -> int:
         return 0
 
     if args.command == "scan-text-parser-candidates":
-        if args.max_distance < 0:
-            raise SystemExit("max-distance deve ser maior ou igual a zero")
-        if args.context < 0:
-            raise SystemExit("context deve ser maior ou igual a zero")
-
+        if args.max_distance < 0 or args.context < 0:
+            raise SystemExit("distâncias e contexto devem ser maiores ou iguais a zero")
         data = args.rom.read_bytes()
         candidates = scan_text_parser_candidates(
-            data,
-            max_distance=args.max_distance,
-            context_size=args.context,
+            data, max_distance=args.max_distance, context_size=args.context
         )
         write_text_parser_report(candidates, args.output)
         print(f"Candidatos encontrados: {len(candidates)}")
@@ -248,7 +185,6 @@ def main() -> int:
     if args.command == "scan-control-tests":
         if args.context < 0:
             raise SystemExit("context deve ser maior ou igual a zero")
-
         data = args.rom.read_bytes()
         occurrences = scan_control_tests(data, context_size=args.context)
         write_control_test_report(occurrences, args.output)
@@ -259,14 +195,10 @@ def main() -> int:
     if args.command == "scan-refs":
         if args.context < 0:
             raise SystemExit("context deve ser maior ou igual a zero")
-
         data = args.rom.read_bytes()
         references = scan_known_targets(
             data,
-            {
-                "opening_script": 0x01626B,
-                "character_table": 0x1A551A,
-            },
+            {"opening_script": 0x01626B, "character_table": 0x1A551A},
             context_size=args.context,
         )
         write_reference_report(references, args.output)
@@ -276,42 +208,31 @@ def main() -> int:
         return 0
 
     if args.command == "scan-controls":
-        if args.offset < 0:
-            raise SystemExit("offset deve ser maior ou igual a zero")
-        if args.size <= 0:
-            raise SystemExit("size deve ser maior que zero")
-
+        if args.offset < 0 or args.size <= 0:
+            raise SystemExit("offset deve ser >= 0 e size deve ser > 0")
         data = args.rom.read_bytes()
         end = args.offset + args.size
         if end > len(data):
             raise SystemExit("a região solicitada ultrapassa o tamanho da ROM")
-
-        occurrences = scan_script_controls(
-            data[args.offset:end],
-            base_offset=args.offset,
-        )
+        occurrences = scan_script_controls(data[args.offset:end], base_offset=args.offset)
         write_control_report(occurrences, args.output)
         print(f"Controles encontrados: {len(occurrences)}")
         print(f"Relatório: {args.output}")
         return 0
 
     if args.command == "decode-text":
-        if args.offset < 0:
-            raise SystemExit("offset deve ser maior ou igual a zero")
-        if args.size <= 0:
-            raise SystemExit("size deve ser maior que zero")
-
+        if args.offset < 0 or args.size <= 0:
+            raise SystemExit("offset deve ser >= 0 e size deve ser > 0")
         data = args.rom.read_bytes()
         end = args.offset + args.size
         if end > len(data):
             raise SystemExit("a região solicitada ultrapassa o tamanho da ROM")
-
-        tokens = tokenize_script(
-            data[args.offset:end],
-            stop_at_terminator=args.stop_at_terminator,
+        rendered = render_script(
+            tokenize_script(
+                data[args.offset:end],
+                stop_at_terminator=args.stop_at_terminator,
+            )
         )
-        rendered = render_script(tokens)
-
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(rendered, encoding="utf-8")
@@ -322,7 +243,6 @@ def main() -> int:
 
     report = analyze_rom(args.rom, block_size=args.block_size)
     write_report(report, args.report)
-
     print(f"Análise concluída: {args.report}")
     print(f"Tamanho: {report['rom']['size']} bytes")
     print(f"CRC32: {report['rom']['crc32']}")
@@ -333,7 +253,6 @@ def main() -> int:
     )
     print(f"Blocos analisados: {report['structure']['summary']['block_count']}")
     print(f"Regiões candidatas: {len(report['candidate_regions'])}")
-
     pointer_candidates = report["pointer_candidates"]
     print("Candidatos a ponteiros:")
     for width in ("16_bit", "24_bit", "32_bit"):
@@ -342,13 +261,10 @@ def main() -> int:
             f"  - {width}: {info['candidate_count']} destinos repetidos; "
             f"{len(info['tables'])} tabelas candidatas"
         )
-
     print(f"Regiões textuais candidatas: {len(report['text_regions'])}")
-
     classifications = report["structure"]["summary"]["classifications"]
     if classifications:
         print("Classificações:")
         for name, count in sorted(classifications.items()):
             print(f"  - {name}: {count}")
-
     return 0
