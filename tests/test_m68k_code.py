@@ -225,3 +225,12 @@ def test_decode_move_byte_immediate_consumes_four_bytes():
     assert jsr.size == 6
     assert jsr.mnemonic == "JSR abs.l"
     assert jsr.target == 0x00009408
+
+
+
+def test_decode_negx_effective_address_forms():
+    for opcode, suffix in (("40 00", "B"), ("40 40", "W"), ("40 80", "L")):
+        instruction = decode_instruction(bytes.fromhex(opcode), 0)
+        assert instruction is not None
+        assert instruction.mnemonic == f"NEGX.{suffix} <EA>"
+        assert instruction.size == 2
