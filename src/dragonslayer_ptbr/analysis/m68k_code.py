@@ -202,6 +202,8 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         mode = (op >> 3) & 0x7
         register = op & 0x7
         size = {0x4000: 1, 0x4040: 2, 0x4080: 4}[op & 0xFFC0]
+        if mode == 1 or (mode == 7 and register not in (0, 1)):
+            return None
         extension = _ea_extension_size(mode, register, size, source=False)
         if extension is None:
             return None
@@ -213,7 +215,11 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         )
 
     if (op & 0xFFC0) == 0x40C0:
-        extension = _ea_extension_size((op >> 3) & 0x7, op & 0x7, 2, source=False)
+        mode = (op >> 3) & 0x7
+        register = op & 0x7
+        if mode == 1 or (mode == 7 and register not in (0, 1)):
+            return None
+        extension = _ea_extension_size(mode, register, 2, source=False)
         if extension is None:
             return None
         return M68KInstruction(offset, 2 + extension, "MOVE.W SR,<EA>")
