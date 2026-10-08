@@ -124,14 +124,10 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
     # Instruções de controle/sistema que aparecem no bootstrap.
     # Elas não introduzem novos destinos no CFG, mas precisam consumir
     # exatamente o tamanho correto para manter o alinhamento.
-    if op in (0x4E60, 0x4E61, 0x4E62, 0x4E63):
-        return M68KInstruction(offset, 2, "MOVE USP")
-    if op in (0x4E64, 0x4E65):
-        return M68KInstruction(offset, 2, "RESET")
-    if op == 0x4E66:
-        return M68KInstruction(offset, 2, "NOP-like 0x4E66")
-    if op == 0x4E67:
-        return M68KInstruction(offset, 2, "NOP-like 0x4E67")
+    if 0x4E60 <= op <= 0x4E67:
+        return M68KInstruction(offset, 2, "MOVE USP,An")
+    if 0x4E68 <= op <= 0x4E6F:
+        return M68KInstruction(offset, 2, "MOVE An,USP")
     if (op & 0xFFF8) == 0x4E40:
         return M68KInstruction(offset, 2, "TRAP")
     if op == 0x4E72:
