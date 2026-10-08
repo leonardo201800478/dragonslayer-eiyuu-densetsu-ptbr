@@ -6,57 +6,106 @@ Projeto de engenharia reversa e tradução para português brasileiro da versão
 
 Analisar a ROM, identificar fonte/charset, localizar e extrair textos, preservar códigos de controle, traduzir, realocar textos quando necessário, corrigir ponteiros, inserir a tradução e validar a ROM final.
 
-## Primeiro marco
+A ROM japonesa original permanece local e **não é distribuída pelo repositório**.
 
-O primeiro componente é o analisador `analyze`, que não modifica a ROM.
+## Estado atual
+
+A investigação já estabeleceu uma base técnica sólida, mas o projeto **ainda não está na fase de inserção de tradução**.
+
+### Confirmado
+
+- ROM japonesa de 2 MiB.
+- CRC32 `01BC1604`.
+- SHA-1 `F67C9139BBC93F171E274A5CD3FBA66480CD8244`.
+- Header Mega Drive válido.
+- **Shift-JIS** nos trechos japoneses identificados.
+- 47 regiões fortemente sustentadas como texto japonês.
+- Controles binários misturados ao texto.
+- `0x01` confirmado como separador/quebra na abertura.
+- `0x06 xx yy` confirmado como comando de três bytes, ainda sem semântica completa.
+- `0x0E` observado como controle.
+- `0x00` observado como terminador em estruturas textuais.
+- Tabela explícita de códigos em `0x1A551A`, observada até `0x1A62D2`.
+- A tabela contém códigos latinos maiúsculos acentuados; os minúsculos acentuados portugueses observados não estão presentes.
+- O decoder estrutural consegue atravessar a abertura preservando os controles.
+
+### Ainda não confirmado
+
+- rotina 68000 definitiva do engine de texto;
+- gramática completa dos controles;
+- limites exatos das entradas;
+- mecanismo de seleção dos scripts;
+- tabela/formato definitivo de ponteiros;
+- relação completa entre códigos e glifos;
+- formato da fonte;
+- compressão, caso exista para algum recurso;
+- allocator/realocação;
+- encoder/importador definitivo;
+- patch PT-BR.
+
+A regra do projeto é não transformar uma hipótese em conhecimento específico do jogo sem evidência direta da ROM/código.
+
+## Documentação
+
+- **[docs/analysis-results.md](docs/analysis-results.md)** — evidências e resultados técnicos consolidados.
+- **[docs/reverse-engineering.md](docs/reverse-engineering.md)** — estratégia e critérios da engenharia reversa.
+- **[docs/project-roadmap.md](docs/project-roadmap.md)** — roadmap completo, gates e critérios para chegar ao primeiro teste PT-BR seguro.
+- `reports/` — resultados reproduzíveis das análises.
+- `tests/` — testes automatizados.
+
+## Próximo marco
+
+A próxima etapa é a **localização do engine 68000**, não a escrita da ROM.
+
+O objetivo é comprovar uma cadeia:
+
+`seleção do script → referência → leitura do byte → teste de controle → processamento → acesso à fonte/renderização`.
+
+Somente depois serão implementados encoder, ponteiros de escrita, realocação e patch.
+
+## Primeiro teste de tradução
+
+O primeiro teste PT-BR será um **vertical slice mínimo e reversível**, não uma tradução completa.
+
+Antes dele, o projeto deverá provar:
+
+1. formato do script;
+2. terminador;
+3. controles;
+4. limites das entradas;
+5. rotina de leitura;
+6. seleção/referência do script;
+7. encoder reversível;
+8. realocação segura, se necessária;
+9. validação de referências e sobreposição;
+10. execução da ROM modificada no emulador sem quebrar o fluxo.
+
+O marco será chamado **M1 — Primeiro Texto PT-BR Executável**.
+
+## Instalação e análise
 
 ```bash
 python -m pip install -e ".[dev]"
-dslayer-ptbr analyze --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --report reports/rom-analysis.json
 pytest
 ```
 
-Os candidatos encontrados pelo analisador são heurísticos. Nenhum offset será considerado confirmado antes da validação e documentação no profile do jogo.
+Exemplo de análise:
+
+```powershell
+python -m dragonslayer_ptbr analyze `
+  --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" `
+  --report reports/rom-analysis.json
+```
+
+Os candidatos encontrados pelos analisadores são heurísticos. Nenhum offset deve ser tratado como confirmado sem validação e documentação.
 
 ## Estrutura
 
 ```text
 src/dragonslayer_ptbr/
-├── analysis/       # análise da imagem e regiões candidatas
+├── analysis/       # análise da imagem e engenharia reversa
 ├── text/           # decoder, encoder, tabelas e extrator
 ├── pointers/       # leitura, escrita e realocação
 ├── profiles/       # conhecimento específico do jogo
 └── cli.py
 ```
-
-A ROM original deve permanecer local e não deve ser distribuída pelo projeto.
-
-
-## Documentação de engenharia reversa
-
-O estado detalhado da investigação está consolidado em:
-
-- `docs/analysis-results.md` — relatório técnico completo das análises da ROM, evidências, offsets confirmados, controles, tabela de caracteres, ponteiros e estado de cada componente.
-- `docs/reverse-engineering.md` — estratégia, critérios de validação e próximos passos da engenharia reversa.
-
-### Estado técnico atual
-
-Já foram confirmados diretamente na ROM:
-
-- ROM japonesa de 2 MiB;
-- charset **Shift-JIS**;
-- diversas regiões de texto;
-- controles binários misturados ao texto;
-- estrutura `0x06 xx yy`;
-- terminador `0x00` em estruturas observadas;
-- tabela explícita de códigos Shift-JIS em `0x1A551A`.
-
-Ainda não foram confirmados:
-
-- rotina 68000 responsável pela leitura/impressão;
-- tabela definitiva de ponteiros de script;
-- semântica completa dos controles;
-- formato final das entradas;
-- mecanismo de realocação.
-
-A regra do projeto é não transformar uma hipótese em conhecimento específico do jogo sem evidência direta da ROM/código.
