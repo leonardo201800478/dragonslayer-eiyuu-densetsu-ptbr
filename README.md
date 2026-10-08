@@ -30,3 +30,33 @@ src/dragonslayer_ptbr/
 ```
 
 A ROM original deve permanecer local e não deve ser distribuída pelo projeto.
+
+
+## Documentação de engenharia reversa
+
+O estado detalhado da investigação está consolidado em:
+
+- `docs/analysis-results.md` — relatório técnico completo das análises da ROM, evidências, offsets confirmados, controles, tabela de caracteres, ponteiros e estado de cada componente.
+- `docs/reverse-engineering.md` — estratégia, critérios de validação e próximos passos da engenharia reversa.
+
+### Estado técnico atual
+
+Já foram confirmados diretamente na ROM:
+
+- ROM japonesa de 2 MiB;
+- charset **Shift-JIS**;
+- diversas regiões de texto;
+- controles binários misturados ao texto;
+- estrutura `0x06 xx yy`;
+- terminador `0x00` em estruturas observadas;
+- tabela explícita de códigos Shift-JIS em `0x1A551A`.
+
+Ainda não foram confirmados:
+
+- rotina 68000 responsável pela leitura/impressão;
+- tabela definitiva de ponteiros de script;
+- semântica completa dos controles;
+- formato final das entradas;
+- mecanismo de realocação.
+
+A regra do projeto é não transformar uma hipótese em conhecimento específico do jogo sem evidência direta da ROM/código.
