@@ -191,3 +191,21 @@ def test_decode_immediate_btst():
     assert instruction is not None
     assert instruction.mnemonic == "BTST #imm,<EA>"
     assert instruction.size == 4
+
+
+
+def test_cfg_continues_after_bsr_call():
+    rom = bytearray(0x40)
+    rom[4:8] = (0x10).to_bytes(4, "big")
+    rom[0x10:0x14] = bytes.fromhex("61 00 00 0C")
+    rom[0x14:0x16] = bytes.fromhex("4E 71")
+    rom[0x20:0x22] = bytes.fromhex("4E 75")
+
+    blocks = build_control_flow_graph(bytes(rom))
+    by_start = {block.start: block for block in blocks}
+
+    assert 0x10 in by_start
+    assert 0x14 in by_start
+    assert 0x20 in by_start
+    assert by_start[0x10].end == 0x14
+    assert by_start[0x14].end == 0x16
