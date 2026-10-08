@@ -216,8 +216,13 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
     if (op & 0xF100) == 0x0100:
         return M68KInstruction(offset, 2, "BIT dynamic")
 
-    # ANDI/ORI/SUBI/ADDI/CMPI byte.
-    if (op & 0xFF00) in (0x0000, 0x0200, 0x0400, 0x0600, 0x0A00, 0x0C00):
+    if (op & 0xFF00) == 0x0C00:
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "CMPI.B #imm,Dn")
+
+    # ANDI/ORI/SUBI/ADDI byte.
+    if (op & 0xFF00) in (0x0000, 0x0200, 0x0400, 0x0600, 0x0A00):
         if offset + 4 > len(data):
             return None
         return M68KInstruction(offset, 4, "IMMEDIATE.B")
@@ -295,15 +300,16 @@ def build_control_flow_graph(
                 offset = next_offset
                 break
 
-            if instruction.mnemonic == "JMP abs.l":
+            if instruction.mnemonic in {"JMP abs.l", "JMP (An)"}:
                 if instruction.target is not None:
                     pending.append(instruction.target)
-                reason = "jump"
+                reason = "jump" if instruction.mnemonic == "JMP abs.l" else "indirect_jump"
                 offset = next_offset
                 break
 
-            if instruction.mnemonic == "JSR abs.l":
-                pending.append(instruction.target)
+            if instruction.mnemonic in {"JSR abs.l", "JSR (An)"}:
+                if instruction.target is not None:
+                    pending.append(instruction.target)
                 offset = next_offset
                 continue
 
