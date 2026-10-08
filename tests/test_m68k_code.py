@@ -109,3 +109,15 @@ def test_cfg_ignores_unknown_indirect_target():
     blocks = build_control_flow_graph(bytes(rom))
     assert blocks
     assert all(block.start is not None for block in blocks)
+
+
+def test_decode_bootstrap_system_instructions():
+    rom = bytes.fromhex(
+        "4E66 4E6C 4E72 1234 4E74 0000 4E50 0004 4E58"
+    )
+    assert decode_instruction(rom, 0).mnemonic == "MOVE USP,An"
+    assert decode_instruction(rom, 2).mnemonic == "MOVE An,USP"
+    assert decode_instruction(rom, 4).mnemonic == "STOP"
+    assert decode_instruction(rom, 8).mnemonic == "RTD"
+    assert decode_instruction(rom, 12).mnemonic == "LINK"
+    assert decode_instruction(rom, 16).mnemonic == "UNLK"
