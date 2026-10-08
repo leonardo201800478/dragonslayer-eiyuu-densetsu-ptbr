@@ -65,7 +65,9 @@ def _ea_extension_size(mode: int, register: int, operand_size: int, *, source: b
         if register == 1:
             return 4
         if source and register == 4:
-            return operand_size
+            # O campo imediato do 68000 ocupa uma extensão de 16 bits
+            # para BYTE/WORD e 32 bits para LONG.
+            return 4 if operand_size == 4 else 2
     return None
 
 
