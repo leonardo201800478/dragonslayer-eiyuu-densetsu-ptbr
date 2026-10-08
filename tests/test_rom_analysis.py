@@ -278,3 +278,12 @@ def test_script_control_scan_rejects_negative_base_offset():
 
     with pytest.raises(ValueError, match="base_offset"):
         scan_script_controls(b"\x01", base_offset=-1)
+
+
+def test_cli_module_compiles():
+    """Garante que a CLI publicada não contém erro de sintaxe."""
+    import py_compile
+
+    import dragonslayer_ptbr.cli as cli
+
+    py_compile.compile(cli.__file__, doraise=True)
