@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .analysis.script_controls import scan_script_controls, write_control_report
 from .analysis.rom import DEFAULT_BLOCK_SIZE, analyze_rom, write_report
+from .analysis.script_controls import scan_script_controls, write_control_report
 from .text.script_codec import render_script, tokenize_script
 
 
@@ -34,7 +34,32 @@ def build_parser() -> argparse.ArgumentParser:
         help="tamanho dos blocos em bytes; aceita decimal ou hexadecimal (padrão: 0x100)",
     )
 
-    controls = sub.add_parser(\n        "scan-controls",\n        help="mapeia controles de uma região de script sem atribuir semântica",\n    )\n    controls.add_argument("--rom", required=True, type=Path)\n    controls.add_argument("--offset", required=True, type=lambda value: int(value, 0))\n    controls.add_argument("--size", required=True, type=lambda value: int(value, 0))\n    controls.add_argument(\n        "--output",\n        type=Path,\n        default=Path("reports/script-controls.md"),\n        help="relatório Markdown de saída",\n    )\n\n    decode = sub.add_parser(\n        "decode-text",
+    controls = sub.add_parser(
+        "scan-controls",
+        help="mapeia controles de uma região de script sem atribuir semântica",
+    )
+    controls.add_argument("--rom", required=True, type=Path)
+    controls.add_argument(
+        "--offset",
+        required=True,
+        type=lambda value: int(value, 0),
+        help="offset inicial em bytes; aceita decimal ou hexadecimal",
+    )
+    controls.add_argument(
+        "--size",
+        required=True,
+        type=lambda value: int(value, 0),
+        help="quantidade de bytes; aceita decimal ou hexadecimal",
+    )
+    controls.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/script-controls.md"),
+        help="relatório Markdown de saída",
+    )
+
+    decode = sub.add_parser(
+        "decode-text",
         help="decodifica uma região confirmada do script sem modificar a ROM",
     )
     decode.add_argument("--rom", required=True, type=Path)
@@ -71,7 +96,28 @@ def main() -> int:
     if not args.rom.is_file():
         raise SystemExit(f"ROM não encontrada: {args.rom}")
 
-    if args.command == "scan-controls":\n        if args.offset < 0:\n            raise SystemExit("offset deve ser maior ou igual a zero")\n        if args.size <= 0:\n            raise SystemExit("size deve ser maior que zero")\n\n        data = args.rom.read_bytes()\n        end = args.offset + args.size\n        if end > len(data):\n            raise SystemExit("a região solicitada ultrapassa o tamanho da ROM")\n\n        occurrences = scan_script_controls(data[args.offset:end], base_offset=args.offset)\n        write_control_report(occurrences, args.output)\n        print(f"Controles encontrados: {len(occurrences)}")\n        print(f"Relatório: {args.output}")\n        return 0\n\n    if args.command == "decode-text":\n        if args.offset < 0:
+    if args.command == "scan-controls":
+        if args.offset < 0:
+            raise SystemExit("offset deve ser maior ou igual a zero")
+        if args.size <= 0:
+            raise SystemExit("size deve ser maior que zero")
+
+        data = args.rom.read_bytes()
+        end = args.offset + args.size
+        if end > len(data):
+            raise SystemExit("a região solicitada ultrapassa o tamanho da ROM")
+
+        occurrences = scan_script_controls(
+            data[args.offset:end],
+            base_offset=args.offset,
+        )
+        write_control_report(occurrences, args.output)
+        print(f"Controles encontrados: {len(occurrences)}")
+        print(f"Relatório: {args.output}")
+        return 0
+
+    if args.command == "decode-text":
+        if args.offset < 0:
             raise SystemExit("offset deve ser maior ou igual a zero")
         if args.size <= 0:
             raise SystemExit("size deve ser maior que zero")
@@ -113,7 +159,10 @@ def main() -> int:
     print("Candidatos a ponteiros:")
     for width in ("16_bit", "24_bit", "32_bit"):
         info = pointer_candidates[width]
-        print(f"  - {width}: {info['candidate_count']} destinos repetidos; {len(info['tables'])} tabelas candidatas")
+        print(
+            f"  - {width}: {info['candidate_count']} destinos repetidos; "
+            f"{len(info['tables'])} tabelas candidatas"
+        )
 
     print(f"Regiões textuais candidatas: {len(report['text_regions'])}")
 
