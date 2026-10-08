@@ -7,3 +7,4 @@ class DragonSlayerProfile:
     platform: str = "Mega Drive"
     text_encoding: str = "shift_jis"
     extended_control_prefix: int = 0x06
+    character_table_offset: int = 0x1A551A
