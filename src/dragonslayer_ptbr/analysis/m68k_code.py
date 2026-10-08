@@ -249,12 +249,20 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
     if (op & 0xFFF8) == 0x4E90:
         return M68KInstruction(offset, 2, "JSR (An)")
 
-    if op in (0x41F9, 0x4879):
+    # LEA abs.l: bits 11-9 selecionam o registrador A0-A7.
+    # A forma base 41F9 corresponde a LEA $xxxxxxxx,A0.
+    if (op & 0xF1FF) == 0x41F9:
         if offset + 6 > len(data):
             return None
         target = int.from_bytes(data[offset + 2 : offset + 6], "big")
-        mnemonic = "LEA abs.l" if op == 0x41F9 else "PEA abs.l"
-        return M68KInstruction(offset, 6, mnemonic, target)
+        register = (op >> 9) & 0x7
+        return M68KInstruction(offset, 6, f"LEA abs.l,A{register}", target)
+
+    if op == 0x4879:
+        if offset + 6 > len(data):
+            return None
+        target = int.from_bytes(data[offset + 2 : offset + 6], "big")
+        return M68KInstruction(offset, 6, "PEA abs.l", target)
 
     if (op & 0xF1FF) == 0x41FA:
         if offset + 4 > len(data):
