@@ -603,3 +603,192 @@ Nenhuma rotina será marcada como "engine de texto" apenas por aparência. Será
 | Ponteiros dos scripts | **AINDA NÃO LOCALIZADOS** |
 | Encoder | **NÃO IMPLEMENTADO** |
 | Inserção PT-BR | **NÃO INICIADA** |
+
+
+---
+
+## 21. Resultado do mapa de controles da abertura
+
+O comando `scan-controls` foi executado sobre:
+
+```
+0x01626B – 0x01668A
+```
+
+e encontrou **42 ocorrências de controle**.
+
+### Frequência
+
+| Sequência | Ocorrências |
+|---|---:|
+| `01` | 33 |
+| `06 FE 0E` | 5 |
+| `00` | 1 |
+| `06 00 FE` | 1 |
+| `06 08 06` | 1 |
+| `0E` | 1 |
+
+### Offsets
+
+Os cinco comandos `06 FE 0E` estão em:
+
+```
+0x0162F1
+0x016399
+0x016459
+0x016515
+0x0165F7
+```
+
+Os demais comandos especiais observados são:
+
+```
+0x016658 : 06 00 FE
+0x01665B : 0E
+0x016681 : 06 08 06
+0x016686 : 00
+0x016688 : 01
+```
+
+Os separadores `01` aparecem desde `0x01628B` até `0x016688`.
+
+### Regularidade dos blocos
+
+Entre ocorrências consecutivas de `01`, há vários intervalos de aproximadamente:
+
+```
+0x20 = 32 bytes
+0x21 = 33 bytes
+```
+
+Também aparecem intervalos próximos, como 29, 31, 34 e 35 bytes, enquanto os intervalos de 1–3 bytes ficam concentrados na sequência especial próxima ao final:
+
+```
+0x016658  06 00 FE
+0x01665B  0E
+0x01665C  01
+0x01665D  01
+0x01665E  01
+0x01665F  01
+0x016660  01
+```
+
+Esse padrão é compatível com uma estrutura de **linhas/blocos de apresentação com largura limitada**, mas isso ainda é uma **HIPÓTESE**. Não deve ser interpretado como confirmação de que o jogo utiliza exatamente 32 ou 33 bytes por linha.
+
+### Evidência particularmente forte
+
+A sequência:
+
+```
+0x016658  06 00 FE
+0x01665B  0E
+0x01665C  01
+0x01665D  01
+0x01665E  01
+0x01665F  01
+0x016660  01
+```
+
+mostra que cinco `0x01` podem ocorrer consecutivamente depois de comandos especiais.
+
+Isso indica que `0x01` deve ser interpretado como **controle de apresentação**, e não simplesmente como parte de uma codificação Shift-JIS.
+
+### Interpretação atual
+
+A classificação dos controles passa a ser:
+
+| Sequência | Classificação | Função |
+|---|---|---|
+| `01` | **CONFIRMADO — controle** | contexto indica quebra/separação de linha |
+| `06 FE 0E` | **CONFIRMADO — comando 3 bytes** | função ainda desconhecida |
+| `06 00 FE` | **CONFIRMADO — comando 3 bytes** | função ainda desconhecida |
+| `06 08 06` | **CONFIRMADO — comando 3 bytes** | função ainda desconhecida |
+| `0E` | **CONFIRMADO — controle** | função ainda desconhecida |
+| `00` | **CONFIRMADO — terminador observado** | encerramento da estrutura observada |
+
+Não foi atribuído significado semântico aos comandos `0x06` ou `0x0E`.
+
+---
+
+## 22. Consequência para a engenharia reversa
+
+O mapa de controles permite uma estratégia mais precisa para a análise 68000.
+
+Em vez de procurar genericamente por "texto", devemos procurar uma rotina que:
+
+1. recebe ou calcula o endereço de uma sequência em torno de `0x01626B`;
+2. lê bytes sequencialmente;
+3. diferencia caracteres Shift-JIS de bytes de controle;
+4. trata especificamente `0x01`;
+5. reconhece `0x06` e consome os dois bytes seguintes;
+6. trata `0x0E`;
+7. encerra a estrutura ao encontrar `0x00`;
+8. eventualmente consulta a tabela de caracteres em `0x1A551A`.
+
+A ocorrência repetida de `06 FE 0E` é particularmente útil como assinatura de dados para confirmar se uma rotina encontrada realmente processa esse protocolo.
+
+---
+
+## 23. Próxima investigação: limites reais das entradas
+
+Ainda não devemos considerar toda a faixa `0x01626B–0x01668A` uma única entrada.
+
+A próxima tarefa é separar:
+
+```
+entrada / bloco
+    ├── linhas
+    ├── comandos
+    └── terminador
+```
+
+e determinar se os cinco `06 FE 0E` representam:
+
+- páginas de texto;
+- mudança de janela;
+- espera/avanço;
+- troca de estado;
+- chamada de evento;
+- ou outra função.
+
+Essa distinção será feita somente através do código 68000.
+
+---
+
+## 24. Regra para o encoder
+
+A regularidade de aproximadamente 32–33 bytes por linha **não deve ser usada ainda como limite rígido para o texto PT-BR**.
+
+O encoder futuro precisa reproduzir a lógica real do jogo:
+
+- se `0x01` for quebra automática, calcular a quebra;
+- se houver largura fixa de janela, respeitar a largura;
+- se `06 FE 0E` alterar o estado de apresentação, preservá-lo;
+- se existirem limites de página, preservar a estrutura;
+- manter os comandos não textuais intactos.
+
+Somente depois dessa confirmação será possível saber se uma tradução PT-BR pode simplesmente substituir as strings ou se precisará de reflow/reempacotamento.
+
+---
+
+## 25. Novo estado da investigação
+
+A abertura agora fornece uma assinatura suficientemente rica para procurar o engine:
+
+```
+Shift-JIS
+  +
+01
+  +
+06 FE 0E
+  +
+06 00 FE
+  +
+0E
+  +
+00
+```
+
+Isso é muito mais útil para a análise estática do que procurar somente sequências de caracteres japoneses.
+
+O próximo alvo técnico passa a ser a **rotina 68000 que interpreta essa assinatura**.
