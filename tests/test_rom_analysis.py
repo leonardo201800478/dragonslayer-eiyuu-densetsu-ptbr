@@ -287,3 +287,50 @@ def test_cli_module_compiles():
     import dragonslayer_ptbr.cli as cli
 
     py_compile.compile(cli.__file__, doraise=True)
+
+
+def test_m68k_reference_scanner_finds_absolute_long_instruction():
+    """Reconhece LEA abs.l apontando para um endereço da ROM."""
+    from dragonslayer_ptbr.analysis.m68k_references import find_address_references
+
+    target = 0x1A551A
+    rom = bytearray(0x200000)
+    offset = 0x1200
+    rom[offset : offset + 2] = bytes.fromhex("41 F9")
+    rom[offset + 2 : offset + 6] = target.to_bytes(4, "big")
+
+    refs = find_address_references(bytes(rom), target, include_three_byte=False)
+
+    assert len(refs) == 1
+    assert refs[0].offset == offset + 2
+    assert refs[0].width == 4
+    assert refs[0].instruction == "LEA abs.l"
+
+
+def test_m68k_reference_scanner_finds_24_bit_literal():
+    """Localiza uma representação de endereço de 24 bits em big-endian."""
+    from dragonslayer_ptbr.analysis.m68k_references import find_address_references
+
+    target = 0x01626B
+    rom = b"\x00" * 0x40 + target.to_bytes(3, "big") + b"\x00" * 0x40
+
+    refs = find_address_references(
+        rom,
+        target,
+        include_four_byte=False,
+    )
+
+    assert len(refs) == 1
+    assert refs[0].width == 3
+    assert refs[0].target == target
+
+
+def test_m68k_reference_scanner_rejects_invalid_configuration():
+    """Garante validação dos parâmetros do scanner 68000."""
+    from dragonslayer_ptbr.analysis.m68k_references import find_address_references
+
+    with pytest.raises(ValueError, match="pelo menos uma largura"):
+        find_address_references(b"\x00" * 32, 0x20, include_three_byte=False, include_four_byte=False)
+
+    with pytest.raises(ValueError, match="context_size"):
+        find_address_references(b"\x00" * 32, 0x20, context_size=-1)
