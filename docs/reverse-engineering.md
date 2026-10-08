@@ -149,3 +149,105 @@ Há uma segunda evidência direta relevante em **0x1A551A**:
 **HIPÓTESE ainda não resolvida:** essa tabela pode participar diretamente da localização dos glifos ou de uma etapa de compressão/renderização da fonte. O significado exato e a rotina que a consulta ainda precisam ser encontrados no código 68000.
 
 Isso é particularmente importante para a tradução porque reduz o risco de criar uma tabela de caracteres artificial: o próprio jogo já fornece uma tabela de repertório que podemos usar como referência para o encoder futuro.
+
+
+## Mapa confirmado de controles da abertura
+
+O scanner de controles foi executado sobre a região:
+
+```
+0x01626B–0x01668A
+```
+
+Resultado: **42 ocorrências**.
+
+### Frequência
+
+| Bytes | Ocorrências | Estado |
+|---|---:|---|
+| `01` | 33 | **CONFIRMADO — controle de apresentação; contexto indica separação/quebra de linha** |
+| `06 FE 0E` | 5 | **CONFIRMADO — comando de 3 bytes; semântica ainda desconhecida** |
+| `06 00 FE` | 1 | **CONFIRMADO — comando de 3 bytes; semântica ainda desconhecida** |
+| `06 08 06` | 1 | **CONFIRMADO — comando de 3 bytes; semântica ainda desconhecida** |
+| `0E` | 1 | **CONFIRMADO — controle individual; semântica ainda desconhecida** |
+| `00` | 1 | **CONFIRMADO — terminador observado na estrutura analisada** |
+
+### Ocorrências relevantes
+
+Os comandos `06 FE 0E` aparecem em:
+
+```
+0x0162F1
+0x016399
+0x016459
+0x016515
+0x0165F7
+```
+
+A sequência especial próxima ao fim da abertura é:
+
+```
+0x016658  06 00 FE
+0x01665B  0E
+0x01665C  01
+0x01665D  01
+0x01665E  01
+0x01665F  01
+0x016660  01
+0x016681  06 08 06
+0x016686  00
+0x016688  01
+```
+
+### Regularidade dos separadores
+
+Os `0x01` aparecem em posições aproximadamente regulares. Há vários intervalos de **32 ou 33 bytes** entre separadores consecutivos, embora também existam intervalos menores e maiores.
+
+Isso constitui uma **HIPÓTESE de estrutura de linhas/blocos com largura limitada**, e não uma confirmação de que o jogo utiliza exatamente 32 ou 33 bytes por linha.
+
+A sequência de cinco `0x01` consecutivos após `06 00 FE` é especialmente relevante: ela reforça que `0x01` pertence ao protocolo de apresentação e não ao conjunto de caracteres Shift-JIS.
+
+### Assinatura útil para a análise 68000
+
+A abertura fornece agora uma assinatura de dados suficientemente específica para procurar a rotina de interpretação:
+
+```
+Shift-JIS
+  +
+0x01
+  +
+0x06 xx yy
+  +
+0x0E
+  +
+0x00
+```
+
+A repetição de `06 FE 0E` cinco vezes torna essa sequência uma boa assinatura para validar se uma rotina 68000 encontrada realmente processa esse protocolo.
+
+### Limite da interpretação atual
+
+Ainda não é permitido afirmar que:
+
+- `06 FE 0E` significa mudança de página, atraso, retrato, som ou outro evento;
+- `06 00 FE` ou `06 08 06` tenham funções específicas;
+- `0x0E` tenha uma função específica;
+- 32/33 bytes sejam a largura fixa da janela;
+- a região inteira corresponda a uma única entrada de script.
+
+Essas questões devem ser resolvidas pela análise estática do código 68000.
+
+## Próxima etapa de engenharia reversa
+
+A investigação deixa de priorizar heurísticas genéricas de ponteiros e passa a procurar a rotina 68000 que:
+
+1. recebe ou calcula um endereço de dados próximo de `0x01626B`;
+2. lê bytes sequencialmente;
+3. diferencia caracteres Shift-JIS de controles;
+4. trata `0x01`;
+5. reconhece `0x06` e consome os dois bytes seguintes;
+6. trata `0x0E`;
+7. reconhece `0x00` quando aplicável;
+8. possivelmente consulta a tabela de caracteres em `0x1A551A`.
+
+O objetivo imediato é identificar o **engine real de processamento de texto**, antes de implementar encoder, realocação ou patching.
