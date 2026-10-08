@@ -7,6 +7,10 @@ from .analysis.rom import DEFAULT_BLOCK_SIZE, analyze_rom, write_report
 from .analysis.script_controls import scan_script_controls, write_control_report
 from .analysis.m68k_references import scan_known_targets, write_reference_report
 from .analysis.m68k_control_tests import scan_control_tests, write_control_test_report
+from .analysis.m68k_text_parser_candidates import (
+    scan_text_parser_candidates,
+    write_text_parser_report,
+)
 from .text.script_codec import render_script, tokenize_script
 
 
@@ -124,6 +128,29 @@ def build_parser() -> argparse.ArgumentParser:
         help="bytes de contexto em cada lado (padrão: 12)",
     )
 
+    parser_candidates = sub.add_parser(
+        "scan-text-parser-candidates",
+        help="localiza leitura de byte seguida de comparação de controle",
+    )
+    parser_candidates.add_argument("--rom", required=True, type=Path)
+    parser_candidates.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/m68k-text-parser-candidates.md"),
+    )
+    parser_candidates.add_argument(
+        "--max-distance",
+        type=lambda value: int(value, 0),
+        default=16,
+        help="distância máxima entre leitura e teste (padrão: 16)",
+    )
+    parser_candidates.add_argument(
+        "--context",
+        type=lambda value: int(value, 0),
+        default=16,
+        help="bytes de contexto em cada lado (padrão: 16)",
+    )
+
     return parser
 
 
@@ -133,6 +160,23 @@ def main() -> int:
 
     if not args.rom.is_file():
         raise SystemExit(f"ROM não encontrada: {args.rom}")
+
+    if args.command == "scan-text-parser-candidates":
+        if args.max_distance < 0:
+            raise SystemExit("max-distance deve ser maior ou igual a zero")
+        if args.context < 0:
+            raise SystemExit("context deve ser maior ou igual a zero")
+
+        data = args.rom.read_bytes()
+        candidates = scan_text_parser_candidates(
+            data,
+            max_distance=args.max_distance,
+            context_size=args.context,
+        )
+        write_text_parser_report(candidates, args.output)
+        print(f"Candidatos encontrados: {len(candidates)}")
+        print(f"Relatório: {args.output}")
+        return 0
 
     if args.command == "scan-control-tests":
         if args.context < 0:
