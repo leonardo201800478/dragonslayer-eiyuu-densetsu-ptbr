@@ -416,3 +416,190 @@ validação automática
 ```
 
 A prioridade é produzir uma ROM traduzida funcional, não apenas um dump textual que pareça correto.
+
+
+---
+
+## 16. Evidência prática do primeiro dump da abertura
+
+A primeira execução real do decoder sobre:
+
+```text
+offset = 0x1626B
+size   = 0x420
+```
+
+produziu uma narrativa japonesa coerente do início ao fim da região principal.
+
+O dump contém, entre outros trechos, referências a:
+
+- イセルハーサ;
+- ファーレーン;
+- アスエル王;
+- 首都ルディア;
+- セリオス王子;
+- アクダム;
+- サースアイ島;
+- エルアスタ.
+
+Isso constitui evidência prática de que o decoder está atravessando corretamente caracteres Shift-JIS de 1 e 2 bytes e preservando os controles sem deslocar o alinhamento do texto.
+
+### Padrões observados
+
+O comando `0x01` aparece repetidamente entre linhas:
+
+```text
+...ことかも知れない。 01 遠い未来...
+...豊かな 01 自然に恵まれた...
+...国だったが、 01 心優しき...
+```
+
+A repetição e o contexto narrativo permitem classificar `0x01` como:
+
+**CONFIRMADO — separador/quebra de linha do texto da abertura.**
+
+O padrão `06 FE 0E` aparece em transições narrativas, por exemplo após:
+
+```text
+...過ごしていた。
+...混戦状態がつづいた。
+...殺害されていたのである。
+...政務を行うと言うのである。
+```
+
+Classificação atual:
+
+**CONFIRMADO — comando de três bytes.**
+
+**HIPÓTESE — comando associado à transição/estado de apresentação do texto.**
+
+A função semântica não será nomeada até ser localizada no código 68000.
+
+Também foi observado:
+
+```text
+06 00 FE
+0E
+01 01 01 01 01
+```
+
+em uma transição da abertura, além de:
+
+```text
+06 08 06
+```
+
+próximo ao encerramento da região.
+
+Isso demonstra que `0x06` inicia comandos de comprimento superior a um byte e que `0x0E` também pode aparecer isoladamente. O decoder atual preserva esses bytes, mas ainda não representa uma gramática completa do protocolo.
+
+### Final da região decodificada
+
+O final produzido pelo comando contém:
+
+```text
+それから約１０年の歳月が流れた。<CTRL 06 08 06>/9<END><RAW FF><CTRL 01>z#
+```
+
+A presença de `FF` e de bytes posteriores ao `END` indica que os `0x420` bytes abrangem dados adjacentes à estrutura textual principal.
+
+Portanto, o limite `0x1668B` usado no primeiro teste é um **limite de investigação**, não o tamanho confirmado da entrada de script.
+
+---
+
+## 17. Scanner de controles
+
+Foi adicionado:
+
+```
+src/dragonslayer_ptbr/analysis/script_controls.py
+```
+
+O scanner:
+
+- percorre uma região já selecionada;
+- reconhece Shift-JIS sem quebrar o alinhamento;
+- registra controles com seus offsets absolutos;
+- preserva os bytes originais;
+- gera relatório determinístico em Markdown;
+- não atribui semântica aos comandos;
+- não modifica a ROM.
+
+Uso:
+
+```powershell
+python -m dragonslayer_ptbr scan-controls `
+  --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" `
+  --offset 0x1626B `
+  --size 0x420 `
+  --output reports/script-controls.md
+```
+
+Esse relatório será usado como evidência para a próxima etapa: localizar no código 68000 as rotinas que consomem os controles.
+
+---
+
+## 18. Nova hipótese de investigação
+
+O objetivo imediato deixou de ser simplesmente localizar texto.
+
+Agora a investigação deve responder:
+
+1. qual rotina recebe o endereço da sequência textual;
+2. como ela lê um caractere Shift-JIS;
+3. onde testa `0x01`;
+4. onde testa `0x06`;
+5. como determina o comprimento dos comandos iniciados por `0x06`;
+6. onde trata `0x0E`;
+7. onde reconhece `0x00`;
+8. como a rotina acessa a tabela de caracteres em `0x1A551A`;
+9. como o código seleciona a próxima entrada de script.
+
+A evidência do dump torna essas perguntas mais precisas e reduz a necessidade de heurística.
+
+---
+
+## 19. Próxima etapa: análise 68000
+
+A próxima investigação deverá partir das referências ao código e aos dados, procurando uma cadeia de execução semelhante a:
+
+```text
+seleção da entrada
+      ↓
+endereço do script
+      ↓
+leitura de byte
+      ↓
+teste de controle
+      ├── 0x00
+      ├── 0x01
+      ├── 0x06
+      └── 0x0E
+      ↓
+rotina de renderização
+      ↓
+consulta à fonte/tabela de caracteres
+```
+
+Nenhuma rotina será marcada como "engine de texto" apenas por aparência. Será necessário obter uma cadeia de referências consistente.
+
+---
+
+## 20. Estado após o primeiro dump real
+
+| Item | Estado |
+|---|---|
+| Texto japonês da abertura | **CONFIRMADO** |
+| Shift-JIS | **CONFIRMADO** |
+| Quebra/separador `0x01` | **CONFIRMADO** |
+| Comando `06 xx yy` | **CONFIRMADO** |
+| `06 FE 0E` recorrente | **CONFIRMADO como comando; função desconhecida** |
+| `06 00 FE` | **CONFIRMADO como comando; função desconhecida** |
+| `06 08 06` | **CONFIRMADO como comando; função desconhecida** |
+| `0x0E` isolado | **CONFIRMADO como controle; função desconhecida** |
+| `0x00` | **CONFIRMADO em estrutura observada** |
+| Limite exato da abertura | **AINDA NÃO CONFIRMADO** |
+| Rotina 68000 | **AINDA NÃO LOCALIZADA** |
+| Ponteiros dos scripts | **AINDA NÃO LOCALIZADOS** |
+| Encoder | **NÃO IMPLEMENTADO** |
+| Inserção PT-BR | **NÃO INICIADA** |
