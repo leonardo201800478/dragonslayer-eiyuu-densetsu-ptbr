@@ -16,6 +16,7 @@ from .analysis.m68k_a3_flow import (
     scan_a3_definitions,
     write_a3_report,
 )
+from .analysis.m68k_code import build_control_flow_graph, write_code_report
 from .analysis.m68k_indexed_reads import (
     scan_indexed_byte_reads,
     write_indexed_byte_report,
@@ -98,6 +99,14 @@ def build_parser() -> argparse.ArgumentParser:
     a3_flow.add_argument("--output", type=Path, default=Path("reports/m68k-a3-flow.md"))
     a3_flow.add_argument("--context", type=lambda value: int(value, 0), default=12)
 
+    code_flow = sub.add_parser(
+        "scan-m68k-code", help="segue o fluxo 68000 a partir do vetor de reset"
+    )
+    code_flow.add_argument("--rom", required=True, type=Path)
+    code_flow.add_argument("--output", type=Path, default=Path("reports/m68k-code-flow.md"))
+    code_flow.add_argument("--entry", type=lambda value: int(value, 0))
+    code_flow.add_argument("--max-blocks", type=int, default=5000)
+
     indexed = sub.add_parser(
         "scan-indexed-reads",
         help="localiza leituras MOVE.B com endereçamento indexado",
@@ -145,6 +154,18 @@ def main() -> int:
         )
         write_japanese_text_report(regions, args.output)
         print(f"Regiões de texto japonês encontradas: {len(regions)}")
+        print(f"Relatório: {args.output}")
+        return 0
+
+    if args.command == "scan-m68k-code":
+        if args.max_blocks < 1:
+            raise SystemExit("max-blocks deve ser maior que zero")
+        data = args.rom.read_bytes()
+        entries = None if args.entry is None else [args.entry]
+        blocks = build_control_flow_graph(data, entry_points=entries, max_blocks=args.max_blocks)
+        write_code_report(blocks, args.output)
+        print(f"Blocos de código alcançáveis: {len(blocks)}")
+        print(f"Instruções reconhecidas: {sum(len(block.instructions) for block in blocks)}")
         print(f"Relatório: {args.output}")
         return 0
 
