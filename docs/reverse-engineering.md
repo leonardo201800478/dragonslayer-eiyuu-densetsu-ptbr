@@ -134,3 +134,18 @@ A CLI agora possui o comando decode-text. Exemplo:
     python -m dragonslayer_ptbr decode-text --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --offset 0x1626B --size 0x420 --output reports/opening-script.txt
 
 Esse comando é deliberadamente de leitura. A etapa de encoder/inserção permanece bloqueada até que o formato das referências e o significado dos controles sejam confirmados.
+
+
+## Segunda confirmação: tabela de caracteres
+
+Há uma segunda evidência direta relevante em **0x1A551A**:
+
+- o conteúdo começa com códigos Shift-JIS como **0x8140** e segue em sequência por pontuação, hiragana e katakana;
+- depois aparecem centenas de códigos de kanji em ordem;
+- a estrutura é compatível com uma tabela de repertório/códigos de caracteres usada pelo sistema de fonte.
+
+**CONFIRMADO:** a ROM contém uma tabela explícita de códigos Shift-JIS em **0x1A551A**.
+
+**HIPÓTESE ainda não resolvida:** essa tabela pode participar diretamente da localização dos glifos ou de uma etapa de compressão/renderização da fonte. O significado exato e a rotina que a consulta ainda precisam ser encontrados no código 68000.
+
+Isso é particularmente importante para a tradução porque reduz o risco de criar uma tabela de caracteres artificial: o próprio jogo já fornece uma tabela de repertório que podemos usar como referência para o encoder futuro.
