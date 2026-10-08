@@ -43,16 +43,34 @@ def _sjis_char_size(data: bytes, offset: int) -> int:
 
 
 def _japanese_ratio(text: str) -> float:
-    """Calcula a proporção de caracteres japoneses no texto decodificado."""
+    """Calcula a proporção japonesa ignorando marcadores de controle."""
     if not text:
         return 0.0
+
+    filtered: list[str] = []
+    index = 0
+    while index < len(text):
+        if text.startswith("<CTRL ", index):
+            end = text.find(">", index + 6)
+            if end >= 0:
+                index = end + 1
+                continue
+        if text[index] == " ":
+            index += 1
+            continue
+        filtered.append(text[index])
+        index += 1
+
+    if not filtered:
+        return 0.0
+
     japanese = sum(
         1
-        for char in text
+        for char in filtered
         if "\u3040" <= char <= "\u30FF"
         or "\u3400" <= char <= "\u9FFF"
     )
-    return japanese / len(text)
+    return japanese / len(filtered)
 
 
 def _consume_region(
