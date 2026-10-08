@@ -312,10 +312,11 @@ def test_m68k_reference_scanner_finds_24_bit_literal():
     from dragonslayer_ptbr.analysis.m68k_references import find_address_references
 
     target = 0x01626B
-    rom = b"\x00" * 0x40 + target.to_bytes(3, "big") + b"\x00" * 0x40
+    rom = bytearray(0x20000)
+    rom[0x40:0x43] = target.to_bytes(3, "big")
 
     refs = find_address_references(
-        rom,
+        bytes(rom),
         target,
         include_four_byte=False,
     )
