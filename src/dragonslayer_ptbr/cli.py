@@ -6,6 +6,7 @@ from pathlib import Path
 from .analysis.rom import DEFAULT_BLOCK_SIZE, analyze_rom, write_report
 from .analysis.script_controls import scan_script_controls, write_control_report
 from .analysis.m68k_references import scan_known_targets, write_reference_report
+from .analysis.m68k_control_tests import scan_control_tests, write_control_test_report
 from .text.script_codec import render_script, tokenize_script
 
 
@@ -105,6 +106,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="bytes de contexto em cada lado (padrão: 8)",
     )
 
+
+    control_tests = sub.add_parser(
+        "scan-control-tests",
+        help="localiza comparações 68000 explícitas com bytes de controle",
+    )
+    control_tests.add_argument("--rom", required=True, type=Path)
+    control_tests.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/m68k-control-tests.md"),
+    )
+    control_tests.add_argument(
+        "--context",
+        type=lambda value: int(value, 0),
+        default=12,
+        help="bytes de contexto em cada lado (padrão: 12)",
+    )
+
     return parser
 
 
@@ -114,6 +133,17 @@ def main() -> int:
 
     if not args.rom.is_file():
         raise SystemExit(f"ROM não encontrada: {args.rom}")
+
+    if args.command == "scan-control-tests":
+        if args.context < 0:
+            raise SystemExit("context deve ser maior ou igual a zero")
+
+        data = args.rom.read_bytes()
+        occurrences = scan_control_tests(data, context_size=args.context)
+        write_control_test_report(occurrences, args.output)
+        print(f"Comparações encontradas: {len(occurrences)}")
+        print(f"Relatório: {args.output}")
+        return 0
 
     if args.command == "scan-refs":
         if args.context < 0:
