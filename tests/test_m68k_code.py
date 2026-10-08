@@ -180,3 +180,14 @@ def test_decode_lea_absolute_a1():
     assert instruction is not None
     assert instruction.mnemonic == "LEA abs.l,A1"
     assert instruction.target == 0x00FF0000
+
+
+
+def test_decode_immediate_btst():
+    instruction = decode_instruction(
+        bytes.fromhex("08 00 00 01"),
+        0,
+    )
+    assert instruction is not None
+    assert instruction.mnemonic == "BTST #imm,<EA>"
+    assert instruction.size == 4
