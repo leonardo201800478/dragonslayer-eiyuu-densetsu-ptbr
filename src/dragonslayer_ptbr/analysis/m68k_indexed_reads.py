@@ -50,21 +50,22 @@ def scan_indexed_byte_reads(
 
     results: list[IndexedByteRead] = []
 
-    for offset in range(0, len(data) - 1, 2):
+    for offset in range(0, len(data) - 3, 2):
         opcode = int.from_bytes(data[offset : offset + 2], "big")
 
-        # MOVE.B: 0001 ddd rrr 1 1 ix
-        # mode=6 (110), register field = base An.
-        if (opcode & 0xF138) != 0x1030:
+        # MOVE.B: 0001 ddd mmm rrr, com mode=6 (110),
+        # seguido por uma palavra de extensão do modo indexado.
+        if (opcode & 0x0038) != 0x0030 or (opcode >> 12) != 0x1:
             continue
 
         destination = (opcode >> 9) & 0x7
         base_register = opcode & 0x7
-        index_register = (opcode >> 12) & 0x7
-        index_long = bool(opcode & 0x0008)
+        extension = int.from_bytes(data[offset + 2 : offset + 4], "big")
+        index_register = (extension >> 12) & 0x7
+        index_long = bool(extension & 0x0800)
 
         left = max(0, offset - context_size)
-        right = min(len(data), offset + 2 + context_size)
+        right = min(len(data), offset + 4 + context_size)
         results.append(
             IndexedByteRead(
                 offset=offset,
