@@ -146,3 +146,35 @@ def test_pointer_tables_reject_large_target_jumps():
     tables = result["16_bit"]["tables"]
 
     assert tables == []
+
+
+def test_text_region_scanner_finds_delimited_candidate():
+    """Verifica uma região delimitada sem assumir charset."""
+    from dragonslayer_ptbr.analysis.text_regions import scan_text_regions
+
+    rom = b"\xFF" * 16 + b"HELLO WORLD" + b"\x00" + b"\xFF" * 16
+
+    candidates = scan_text_regions(bytes(rom), minimum_size=4)
+
+    assert candidates
+    assert candidates[0]["offset"] == 16
+    assert candidates[0]["end"] == 27
+    assert candidates[0]["delimiter"] == 0
+    assert candidates[0]["ascii_ratio"] == 1.0
+
+
+def test_text_region_scanner_rejects_invalid_parameters():
+    """Garante validação dos parâmetros do scanner textual."""
+    from dragonslayer_ptbr.analysis.text_regions import scan_text_regions
+
+    with pytest.raises(ValueError, match="minimum_size"):
+        scan_text_regions(b"ABC", minimum_size=0)
+
+    with pytest.raises(ValueError, match="maximum_size"):
+        scan_text_regions(b"ABC", minimum_size=8, maximum_size=4)
+
+    with pytest.raises(ValueError, match="minimum_score"):
+        scan_text_regions(b"ABC", minimum_score=1.1)
+
+    with pytest.raises(ValueError, match="delimiters"):
+        scan_text_regions(b"ABC", delimiters=())
