@@ -53,11 +53,68 @@ def _branch_target(offset: int, displacement: int, size: int) -> int:
     return offset + size + displacement
 
 
-def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
-    """Decodifica apenas formas suficientes para construir um CFG inicial.
+def _ea_extension_size(mode: int, register: int, operand_size: int, *, source: bool) -> int | None:
+    """Retorna o tamanho da extensão do effective address em bytes."""
+    if mode <= 4:
+        return 0
+    if mode in (5, 6):
+        return 2
+    if mode == 7:
+        if register == 0:
+            return 2
+        if register == 1:
+            return 4
+        if source and register == 4:
+            return operand_size
+    return None
 
-    O decoder é deliberadamente conservador. Opcode desconhecido retorna None
-    em vez de tentar adivinhar o tamanho da instrução.
+
+def _decode_move(data: bytes, offset: int, op: int) -> M68KInstruction | None:
+    """Decodifica MOVE/MOVEA nas formas gerais do 68000."""
+    top = op >> 12
+    if top not in (1, 2, 3):
+        return None
+
+    operand_size = 1 if top == 1 else 2 if top == 3 else 4
+    source_mode = (op >> 3) & 0x7
+    source_register = op & 0x7
+    destination_mode = (op >> 6) & 0x7
+
+    # MOVEA usa destino An e apenas tamanhos W/L.
+    if destination_mode == 1 and top in (2, 3):
+        source_extension = _ea_extension_size(
+            source_mode, source_register, operand_size, source=True
+        )
+        if source_extension is None:
+            return None
+        return M68KInstruction(
+            offset,
+            2 + source_extension,
+            "MOVEA.L" if top == 2 else "MOVEA.W",
+        )
+
+    destination_extension = _ea_extension_size(
+        destination_mode, (op >> 9) & 0x7, operand_size, source=False
+    )
+    source_extension = _ea_extension_size(
+        source_mode, source_register, operand_size, source=True
+    )
+    if destination_extension is None or source_extension is None:
+        return None
+
+    return M68KInstruction(
+        offset,
+        2 + source_extension + destination_extension,
+        {1: "MOVE.B", 2: "MOVE.L", 3: "MOVE.W"}[top],
+    )
+
+
+def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
+    """Decodifica formas 68000 suficientes para construir um CFG inicial.
+
+    O decoder continua conservador: uma forma não reconhecida retorna None.
+    O objetivo é preservar o alinhamento do fluxo, não substituir um
+    desassembler completo.
     """
     if offset < 0 or offset + 2 > len(data) or offset % 2:
         return None
@@ -73,7 +130,6 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
     if op == 0x4E77:
         return M68KInstruction(offset, 2, "RTR")
 
-    # TAS absoluto, presente logo no vetor de inicialização desta ROM.
     if op == 0x4AB9:
         if offset + 6 > len(data):
             return None
@@ -114,6 +170,11 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         mnemonic = "JMP abs.l" if op == 0x4EF9 else "JSR abs.l"
         return M68KInstruction(offset, 6, mnemonic, target)
 
+    if (op & 0xFFF8) == 0x4ED0:
+        return M68KInstruction(offset, 2, "JMP (An)")
+    if (op & 0xFFF8) == 0x4E90:
+        return M68KInstruction(offset, 2, "JSR (An)")
+
     if op in (0x41F9, 0x4879):
         if offset + 6 > len(data):
             return None
@@ -121,46 +182,6 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         mnemonic = "LEA abs.l" if op == 0x41F9 else "PEA abs.l"
         return M68KInstruction(offset, 6, mnemonic, target)
 
-    # MOVE.L #imm,(xxx).W: opcode 0x23xx.
-    if (op & 0xF1FF) == 0x237C:
-        if offset + 8 > len(data):
-            return None
-        target = int.from_bytes(data[offset + 6 : offset + 8], "big")
-        return M68KInstruction(offset, 8, "MOVE.L #imm,(xxx).W", target)
-
-    # MOVE.W (An),Dn.
-    if (op & 0xF1C0) == 0x3010:
-        return M68KInstruction(offset, 2, "MOVE.W (An),Dn")
-
-    if (op & 0xF100) == 0x7000:
-        return M68KInstruction(offset, 2, "MOVEQ")
-
-    if (op & 0xF1F8) == 0x1018:
-        return M68KInstruction(offset, 2, "MOVE.B (An)+,Dn")
-
-    if (op & 0xF1F8) == 0x1010:
-        return M68KInstruction(offset, 2, "MOVE.B (An),Dn")
-
-    if (op & 0x0038) == 0x0030 and (op >> 12) == 0x1:
-        if offset + 4 > len(data):
-            return None
-        return M68KInstruction(offset, 4, "MOVE.B (An,Dn.W/L),Dm")
-
-    # MOVEA.L Dn,An.
-    if (op & 0xF1C0) == 0x2040:
-        return M68KInstruction(offset, 2, "MOVEA.L Dn,An")
-
-    if (op & 0xF1C0) == 0x2640:
-        if offset + 4 > len(data):
-            return None
-        return M68KInstruction(offset, 4, "MOVEA.L d16(An),A3")
-
-    if (op & 0xF1C0) == 0x3640:
-        if offset + 4 > len(data):
-            return None
-        return M68KInstruction(offset, 4, "MOVEA.W d16(An),A3")
-
-    # LEA d16(PC),An — modo usado pelo bootstrap da ROM.
     if (op & 0xF1FF) == 0x4BFA:
         if offset + 4 > len(data):
             return None
@@ -173,13 +194,11 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
             return None
         return M68KInstruction(offset, 4, "LEA d16(An),An")
 
-    # MOVEM com lista de registradores.
     if (op & 0xFB80) in (0x4880, 0x4C80):
         if offset + 4 > len(data):
             return None
         return M68KInstruction(offset, 4, "MOVEM")
 
-    # DBcc: opcode + deslocamento de 16 bits.
     if (op & 0xF0F8) == 0x50C8:
         if offset + 4 > len(data):
             return None
@@ -187,47 +206,42 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         target = offset + 4 + displacement
         return M68KInstruction(offset, 4, "DBcc", target)
 
-    # MOVE.W #imm,SR.
-    if op == 0x46FC:
-        if offset + 4 > len(data):
-            return None
-        return M68KInstruction(offset, 4, "MOVE.W #imm,SR")
-
-    # ADDQ/SUBQ em formas de registrador.
     if (op & 0xF100) in (0x5000, 0x5100):
         return M68KInstruction(offset, 2, "ADDQ/SUBQ")
 
-    # Shift/rotate.
     if (op & 0xF000) == 0xE000:
         return M68KInstruction(offset, 2, "SHIFT/ROTATE")
 
-    # Imediatos byte para registrador.
-    if (op & 0xFF00) in (0x0200, 0x0400, 0x0600, 0x0A00, 0x0C00):
+    # BTST/BCHG/BCLR/BSET dinâmico.
+    if (op & 0xF100) == 0x0100:
+        return M68KInstruction(offset, 2, "BIT dynamic")
+
+    # ANDI/ORI/SUBI/ADDI/CMPI byte.
+    if (op & 0xFF00) in (0x0000, 0x0200, 0x0400, 0x0600, 0x0A00, 0x0C00):
         if offset + 4 > len(data):
             return None
         return M68KInstruction(offset, 4, "IMMEDIATE.B")
 
-    # MOVE.L #imm,An.
-    if (op & 0xF1FF) == 0x207C:
-        if offset + 6 > len(data):
-            return None
-        return M68KInstruction(offset, 6, "MOVE.L #imm,An")
+    # MOVEQ #imm,Dn.
+    if (op & 0xF100) == 0x7000:
+        return M68KInstruction(offset, 2, "MOVEQ")
 
-    # MOVE d16(An),Dn.
-    if (op & 0xF1C0) in (0x1028, 0x3028):
+    # Todas as formas gerais de MOVE/MOVEA.
+    move = _decode_move(data, offset, op)
+    if move is not None:
+        return move
+
+    # ADD/SUB/CMP register-to-EA nas formas de uma palavra sem extensão.
+    if (op & 0xF000) in (0x9000, 0xB000, 0xD000):
+        mode = (op >> 3) & 0x7
+        register = op & 0x7
+        if _ea_extension_size(mode, register, 2, source=False) is not None:
+            return M68KInstruction(offset, 2, "ARITHMETIC")
+
+    if op == 0x46FC:
         if offset + 4 > len(data):
             return None
-        return M68KInstruction(offset, 4, "MOVE d16(An),Dn")
-
-    if (op & 0xFF00) == 0x0C00:
-        if offset + 4 > len(data):
-            return None
-        return M68KInstruction(offset, 4, "CMPI.B #imm,Dn")
-
-    if (op & 0xFFC0) == 0x0C40:
-        if offset + 4 > len(data):
-            return None
-        return M68KInstruction(offset, 4, "CMPI.W #imm,Dn")
+        return M68KInstruction(offset, 4, "MOVE.W #imm,SR")
 
     return None
 
