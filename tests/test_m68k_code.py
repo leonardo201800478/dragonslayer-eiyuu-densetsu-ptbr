@@ -56,7 +56,7 @@ def test_decode_bootstrap_pc_relative_lea():
 
 
 def test_decode_indirect_jump():
-    instruction = decode_instruction(bytes.fromhex("4E 66"), 0)
+    instruction = decode_instruction(bytes.fromhex("4E D0"), 0)
     assert instruction is not None
     assert instruction.mnemonic == "JMP (An)"
 
@@ -64,8 +64,8 @@ def test_decode_indirect_jump():
 def test_decode_move_long_immediate_absolute_word():
     instruction = decode_instruction(bytes.fromhex("23 7C 53 45 47 41 2F 00"), 0)
     assert instruction is not None
-    assert instruction.mnemonic == "MOVE.L #imm,(xxx).W"
-    assert instruction.target == 0x2F00
+    assert instruction.mnemonic == "MOVE.L #imm,d16(An)"
+    assert instruction.target is None
 
 
 def test_decode_move_word_register_indirect():
