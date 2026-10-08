@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .pointers import scan_pointer_candidates
+from .text_regions import scan_text_regions
 
 
 DEFAULT_BLOCK_SIZE = 0x100
@@ -191,10 +192,12 @@ def analyze_rom(
         },
         "pointer_candidates": scan_pointer_candidates(data),
         "candidate_regions": _runs(data),
+        "text_regions": scan_text_regions(data),
         "notes": [
             "Candidatos são heurísticos; não representam texto confirmado.",
             "Classificações estatísticas não determinam se um bloco é código, gráfico, texto ou dados comprimidos.",
             "Charset, compressão, ponteiros e códigos de controle serão determinados em etapas posteriores.",
+            "Regiões text_regions são candidatos estruturais e não confirmam texto ou charset.",
         ],
     }
 
