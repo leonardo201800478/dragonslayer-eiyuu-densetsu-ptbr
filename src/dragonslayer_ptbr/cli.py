@@ -5,6 +5,7 @@ from pathlib import Path
 
 from .analysis.rom import DEFAULT_BLOCK_SIZE, analyze_rom, write_report
 from .analysis.script_controls import scan_script_controls, write_control_report
+from .analysis.m68k_references import scan_known_targets, write_reference_report
 from .text.script_codec import render_script, tokenize_script
 
 
@@ -86,6 +87,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="para no primeiro terminador 0x00",
     )
 
+
+    refs = sub.add_parser(
+        "scan-refs",
+        help="procura referências 68000 a offsets confirmados da ROM",
+    )
+    refs.add_argument("--rom", required=True, type=Path)
+    refs.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/m68k-references.md"),
+    )
+    refs.add_argument(
+        "--context",
+        type=lambda value: int(value, 0),
+        default=8,
+        help="bytes de contexto em cada lado (padrão: 8)",
+    )
+
     return parser
 
 
@@ -95,6 +114,25 @@ def main() -> int:
 
     if not args.rom.is_file():
         raise SystemExit(f"ROM não encontrada: {args.rom}")
+
+    if args.command == "scan-refs":
+        if args.context < 0:
+            raise SystemExit("context deve ser maior ou igual a zero")
+
+        data = args.rom.read_bytes()
+        references = scan_known_targets(
+            data,
+            {
+                "opening_script": 0x01626B,
+                "character_table": 0x1A551A,
+            },
+            context_size=args.context,
+        )
+        write_reference_report(references, args.output)
+        for name, items in references.items():
+            print(f"{name}: {len(items)} referências")
+        print(f"Relatório: {args.output}")
+        return 0
 
     if args.command == "scan-controls":
         if args.offset < 0:
