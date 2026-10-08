@@ -99,3 +99,13 @@ def test_decode_cmpi_byte_keeps_specific_classification():
     instruction = decode_instruction(bytes.fromhex("0C 00 00 01"), 0)
     assert instruction is not None
     assert instruction.mnemonic == "CMPI.B #imm,Dn"
+
+
+def test_cfg_ignores_unknown_indirect_target():
+    rom = bytearray(0x30)
+    rom[4:8] = (0x10).to_bytes(4, "big")
+    rom[0x10:0x12] = bytes.fromhex("4E 90")  # JSR (A0), destino dinâmico
+    rom[0x12:0x14] = bytes.fromhex("4E 75")
+    blocks = build_control_flow_graph(bytes(rom))
+    assert blocks
+    assert all(block.start is not None for block in blocks)

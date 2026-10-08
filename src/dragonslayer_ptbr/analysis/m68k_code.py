@@ -278,6 +278,8 @@ def build_control_flow_graph(
 
     while pending and len(blocks) < max_blocks:
         start = pending.pop()
+        if start is None:
+            continue
         if start in visited or start < 0 or start >= len(data) or start % 2:
             continue
         visited.add(start)
@@ -314,18 +316,21 @@ def build_control_flow_graph(
                 continue
 
             if instruction.mnemonic == "BRA":
-                pending.append(instruction.target)
+                if instruction.target is not None:
+                    pending.append(instruction.target)
                 reason = "branch"
                 offset = next_offset
                 break
 
             if instruction.mnemonic == "BSR":
-                pending.append(instruction.target)
+                if instruction.target is not None:
+                    pending.append(instruction.target)
                 offset = next_offset
                 continue
 
             if instruction.mnemonic.startswith("B") and instruction.mnemonic not in {"BRA", "BSR"}:
-                pending.append(instruction.target)
+                if instruction.target is not None:
+                    pending.append(instruction.target)
                 if next_offset < len(data):
                     pending.append(next_offset)
                 reason = "conditional_branch"
