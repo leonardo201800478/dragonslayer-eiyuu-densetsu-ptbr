@@ -17,13 +17,19 @@ A ferramenta é genérica: ela **não extrai textos automaticamente** nem presum
 - Python 3.10 ou superior
 - Uma cópia da ROM obtida legalmente. A ROM não é distribuída aqui e não deve ser enviada ao repositório.
 
+## ROM original local
+
+Coloque sua cópia legal da ROM em `roms/original/`. Essa pasta contém instruções e é ignorada pelo Git, portanto a ROM não será incluída em commits. Consulte `roms/original/README.md` antes de adicionar arquivos.
+
+O código deste repositório está sob a licença MIT (`LICENSE`). Ela não licencia a ROM nem concede direitos sobre o jogo ou outros materiais de terceiros.
+
 ## Instalação e uso
 
 Na raiz do projeto:
 
 ```bash
 python -m pip install .
-python -m dragon_slayer_ptbr apply --rom caminho/para/jogo.bin --manifest translation/patch.json --output jogo-ptbr.bin
+python -m dragon_slayer_ptbr apply --rom roms/original/jogo.bin --manifest translation/patch.json --output jogo-ptbr.bin
 ```
 
 A ferramenta nunca sobrescreve o arquivo de entrada. Se os bytes encontrados não corresponderem aos bytes originais declarados, a execução falha e nenhum arquivo de saída é gerado.

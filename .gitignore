@@ -8,3 +8,7 @@ dist/
 build/
 *.bin
 *.gen
+
+# ROM original: manter somente uma cópia local obtida legalmente.
+/roms/original/**
+!/roms/original/README.md
