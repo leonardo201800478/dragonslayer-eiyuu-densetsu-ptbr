@@ -839,3 +839,603 @@ O relatório produzido deverá ser analisado procurando principalmente:
 - possíveis blocos de código compartilhando essas referências.
 
 A ferramenta é deliberadamente conservadora: uma referência literal não é considerada automaticamente ponteiro de script, e o scanner não substitui um desassembler.
+
+
+---
+
+## 27. Mapa consolidado das regiões de texto japonês
+
+A nova varredura dedicada a Shift-JIS foi adicionada em:
+
+```
+src/dragonslayer_ptbr/analysis/japanese_text.py
+```
+
+Ela não procura ASCII de forma isolada. O algoritmo:
+
+1. valida sequências de caracteres Shift-JIS de 1 e 2 bytes;
+2. aceita `0x01` como controle de um byte;
+3. aceita `0x06 xx yy` como controle de três bytes;
+4. interrompe a região diante de bytes que não pertencem à gramática conhecida;
+5. calcula a proporção de caracteres hiragana/katakana/kanji;
+6. ignora a região conhecida da tabela de caracteres em `0x1A551A`;
+7. agrupa regiões contíguas;
+8. produz offsets, tamanho, quantidade de caracteres e controles.
+
+O resultado atual é de **47 regiões candidatas fortemente sustentadas por texto japonês legível**.
+
+### 27.1 Regiões identificadas
+
+| Offset | Fim | Caracteres | Controles | Classificação investigativa |
+|---:|---:|---:|---:|---|
+| `0x003657` | `0x003687` | 24 | 1 | interface/mensagem |
+| `0x0041C3` | `0x0041F2` | 24 | 2 | interface/mensagem |
+| `0x01626A` | `0x01665B` | 518 | 34 | abertura |
+| `0x01F6EA` | `0x01F74A` | 49 | 2 | diálogo |
+| `0x026230` | `0x026294` | 45 | 7 | sistema/salvamento |
+| `0x02DF10` | `0x02DF51` | 31 | 1 | diálogo/final |
+| `0x02DF52` | `0x02DFDD` | 67 | 5 | diálogo/final |
+| `0x02DFDE` | `0x02E05D` | 62 | 4 | diálogo/final |
+| `0x02E05E` | `0x02E0EB` | 73 | 5 | diálogo/final |
+| `0x02E0EC` | `0x02F151` | vários | vários | bloco de final |
+| `0x030349` | `0x030383` | 31 | 1 | minijogo |
+| `0x030384` | `0x0303B7` | 25 | 1 | minijogo |
+| `0x03045A` | `0x0304A1` | 37 | 2 | minijogo |
+| `0x0304FC` | `0x030545` | 37 | 2 | minijogo |
+| `0x030616` | `0x03064B` | 28 | 1 | minijogo |
+| `0x0306D4` | `0x03071D` | 37 | 2 | minijogo |
+| `0x03072D` | `0x030756` | 22 | 1 | minijogo |
+| `0x030780` | `0x0307B2` | 26 | 1 | minijogo |
+| `0x03105E` | `0x03108A` | 23 | 2 | minijogo |
+| `0x0310A1` | `0x0310D2` | 25 | 1 | minijogo |
+| `0x0310D3` | `0x0310FE` | 21 | 2 | minijogo |
+| `0x031100` | `0x031154` | 43 | 2 | minijogo |
+| `0x031155` | `0x03117E` | 21 | 1 | minijogo |
+| `0x031220` | `0x031248` | 20 | 1 | minijogo |
+| `0x031249` | `0x031282` | 31 | 1 | minijogo |
+| `0x031283` | `0x0312B7` | 26 | 1 | minijogo |
+| `0x0312B8` | `0x0312EA` | 26 | 1 | minijogo |
+| `0x0312EB` | `0x03131B` | 22 | 2 | minijogo |
+| `0x032325` | `0x032390` | 52 | 3 | minijogo/regras |
+| `0x032391` | `0x0323D2` | 33 | 1 | minijogo/regras |
+| `0x0323D3` | `0x03242F` | 47 | 2 | minijogo/regras |
+| `0x032447` | `0x03249C` | 42 | 2 | minijogo/regras |
+| `0x032529` | `0x032563` | 28 | 2 | minijogo/regras |
+| `0x032565` | `0x0325A5` | 32 | 2 | minijogo/regras |
+| `0x0325E8` | `0x032620` | 29 | 1 | minijogo/regras |
+| `0x032648` | `0x03267D` | 26 | 2 | minijogo/regras |
+| `0x0338B2` | `0x033FB9` | 833 | 122 | itens/magias |
+| `0x033FF8` | `0x034113` | 105 | 32 | itens/magias |
+| `0x02F05C` | `0x02F0B7` | 45 | 3 | diálogo/final |
+| `0x02F0FB` | `0x02F185` | 67 | 5 | diálogo/final |
+| `0x02F191` | `0x02F1DD` | 36 | 4 | diálogo/final |
+
+> Nota: a classificação acima é investigativa. Ela descreve o conteúdo observado, não afirma como o engine categoriza os dados internamente.
+
+### 27.2 Exemplos de conteúdo
+
+A região de abertura contém:
+
+```
+はるかなる昔、いや、もしかしたら
+遠い未来のことかも知れない。
+
+「イセルハーサ」と呼ばれる豊かな
+自然に恵まれた世界があった。
+
+イセルハーサのほぼ中央に位置する
+ファーレーン王国は、国土が狭いこ
+ともあって、まずしい国だったが、
+心優しきアスエル王の統治のもと、
+人々は平和な日々を過ごしていた。
+```
+
+O bloco de itens/magias contém sequências reconhecíveis como:
+
+```
+何もない
+ナイフ
+幅広のつるぎ
+小型のつるぎ
+青銅のつるぎ
+鉄のやり
+```
+
+Isso demonstra que a extração já alcança dados de gameplay e não somente a introdução.
+
+---
+
+## 28. Evidência detalhada da abertura
+
+A região investigada começa em aproximadamente:
+
+```
+0x01626B
+```
+
+O decoder produz texto japonês coerente, intercalado com controles.
+
+### 28.1 Estrutura observada
+
+A assinatura mais forte atualmente é:
+
+```
+Shift-JIS
+  +
+0x01
+  +
+0x06 xx yy
+  +
+0x0E
+  +
+0x00
+```
+
+Essa assinatura ocorre dentro de texto narrativo real.
+
+### 28.2 Controles mapeados
+
+Na região investigada foram encontradas **42 ocorrências**:
+
+| Sequência | Quantidade |
+|---|---:|
+| `01` | 33 |
+| `06 FE 0E` | 5 |
+| `06 00 FE` | 1 |
+| `06 08 06` | 1 |
+| `0E` | 1 |
+| `00` | 1 |
+
+Offsets importantes:
+
+```
+0x0162F1  06 FE 0E
+0x016399  06 FE 0E
+0x016459  06 FE 0E
+0x016515  06 FE 0E
+0x0165F7  06 FE 0E
+
+0x016658  06 00 FE
+0x01665B  0E
+0x016681  06 08 06
+0x016686  00
+```
+
+Os `0x01` aparecem repetidamente entre linhas da narrativa.
+
+### 28.3 O que pode e não pode ser concluído
+
+Podemos afirmar:
+
+- `0x01` é usado como controle no texto;
+- `0x06 xx yy` forma uma unidade de três bytes;
+- `0x06 FE 0E` é recorrente em transições narrativas;
+- `0x00` aparece como terminador da estrutura observada;
+- `0x0E` também pode ocorrer isoladamente.
+
+Não podemos afirmar ainda:
+
+- que `06 FE 0E` significa espera;
+- que `06 FE 0E` significa troca de página;
+- que `06 00 FE` significa encerramento;
+- que `0x0E` seja mudança de janela;
+- que `0x01` seja necessariamente uma quebra de linha lógica em todas as regiões.
+
+Essas semânticas exigem rastreamento do código 68000.
+
+---
+
+## 29. Análise 68000 — resultados e correções metodológicas
+
+A análise estática inicialmente procurou referências literais aos offsets de texto e da tabela de caracteres. O resultado foi:
+
+```
+opening_script:
+0 referências diretas confirmadas
+
+character_table:
+0 referências diretas confirmadas
+```
+
+Isso não invalida os dados; indica que o engine provavelmente não utiliza esses endereços como constantes literais nas formas procuradas.
+
+### 29.1 Candidatos de parser
+
+Foi criado:
+
+```
+analysis/m68k_text_parser_candidates.py
+```
+
+O scanner procura:
+
+```
+MOVE.B (An)+,Dn
+        ↓
+CMPI.B #controle,Dn
+```
+
+Os candidatos encontrados foram:
+
+| Leitura | Teste | Registrador | Controle |
+|---:|---:|---:|---:|
+| `0x026AE0` | `0x026AEA` | D0 | `0x01` |
+| `0x0308C0` | `0x0308C2` | D0 | `0x0E` |
+| `0x030AA4` | `0x030AAA` | D0 | `0x0D` |
+| `0x030B46` | `0x030B4C` | D0 | `0x0E` |
+| `0x030B6A` | `0x030B70` | D0 | `0x0E` |
+| `0x030CBE` | `0x030CC4` | D0 | `0x0D` |
+
+Esses seis candidatos foram investigados manualmente.
+
+### 29.2 Família 0x0308xx–0x030cxx
+
+A investigação mostrou que várias dessas rotinas chamam:
+
+```
+0x0309EA
+```
+
+A rotina em `0x0309EA` contém:
+
+```
+LEA $00FF20AE,A3
+```
+
+Ou seja, A3 recebe um endereço de **RAM**, não uma região de script da ROM.
+
+Consequentemente, os candidatos:
+
+```
+0x0308C0
+0x030AA4
+0x030B46
+0x030B6A
+0x030CBE
+```
+
+não devem ser classificados como parser de texto.
+
+Esse é um resultado negativo importante: **aparência de parser não basta**.
+
+### 29.3 Cadeia 0x026ADA
+
+Foi encontrada:
+
+```
+0x026ADA: MOVEA.L $0012(A1),A3
+0x026AE0: MOVE.B (A3)+,D0
+```
+
+seguida de comparações com valores `00..05`.
+
+A cadeia é:
+
+```
+estrutura apontada por A1
+        ↓
+A3 = *(A1 + $12)
+        ↓
+MOVE.B (A3)+,D0
+        ↓
+dispatcher 00..05
+```
+
+Isso é uma cadeia legítima de acesso indireto, mas o contexto ainda aponta mais para **estado/dispatcher** do que para protocolo textual.
+
+### 29.4 Acesso 0x02B344
+
+Também foi observado:
+
+```
+LEA $0001(A3),A3
+MOVE.B (A3)+,D0
+```
+
+Isso demonstra que existem rotinas que avançam explicitamente um ponteiro antes de consumir bytes.
+
+Continua sendo candidato para investigação, mas ainda não há ligação comprovada com o script.
+
+---
+
+## 30. Fluxo A3
+
+Foi criado:
+
+```
+analysis/m68k_a3_flow.py
+```
+
+Objetivo:
+
+- localizar `LEA ...,A3`;
+- localizar `MOVEA.L ...,A3`;
+- localizar `MOVEA.W ...,A3`;
+- localizar `MOVE.B (A3)+,Dn`;
+- relacionar usos à definição anterior mais próxima.
+
+A análise demonstrou que simplesmente procurar o uso mais próximo não é suficiente para provar fluxo de execução.
+
+O caso mais importante até agora é:
+
+```
+0x0309EA
+    ↓
+LEA $00FF20AE,A3
+    ↓
+rotinas 0x0308xx–0x030cxx
+    ↓
+MOVE.B (A3)+,D0
+```
+
+Como `0x00FF20AE` está na RAM, essa família foi rebaixada como candidata ao parser de texto.
+
+### Conclusão
+
+O rastreamento A3 precisa evoluir de proximidade estática para:
+
+- blocos básicos;
+- fluxo de controle;
+- chamadas/retornos;
+- definições dominantes;
+- propagação de registradores.
+
+---
+
+## 31. Acessos indexados
+
+Foi criado:
+
+```
+analysis/m68k_indexed_reads.py
+```
+
+para localizar:
+
+```
+MOVE.B (An,Dn.W),Dm
+MOVE.B (An,Dn.L),Dm
+```
+
+Uma correção importante foi feita durante a implementação: no 68000, a seleção do registrador de índice e o bit W/L pertencem à **palavra de extensão**, e não ao opcode principal.
+
+Depois da correção, a busca bruta encontrou aproximadamente:
+
+```
+7.038 ocorrências
+```
+
+### Interpretação
+
+Esse número é alto demais para ser interpretado diretamente.
+
+Foram encontradas ocorrências em regiões de dados, inclusive próximas da tabela de fonte em `0x1A551A`.
+
+Isso prova que uma busca binária pela codificação da instrução produz muitos falsos positivos quando não existe um desassembler/controle de fluxo.
+
+### Consequência
+
+O scanner indexado é uma ferramenta de coleta, não uma prova de execução.
+
+O próximo filtro deve reconhecer regiões de código por:
+
+- `BSR`;
+- `JSR`;
+- `JMP`;
+- `RTS`;
+- fluxo de branches;
+- prólogos/epílogos;
+- consistência das instruções.
+
+Somente depois deve-se analisar os acessos indexados dentro desses blocos.
+
+---
+
+## 32. Tabela de caracteres — estado atual
+
+A região:
+
+```
+0x1A551A
+```
+
+permanece uma das pistas centrais.
+
+Ela contém:
+
+- `0x8140`;
+- pontuação;
+- hiragana;
+- katakana;
+- grande sequência de kanji.
+
+O fato de não existir referência literal direta ao endereço não elimina seu papel.
+
+As hipóteses principais agora são:
+
+1. endereço base obtido de uma tabela intermediária;
+2. endereço calculado por registrador;
+3. endereço relativo a PC;
+4. ponteiro armazenado em estrutura;
+5. índice transformado antes do acesso;
+6. tabela acessada por cópia/mapeamento de dados.
+
+Nenhuma dessas hipóteses deve ser promovida a fato até que o código seja localizado.
+
+---
+
+## 33. Relação entre texto e fonte
+
+O estado atual permite estabelecer a seguinte relação conceitual:
+
+```
+dados textuais Shift-JIS
+        │
+        ▼
+código de interpretação
+        │
+        ├── caracteres de 1 byte
+        ├── caracteres de 2 bytes
+        └── controles
+                │
+                ▼
+        conversão para índice/glifo
+                │
+                ▼
+        tabela/fonte em 0x1A551A
+```
+
+Essa arquitetura é uma **hipótese de trabalho**, não uma descrição confirmada do engine.
+
+O objetivo da próxima etapa é localizar a instrução que fecha essa cadeia.
+
+---
+
+## 34. O que já pode ser utilizado na tradução
+
+Neste momento já é possível preparar material de tradução sem modificar a ROM:
+
+### Seguro
+
+- dump UTF-8 das regiões confirmadas;
+- preservação de controles;
+- catálogo de strings;
+- identificação de nomes próprios;
+- separação de itens, magias, diálogos e mensagens;
+- criação de arquivos de tradução paralelos;
+- preparação de testes de round-trip do codec.
+
+### Ainda não seguro
+
+- substituir bytes diretamente;
+- alterar tamanho das strings;
+- realocar scripts;
+- modificar ponteiros;
+- definir tamanho máximo de uma linha;
+- remover controles;
+- traduzir `0x06 xx yy` para outra sequência.
+
+---
+
+## 35. Risco principal atual
+
+O maior risco não é mais o charset.
+
+O Shift-JIS está suficientemente confirmado.
+
+O maior risco agora é **estrutura de armazenamento e execução**:
+
+```
+qual entrada aponta para qual texto?
+qual rotina lê a entrada?
+qual é o terminador real?
+quais controles existem?
+como o texto é convertido para glifo?
+há tabelas intermediárias?
+há compressão?
+há fragmentação?
+```
+
+A resposta a essas perguntas determinará se o projeto terá um patch simples ou um sistema de realocação/reconstrução.
+
+---
+
+## 36. Critério de promoção de evidência
+
+A partir desta etapa, cada descoberta deve receber uma das classificações:
+
+### CONFIRMADO
+
+Há evidência direta e reproduzível na ROM/código.
+
+Exemplos:
+
+- Shift-JIS;
+- regiões textuais;
+- `0x01` como controle observado;
+- `06 xx yy` como sequência de três bytes;
+- tabela em `0x1A551A`.
+
+### FORTE EVIDÊNCIA
+
+Há múltiplas ocorrências consistentes, mas ainda falta rastreamento de execução.
+
+Exemplos:
+
+- relação entre controles e apresentação;
+- possível utilização da tabela Shift-JIS para fonte;
+- possíveis estruturas de entradas.
+
+### HIPÓTESE
+
+Explicação plausível ainda não comprovada.
+
+Exemplos:
+
+- `06 FE 0E` como troca de página;
+- largura lógica de aproximadamente 32 bytes;
+- tabela de ponteiros 16-bit;
+- engine compartilhado com outro jogo.
+
+### DESCARTADO/REBAIXADO
+
+Uma hipótese foi testada e perdeu sustentação.
+
+Exemplos:
+
+- candidatos `0x0308xx–0x030cxx` como parser de texto;
+- scanner indexado bruto como prova de código;
+- referências literais diretas à tabela como único mecanismo de acesso.
+
+---
+
+## 37. Estado geral após a documentação
+
+```
+[CONFIRMADO]
+ROM japonesa
+    ↓
+Shift-JIS
+    ↓
+47 regiões de texto
+    ↓
+controles binários
+    ↓
+tabela Shift-JIS em 0x1A551A
+
+[EM INVESTIGAÇÃO]
+    ↓
+rotina 68000 de interpretação
+    ↓
+estrutura de entradas
+    ↓
+ponteiros
+    ↓
+conversão para glifo
+
+[A FAZER]
+    ↓
+extrator completo
+    ↓
+encoder
+    ↓
+tradução PT-BR
+    ↓
+realocação
+    ↓
+patch
+    ↓
+validação em emulador/hardware
+```
+
+O projeto não deve avançar para escrita da ROM antes de fechar pelo menos a primeira cadeia completa:
+
+```
+entrada de script
+→ rotina 68000
+→ interpretação do caractere/controle
+→ acesso à fonte
+→ encerramento da entrada
+```
+
+Essa cadeia será a referência para generalizar o extrator para as demais regiões.
