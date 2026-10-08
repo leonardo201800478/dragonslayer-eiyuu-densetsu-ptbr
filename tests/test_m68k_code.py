@@ -72,3 +72,30 @@ def test_decode_move_word_register_indirect():
     instruction = decode_instruction(bytes.fromhex("30 14"), 0)
     assert instruction is not None
     assert instruction.mnemonic == "MOVE.W (An),Dn"
+
+
+def test_decode_move_byte_d16_address_register():
+    instruction = decode_instruction(bytes.fromhex("10 29 EF 01"), 0)
+    assert instruction is not None
+    assert instruction.mnemonic == "MOVE.B"
+    assert instruction.size == 4
+
+
+def test_decode_move_word_register_to_register():
+    instruction = decode_instruction(bytes.fromhex("38 85"), 0)
+    assert instruction is not None
+    assert instruction.mnemonic == "MOVE.W"
+    assert instruction.size == 2
+
+
+def test_decode_move_long_postincrement_to_address_register():
+    instruction = decode_instruction(bytes.fromhex("28 9D"), 0)
+    assert instruction is not None
+    assert instruction.mnemonic == "MOVE.L"
+    assert instruction.size == 2
+
+
+def test_decode_cmpi_byte_keeps_specific_classification():
+    instruction = decode_instruction(bytes.fromhex("0C 00 00 01"), 0)
+    assert instruction is not None
+    assert instruction.mnemonic == "CMPI.B #imm,Dn"
