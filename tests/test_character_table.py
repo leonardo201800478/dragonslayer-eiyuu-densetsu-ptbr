@@ -18,7 +18,7 @@ def test_read_character_table_big_endian():
 
 def test_portuguese_accent_inventory():
     entries = read_character_table(
-        bytes.fromhex("00 C0 00 C3 00 C7 00 C9 00 E1"),
+        bytes.fromhex("00 C1 00 C3 00 C7 00 C9 00 E1"),
         offset=0,
         end=10,
     )
