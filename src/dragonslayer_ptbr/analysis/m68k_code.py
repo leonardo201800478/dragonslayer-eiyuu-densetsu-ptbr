@@ -73,6 +73,18 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
     if op == 0x4E77:
         return M68KInstruction(offset, 2, "RTR")
 
+    # TAS absoluto, presente logo no vetor de inicialização desta ROM.
+    if op == 0x4AB9:
+        if offset + 6 > len(data):
+            return None
+        target = int.from_bytes(data[offset + 2 : offset + 6], "big")
+        return M68KInstruction(offset, 6, "TAS abs.l", target)
+    if op == 0x4A79:
+        if offset + 4 > len(data):
+            return None
+        target = int.from_bytes(data[offset + 2 : offset + 4], "big")
+        return M68KInstruction(offset, 4, "TAS abs.w", target)
+
     if (op & 0xF000) == 0x6000:
         condition = (op >> 8) & 0xF
         displacement8 = op & 0xFF
