@@ -1,71 +1,32 @@
-# Dragon Slayer: Eiyuu Densetsu — Tradução PT-BR
+# Dragon Slayer: Eiyuu Densetsu — PT-BR
 
-Projeto comunitário para organizar uma tradução em português brasileiro de **Dragon Slayer: Eiyuu Densetsu**, na versão de Mega Drive, e disponibilizar ferramentas Python para aplicar patches em cópias legais do jogo.
+Projeto de engenharia reversa e tradução para português brasileiro da versão japonesa de **Dragon Slayer: Eiyuu Densetsu (Mega Drive)**.
 
-> **Estado:** estrutura inicial. Ainda não há tradução, offsets verificados ou patch do jogo neste repositório.
+## Objetivo
 
-## O que este projeto inclui
+Analisar a ROM, identificar fonte/charset, localizar e extrair textos, preservar códigos de controle, traduzir, realocar textos quando necessário, corrigir ponteiros, inserir a tradução e validar a ROM final.
 
-- Uma ferramenta Python para aplicar alterações binárias descritas em um manifesto JSON.
-- Verificação dos bytes originais em cada offset antes de gravar, para evitar aplicar um patch sobre uma ROM inesperada.
-- Validação de limites, tamanho e sobreposição das alterações.
+## Primeiro marco
 
-A ferramenta é genérica: ela **não extrai textos automaticamente** nem presume conhecer o formato interno do jogo. Os offsets, a codificação de texto e as rotinas de compressão/controle precisam ser pesquisados e documentados antes de criar patches específicos.
-
-## Requisitos
-
-- Python 3.10 ou superior
-- Uma cópia da ROM obtida legalmente. A ROM não é distribuída aqui e não deve ser enviada ao repositório.
-
-## ROM original local
-
-Coloque sua cópia legal da ROM em `roms/original/`. Essa pasta contém instruções e é ignorada pelo Git, portanto a ROM não será incluída em commits. Consulte `roms/original/README.md` antes de adicionar arquivos.
-
-O código deste repositório está sob a licença MIT (`LICENSE`). Ela não licencia a ROM nem concede direitos sobre o jogo ou outros materiais de terceiros.
-
-## Instalação e uso
-
-Na raiz do projeto:
-
-```bash
-python -m pip install .
-python -m dragon_slayer_ptbr apply --rom roms/original/jogo.bin --manifest translation/patch.json --output jogo-ptbr.bin
-```
-
-A ferramenta nunca sobrescreve o arquivo de entrada. Se os bytes encontrados não corresponderem aos bytes originais declarados, a execução falha e nenhum arquivo de saída é gerado.
-
-## Formato do manifesto
-
-Cada alteração especifica o offset em decimal e os bytes originais e substitutos em hexadecimal. Os bytes substitutos devem ter o mesmo comprimento dos bytes originais; expansões de texto exigem uma estratégia específica do jogo e não são suportadas por esta base.
-
-```json
-{
-  "patches": [
-    {
-      "offset": 256,
-      "original": "414243",
-      "replacement": "58595A",
-      "description": "Exemplo ilustrativo — não é texto do jogo"
-    }
-  ]
-}
-```
-
-O manifesto de exemplo real do repositório está vazio em `translation/patch.json`: não representa uma tradução aplicável.
-
-## Desenvolvimento e testes
+O primeiro componente é o analisador `analyze`, que não modifica a ROM.
 
 ```bash
 python -m pip install -e ".[dev]"
+dslayer-ptbr analyze --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --report reports/rom-analysis.json
 pytest
 ```
 
-## Como contribuir
+Os candidatos encontrados pelo analisador são heurísticos. Nenhum offset será considerado confirmado antes da validação e documentação no profile do jogo.
 
-1. Documente a origem e a versão da ROM usada na pesquisa, mas nunca publique a ROM ou seus dados.
-2. Registre apenas offsets e dados mínimos necessários ao patch; valide cada alteração em uma cópia local da sua ROM.
-3. Descreva a codificação, limitações de espaço, ponteiros e qualquer rotina específica que tenha sido confirmada.
-4. Inclua testes para alterações e casos de incompatibilidade.
-5. Não envie dumps de texto, imagens, músicas, scripts ou outros materiais protegidos sem autorização.
+## Estrutura
 
-Contribuições de código neste repositório são licenciadas sob MIT (veja `LICENSE`). Essa licença não concede direitos sobre o jogo, marcas ou materiais protegidos de terceiros.
+```text
+src/dragonslayer_ptbr/
+├── analysis/       # análise da imagem e regiões candidatas
+├── text/           # decoder, encoder, tabelas e extrator
+├── pointers/       # leitura, escrita e realocação
+├── profiles/       # conhecimento específico do jogo
+└── cli.py
+```
+
+A ROM original deve permanecer local e não deve ser distribuída pelo projeto.
