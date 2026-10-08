@@ -334,3 +334,25 @@ def test_m68k_reference_scanner_rejects_invalid_configuration():
 
     with pytest.raises(ValueError, match="context_size"):
         find_address_references(b"\x00" * 32, 0x20, context_size=-1)
+
+
+def test_m68k_control_test_scanner_finds_cmpi_byte():
+    """Reconhece CMPI.B imediato para um byte de controle."""
+    from dragonslayer_ptbr.analysis.m68k_control_tests import scan_control_tests
+
+    rom = bytearray(0x100)
+    rom[0x20:0x24] = bytes.fromhex("0C 00 00 06")
+    results = scan_control_tests(bytes(rom))
+
+    assert len(results) == 1
+    assert results[0].offset == 0x20
+    assert results[0].value == 0x06
+    assert results[0].register == 0
+
+
+def test_m68k_control_test_scanner_rejects_invalid_context():
+    """Garante validação do contexto do scanner de controles."""
+    from dragonslayer_ptbr.analysis.m68k_control_tests import scan_control_tests
+
+    with pytest.raises(ValueError, match="context_size"):
+        scan_control_tests(b"\x00" * 32, context_size=-1)
