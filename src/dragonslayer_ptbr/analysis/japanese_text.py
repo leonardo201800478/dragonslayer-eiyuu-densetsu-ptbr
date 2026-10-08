@@ -169,8 +169,7 @@ def scan_japanese_text(
             continue
 
         end, chars, controls, text = result
-        plain_text = text.replace(" ", "").replace("<CTRL ", "").replace(">", "")
-        if chars >= minimum_characters and _japanese_ratio(plain_text) >= minimum_japanese_ratio:
+        if chars >= minimum_characters and _japanese_ratio(text) >= minimum_japanese_ratio:
             regions.append(
                 JapaneseTextRegion(
                     offset=offset,
