@@ -475,3 +475,22 @@ A próxima tarefa técnica deve ser a **Fase 3 — localização do engine 68000
 7. documentar candidatos com classificação **CONFIRMADO / REFERÊNCIA / HIPÓTESE / DESCARTADO**.
 
 Não iniciar ainda encoder de escrita, realocação ou patch da ROM.
+
+
+## 10. Checkpoint de pausa — análise M68K
+
+A Fase 3 avançou para um CFG conservador baseado no vetor de reset 0x010620.
+
+Estado no momento da pausa:
+- 43 blocos básicos no relatório analisado;
+- 155 instruções reconhecidas;
+- blocos não sobrepostos;
+- chamadas JSR abs.l com destinos identificados;
+- rotinas com RTS alcançadas;
+- decoder ampliado incrementalmente conforme os opcodes reais foram encontrados.
+
+Suporte adicionado nesta etapa: BTST #imm,<EA>, MOVE.W SR,<EA> e NEGX.B/W/L <EA>, além das formas anteriores.
+
+Não foi comprovado parser de texto, ponteiro de script, consulta efetiva à tabela 0x1A551A, conversão código→glifo ou renderer. Permanecem bloqueados encoder de produção, escrita da ROM, realocação e patch de ponteiros.
+
+Na retomada: rodar a suíte, regenerar o relatório M68K, verificar o avanço além de 0x010B3A após NEGX e rastrear as origens de A0–A3 dentro dos blocos alcançáveis.
