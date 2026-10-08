@@ -121,6 +121,17 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         mnemonic = "LEA abs.l" if op == 0x41F9 else "PEA abs.l"
         return M68KInstruction(offset, 6, mnemonic, target)
 
+    # MOVE.L #imm,(xxx).W: opcode 0x23xx.
+    if (op & 0xF1FF) == 0x237C:
+        if offset + 8 > len(data):
+            return None
+        target = int.from_bytes(data[offset + 6 : offset + 8], "big")
+        return M68KInstruction(offset, 8, "MOVE.L #imm,(xxx).W", target)
+
+    # MOVE.W (An),Dn.
+    if (op & 0xF1C0) == 0x3010:
+        return M68KInstruction(offset, 2, "MOVE.W (An),Dn")
+
     if (op & 0xF100) == 0x7000:
         return M68KInstruction(offset, 2, "MOVEQ")
 
@@ -134,6 +145,10 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         if offset + 4 > len(data):
             return None
         return M68KInstruction(offset, 4, "MOVE.B (An,Dn.W/L),Dm")
+
+    # MOVEA.L Dn,An.
+    if (op & 0xF1C0) == 0x2040:
+        return M68KInstruction(offset, 2, "MOVEA.L Dn,An")
 
     if (op & 0xF1C0) == 0x2640:
         if offset + 4 > len(data):
@@ -171,6 +186,16 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         displacement = _signed16(_word(data, offset + 2))
         target = offset + 4 + displacement
         return M68KInstruction(offset, 4, "DBcc", target)
+
+    # MOVE.W #imm,SR.
+    if op == 0x46FC:
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "MOVE.W #imm,SR")
+
+    # ADDQ/SUBQ em formas de registrador.
+    if (op & 0xF100) in (0x5000, 0x5100):
+        return M68KInstruction(offset, 2, "ADDQ/SUBQ")
 
     # Shift/rotate.
     if (op & 0xF000) == 0xE000:
