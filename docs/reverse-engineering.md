@@ -299,3 +299,88 @@ Os resultados mais importantes serão:
 4. blocos de código que contenham testes/leituras próximos aos controles 0x01, 0x06 e 0x0E.
 
 A partir daí será possível escolher pontos de entrada para uma análise 68000 mais profunda, em vez de procurar cegamente por toda a ROM.
+
+
+## 27. Resultado: referências literais não encontradas
+
+A primeira execução do comando scan-refs retornou:
+
+    opening_script: 0
+    character_table: 0
+
+Isso é um resultado válido e importante.
+
+**CONFIRMADO:** a ROM não contém, nas formas pesquisadas, referências literais diretas aos offsets 0x01626B e 0x1A551A.
+
+Portanto, não devemos concluir que essas estruturas sejam inacessíveis ao programa. O código pode calcular os endereços, usar tabelas intermediárias, carregar offsets relativos ou acessar dados através de registradores e estruturas de contexto.
+
+A estratégia de procurar somente o endereço final foi encerrada como método principal.
+
+## 28. Segunda abordagem: procurar a interpretação dos controles
+
+Foi adicionada:
+
+    src/dragonslayer_ptbr/analysis/m68k_control_tests.py
+
+Ela procura instruções 68000 inequívocas do formato:
+
+    CMPI.B #imm,Dn
+
+para os valores de controle já observados:
+
+    0x01
+    0x06
+    0x0E
+    0x00
+
+Novo comando:
+
+    python -m dragonslayer_ptbr scan-control-tests --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-control-tests.md
+
+Essa abordagem procura o comportamento do parser em vez do endereço final do texto.
+
+### Resultado exploratório na ROM local
+
+Uma análise equivalente sobre a ROM validada encontrou:
+
+- 28 ocorrências de CMPI.B para 0x01;
+- 28 ocorrências para 0x06;
+- 4 ocorrências para 0x0E.
+
+Os bytes 0x00 produzem muitas ocorrências e, por isso, são pouco discriminantes isoladamente.
+
+Foram observados três agrupamentos particularmente relevantes de comparações não-zero próximas:
+
+    0x1DE6C – 0x1DF0A
+    0x266C0 – 0x266E8
+    0x30B16 – 0x30B70
+
+Esses agrupamentos são **CANDIDATOS DE INVESTIGAÇÃO**, não engine confirmado.
+
+O bloco em torno de 0x266C0 contém uma sequência de comparações de D0 com valores 0x00–0x07, aparentando ser uma tabela/dispatcher de estados. Isso torna o bloco útil para entender o mecanismo de despacho, mas não há evidência suficiente para classificá-lo como parser de texto.
+
+O bloco em torno de 0x30B16 contém testes explícitos de 0x01 e 0x0E. Também é apenas candidato.
+
+### Próxima análise
+
+O próximo passo é correlacionar essas comparações com:
+
+1. instruções que leem bytes de memória;
+2. operações de pós-incremento em registradores de endereço, como MOVE.B (An)+,...;
+3. saltos condicionais imediatamente posteriores;
+4. chamadas JSR próximas;
+5. acesso a estruturas que possam apontar para scripts.
+
+A meta passa a ser reconstruir uma pequena cadeia de execução:
+
+    leitura de byte
+        ↓
+    comparação/teste
+        ↓
+    despacho do controle
+        ↓
+    avanço do ponteiro do script
+        ↓
+    renderização
+
+Somente quando essa cadeia for demonstrada um bloco será promovido a rotina de texto.
