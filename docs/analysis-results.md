@@ -1678,3 +1678,59 @@ regiões de texto
 Em paralelo, será feita a correlação com a tabela `0x1A551A`.
 
 O objetivo não é encontrar simplesmente uma instrução que "pareça" ser parser, mas obter uma cadeia reproduzível desde a leitura de dados até o processamento do texto.
+
+## 41. Atualização final da análise M68K — CFG e rotinas alcançáveis
+
+A análise de fluxo 68000 foi ampliada a partir do vetor de reset real (0x010620) e alcançou um conjunto maior de rotinas.
+
+- 43 blocos básicos;
+- 155 instruções reconhecidas;
+- blocos não sobrepostos;
+- chamadas absolutas identificadas;
+- destinos de JSR incorporados ao CFG;
+- retornos RTS identificados.
+
+### Cadeias de código observadas
+
+Chamadas confirmadas pelo CFG atual:
+
+0x01077A → JSR 0x00CADA
+0x01078A → JSR 0x009408
+0x0109AA → JSR 0x010AF2
+0x0109B6 → JSR 0x00B53E
+0x0109C2 → JSR 0x00B53E
+0x0109CE → JSR 0x00B53E
+0x0109DA → JSR 0x00B536
+0x010B16 → JSR 0x010B28
+
+As rotinas 0x009408 e 0x00B53E terminam em RTS no CFG atual. Isso é evidência de fluxo de execução real, mas ainda não prova relação com o engine de texto.
+
+### Ampliação incremental do decoder
+
+Durante o avanço do CFG foram encontrados opcodes reais que interrompiam blocos. O decoder agora possui suporte e testes para:
+
+- BTST #imm,<EA>;
+- LEA abs.l,A0–A7;
+- MOVE.W SR,<EA>;
+- NEGX.B/W/L <EA>.
+
+O último caso surgiu em 0x010B3A, onde 0x4000 interrompia a função iniciada em 0x010B28. A implementação de NEGX permanece conservadora e só aceita extensões de effective address já suportadas pelo decoder.
+
+### Rotina 0x0109A2
+
+O CFG mostra uma rotina com múltiplas chamadas: 0x0109AA → 0x010AF2, três chamadas para 0x00B53E e uma chamada para 0x00B536. A rotina merece investigação futura, mas não foi classificada como rotina de texto.
+
+### Classificação
+
+- CONFIRMADO: vetor de reset em 0x010620.
+- CONFIRMADO: CFG alcança múltiplas subrotinas por JSR absoluto.
+- CONFIRMADO: novas formas 68000 foram validadas diretamente pelos bytes da ROM.
+- FORTE EVIDÊNCIA: algumas famílias de rotinas formam cadeias de chamada reais.
+- HIPÓTESE: qualquer uma dessas cadeias ser o parser/renderizador de texto.
+- REBAIXADO: tratar MOVE.B + CMPI.B isoladamente como parser.
+
+### Ponto de retomada
+
+A próxima investigação deve rastrear origem dos registradores A0–A3, leituras MOVE.B, comparações com 0x01/0x06/0x0E/0x00 e chamadas que manipulam ponteiros, cruzando esses dados com as regiões textuais e com a tabela 0x1A551A.
+
+Nenhuma alteração da ROM original foi realizada.
