@@ -94,3 +94,21 @@ def test_pointer_scan_ignores_zero_offset_noise():
     assert result["16_bit"]["candidates"] == []
     assert result["24_bit"]["candidates"] == []
     assert result["32_bit"]["candidates"] == []
+
+
+def test_pointer_tables_detect_monotonic_entries():
+    """Verifica a detecção de uma pequena tabela de ponteiros crescente."""
+    from dragonslayer_ptbr.analysis.pointers import scan_pointer_candidates
+
+    rom = bytearray(0x400)
+    targets = (0x120, 0x140, 0x180, 0x1C0)
+    for index, target in enumerate(targets):
+        start = index * 2
+        rom[start : start + 2] = target.to_bytes(2, byteorder="big")
+
+    result = scan_pointer_candidates(bytes(rom), minimum_table_entries=4)
+    tables = result["16_bit"]["tables"]
+
+    assert tables
+    assert tables[0]["entries"] >= 4
+    assert tables[0]["targets"][:4] == list(targets)
