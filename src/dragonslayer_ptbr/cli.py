@@ -11,6 +11,11 @@ from .analysis.m68k_text_parser_candidates import (
     scan_text_parser_candidates,
     write_text_parser_report,
 )
+from .analysis.m68k_a3_flow import (
+    scan_a3_byte_reads,
+    scan_a3_definitions,
+    write_a3_report,
+)
 from .text.script_codec import render_script, tokenize_script
 
 
@@ -151,6 +156,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="bytes de contexto em cada lado (padrão: 16)",
     )
 
+    a3_flow = sub.add_parser(
+        "scan-a3-flow",
+        help="mapeia definições e leituras do registrador A3",
+    )
+    a3_flow.add_argument("--rom", required=True, type=Path)
+    a3_flow.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/m68k-a3-flow.md"),
+    )
+    a3_flow.add_argument(
+        "--context",
+        type=lambda value: int(value, 0),
+        default=12,
+        help="bytes de contexto em cada lado (padrão: 12)",
+    )
+
     return parser
 
 
@@ -160,6 +182,19 @@ def main() -> int:
 
     if not args.rom.is_file():
         raise SystemExit(f"ROM não encontrada: {args.rom}")
+
+    if args.command == "scan-a3-flow":
+        if args.context < 0:
+            raise SystemExit("context deve ser maior ou igual a zero")
+
+        data = args.rom.read_bytes()
+        definitions = scan_a3_definitions(data, context_size=args.context)
+        uses = scan_a3_byte_reads(data, context_size=args.context)
+        write_a3_report(definitions, uses, args.output)
+        print(f"Definições de A3 encontradas: {len(definitions)}")
+        print(f"Leituras de A3 encontradas: {len(uses)}")
+        print(f"Relatório: {args.output}")
+        return 0
 
     if args.command == "scan-text-parser-candidates":
         if args.max_distance < 0:
