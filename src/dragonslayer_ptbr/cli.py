@@ -62,6 +62,8 @@ def main() -> int:
         info = pointer_candidates[width]
         print(f"  - {width}: {info['candidate_count']} destinos repetidos; {len(info['tables'])} tabelas candidatas")
 
+    print(f"Regiões textuais candidatas: {len(report['text_regions'])}")
+
     classifications = report["structure"]["summary"]["classifications"]
     if classifications:
         print("Classificações:")
