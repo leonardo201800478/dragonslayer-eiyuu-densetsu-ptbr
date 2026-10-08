@@ -341,82 +341,155 @@ def build_control_flow_graph(
     entry_points: list[int] | None = None,
     max_blocks: int = 5000,
 ) -> list[CodeBlock]:
-    """Constrói um CFG inicial seguindo apenas instruções reconhecidas."""
+    """Constrói um CFG conservador com blocos básicos não sobrepostos.
+
+    A primeira etapa descobre instruções alcançáveis e seus sucessores. A
+    segunda transforma os pontos de entrada e destinos de controle em
+    fronteiras de blocos. Isso evita que um branch que aponte para o meio de
+    um bloco produza blocos sobrepostos.
+    """
     if max_blocks < 1:
         raise ValueError("max_blocks deve ser maior que zero")
 
     entries = list(entry_points) if entry_points is not None else [reset_vector(data)]
     pending = list(dict.fromkeys(entries))
+    instructions: dict[int, M68KInstruction] = {}
+    leaders: set[int] = set()
     visited: set[int] = set()
-    blocks: list[CodeBlock] = []
 
-    while pending and len(blocks) < max_blocks:
+    while pending:
         start = pending.pop()
-        if start is None:
+        if start is None or start in visited:
             continue
-        if start in visited or start < 0 or start >= len(data) or start % 2:
+        if start < 0 or start >= len(data) or start % 2:
             continue
-        visited.add(start)
 
-        instructions: list[M68KInstruction] = []
+        visited.add(start)
+        leaders.add(start)
         offset = start
-        reason = "unknown_opcode"
 
         while offset < len(data):
-            instruction = decode_instruction(data, offset)
-            if instruction is None:
-                reason = "unknown_opcode"
+            if offset in instructions:
                 break
 
-            instructions.append(instruction)
+            instruction = decode_instruction(data, offset)
+            if instruction is None:
+                break
+
+            instructions[offset] = instruction
             next_offset = offset + instruction.size
 
             if instruction.mnemonic in {"RTS", "RTE", "RTR"}:
-                reason = "return"
-                offset = next_offset
                 break
 
             if instruction.mnemonic in {"JMP abs.l", "JMP (An)"}:
                 if instruction.target is not None:
+                    leaders.add(instruction.target)
                     pending.append(instruction.target)
-                reason = "jump" if instruction.mnemonic == "JMP abs.l" else "indirect_jump"
-                offset = next_offset
                 break
 
             if instruction.mnemonic in {"JSR abs.l", "JSR (An)"}:
                 if instruction.target is not None:
+                    leaders.add(instruction.target)
                     pending.append(instruction.target)
+                if next_offset < len(data):
+                    leaders.add(next_offset)
                 offset = next_offset
                 continue
 
             if instruction.mnemonic == "BRA":
                 if instruction.target is not None:
+                    leaders.add(instruction.target)
                     pending.append(instruction.target)
-                reason = "branch"
-                offset = next_offset
                 break
 
             if instruction.mnemonic == "BSR":
                 if instruction.target is not None:
+                    leaders.add(instruction.target)
                     pending.append(instruction.target)
+                if next_offset < len(data):
+                    leaders.add(next_offset)
                 offset = next_offset
                 continue
 
-            if instruction.mnemonic.startswith("B") and instruction.mnemonic not in {"BRA", "BSR"}:
+            if instruction.mnemonic.startswith("B") and instruction.mnemonic not in {
+                "BRA",
+                "BSR",
+            }:
                 if instruction.target is not None:
+                    leaders.add(instruction.target)
                     pending.append(instruction.target)
                 if next_offset < len(data):
+                    leaders.add(next_offset)
                     pending.append(next_offset)
-                reason = "conditional_branch"
-                offset = next_offset
                 break
 
             offset = next_offset
 
-        if instructions:
-            blocks.append(CodeBlock(start, offset, tuple(instructions), reason))
+    blocks: list[CodeBlock] = []
+    for start in sorted(leaders):
+        if len(blocks) >= max_blocks:
+            break
 
-    return sorted(blocks, key=lambda block: block.start)
+        instruction = instructions.get(start)
+        if instruction is None:
+            continue
+
+        block_instructions: list[M68KInstruction] = []
+        offset = start
+        reason = "unknown_opcode"
+
+        while offset in instructions:
+            if offset != start and offset in leaders:
+                reason = "block_boundary"
+                break
+
+            current = instructions[offset]
+            block_instructions.append(current)
+            next_offset = offset + current.size
+
+            if current.mnemonic in {"RTS", "RTE", "RTR"}:
+                reason = "return"
+                offset = next_offset
+                break
+
+            if current.mnemonic in {"JMP abs.l", "JMP (An)"}:
+                reason = "jump" if current.mnemonic == "JMP abs.l" else "indirect_jump"
+                offset = next_offset
+                break
+
+            if current.mnemonic == "BRA":
+                reason = "branch"
+                offset = next_offset
+                break
+
+            if current.mnemonic == "BSR":
+                reason = "call"
+                offset = next_offset
+                break
+
+            if current.mnemonic.startswith("B"):
+                reason = "conditional_branch"
+                offset = next_offset
+                break
+
+            if current.mnemonic in {"JSR abs.l", "JSR (An)"}:
+                offset = next_offset
+                continue
+
+            offset = next_offset
+
+        if block_instructions:
+            blocks.append(
+                CodeBlock(
+                    start=start,
+                    end=offset,
+                    instructions=tuple(block_instructions),
+                    stopped_reason=reason,
+                )
+            )
+
+    return blocks
 
 
 def write_code_report(blocks: list[CodeBlock], output) -> None:
