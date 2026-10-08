@@ -60,7 +60,7 @@ def main() -> int:
     print("Candidatos a ponteiros:")
     for width in ("16_bit", "24_bit", "32_bit"):
         info = pointer_candidates[width]
-        print(f"  - {width}: {info['candidate_count']}")
+        print(f"  - {width}: {info['candidate_count']} destinos repetidos; {len(info['tables'])} tabelas candidatas")
 
     classifications = report["structure"]["summary"]["classifications"]
     if classifications:
