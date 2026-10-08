@@ -16,6 +16,10 @@ from .analysis.m68k_a3_flow import (
     scan_a3_definitions,
     write_a3_report,
 )
+from .analysis.m68k_indexed_reads import (
+    scan_indexed_byte_reads,
+    write_indexed_byte_report,
+)
 from .text.script_codec import render_script, tokenize_script
 
 
@@ -173,6 +177,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="bytes de contexto em cada lado (padrão: 12)",
     )
 
+    indexed = sub.add_parser(
+        "scan-indexed-reads",
+        help="localiza leituras MOVE.B com endereçamento indexado",
+    )
+    indexed.add_argument("--rom", required=True, type=Path)
+    indexed.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/m68k-indexed-reads.md"),
+    )
+    indexed.add_argument(
+        "--context",
+        type=lambda value: int(value, 0),
+        default=16,
+        help="bytes de contexto em cada lado (padrão: 16)",
+    )
+
     return parser
 
 
@@ -182,6 +203,17 @@ def main() -> int:
 
     if not args.rom.is_file():
         raise SystemExit(f"ROM não encontrada: {args.rom}")
+
+    if args.command == "scan-indexed-reads":
+        if args.context < 0:
+            raise SystemExit("context deve ser maior ou igual a zero")
+
+        data = args.rom.read_bytes()
+        occurrences = scan_indexed_byte_reads(data, context_size=args.context)
+        write_indexed_byte_report(occurrences, args.output)
+        print(f"Leituras indexadas encontradas: {len(occurrences)}")
+        print(f"Relatório: {args.output}")
+        return 0
 
     if args.command == "scan-a3-flow":
         if args.context < 0:
