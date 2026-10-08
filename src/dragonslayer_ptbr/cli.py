@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 
 from .analysis.rom import DEFAULT_BLOCK_SIZE, analyze_rom, write_report
+from .text.script_codec import render_script, tokenize_script
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -32,6 +33,34 @@ def build_parser() -> argparse.ArgumentParser:
         help="tamanho dos blocos em bytes; aceita decimal ou hexadecimal (padrão: 0x100)",
     )
 
+    decode = sub.add_parser(
+        "decode-text",
+        help="decodifica uma região confirmada do script sem modificar a ROM",
+    )
+    decode.add_argument("--rom", required=True, type=Path)
+    decode.add_argument(
+        "--offset",
+        required=True,
+        type=lambda value: int(value, 0),
+        help="offset inicial em bytes; aceita decimal ou hexadecimal",
+    )
+    decode.add_argument(
+        "--size",
+        required=True,
+        type=lambda value: int(value, 0),
+        help="quantidade de bytes; aceita decimal ou hexadecimal",
+    )
+    decode.add_argument(
+        "--output",
+        type=Path,
+        help="arquivo de saída UTF-8; se omitido, escreve no console",
+    )
+    decode.add_argument(
+        "--stop-at-terminator",
+        action="store_true",
+        help="para no primeiro terminador 0x00",
+    )
+
     return parser
 
 
@@ -41,6 +70,31 @@ def main() -> int:
 
     if not args.rom.is_file():
         raise SystemExit(f"ROM não encontrada: {args.rom}")
+
+    if args.command == "decode-text":
+        if args.offset < 0:
+            raise SystemExit("offset deve ser maior ou igual a zero")
+        if args.size <= 0:
+            raise SystemExit("size deve ser maior que zero")
+
+        data = args.rom.read_bytes()
+        end = args.offset + args.size
+        if end > len(data):
+            raise SystemExit("a região solicitada ultrapassa o tamanho da ROM")
+
+        tokens = tokenize_script(
+            data[args.offset:end],
+            stop_at_terminator=args.stop_at_terminator,
+        )
+        rendered = render_script(tokens)
+
+        if args.output:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(rendered, encoding="utf-8")
+            print(f"Texto decodificado: {args.output}")
+        else:
+            print(rendered)
+        return 0
 
     report = analyze_rom(args.rom, block_size=args.block_size)
     write_report(report, args.report)
