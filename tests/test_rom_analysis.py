@@ -34,7 +34,7 @@ def test_analysis_does_not_modify_rom(tmp_path: Path):
 def test_structural_analysis_scans_fixed_blocks(tmp_path: Path):
     """Verifica as métricas e classificações dos blocos da ROM."""
     path = tmp_path / "test.bin"
-    path.write_bytes(b"\\x00" * 0x100 + b"\\xFF" * 0x100 + b"A" * 0x100)
+    path.write_bytes(b"\x00" * 0x100 + b"\xFF" * 0x100 + b"A" * 0x100)
 
     report = analyze_rom(path, block_size=0x100)
     structure = report["structure"]
@@ -52,7 +52,7 @@ def test_structural_analysis_scans_fixed_blocks(tmp_path: Path):
 def test_block_size_must_be_positive(tmp_path: Path):
     """Garante erro explícito para tamanho de bloco inválido."""
     path = tmp_path / "test.bin"
-    path.write_bytes(b"\\x00" * 32)
+    path.write_bytes(b"\x00" * 32)
 
     with pytest.raises(ValueError, match="block_size"):
         analyze_rom(path, block_size=0)
@@ -82,14 +82,14 @@ def test_pointer_scan_rejects_invalid_minimum_references():
     from dragonslayer_ptbr.analysis.pointers import scan_pointer_candidates
 
     with pytest.raises(ValueError, match="minimum_references"):
-        scan_pointer_candidates(b"\\x00" * 32, minimum_references=0)
+        scan_pointer_candidates(b"\x00" * 32, minimum_references=0)
 
 
 def test_pointer_scan_ignores_zero_offset_noise():
     """Garante que preenchimento 00 não seja tratado como ponteiro para zero."""
     from dragonslayer_ptbr.analysis.pointers import scan_pointer_candidates
 
-    result = scan_pointer_candidates(b"\\x00" * 0x100, minimum_references=2)
+    result = scan_pointer_candidates(b"\x00" * 0x100, minimum_references=2)
 
     assert result["16_bit"]["candidates"] == []
     assert result["24_bit"]["candidates"] == []
