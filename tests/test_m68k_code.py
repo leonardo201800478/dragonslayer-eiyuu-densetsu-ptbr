@@ -45,3 +45,11 @@ def test_cfg_follows_jsr_and_return():
     starts = {block.start for block in blocks}
     assert 0x10 in starts
     assert 0x20 in starts
+
+
+def test_decode_bootstrap_pc_relative_lea():
+    rom = bytes.fromhex("4B FA 00 7C")
+    instruction = decode_instruction(rom, 0)
+    assert instruction is not None
+    assert instruction.mnemonic == "LEA d16(PC),An"
+    assert instruction.target == 0x80
