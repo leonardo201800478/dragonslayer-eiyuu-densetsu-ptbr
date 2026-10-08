@@ -196,6 +196,12 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         if extension is None:
             return None
         return M68KInstruction(offset, 2 + extension, "MOVE.W <EA>,CCR")
+    if (op & 0xFFC0) == 0x40C0:
+        extension = _ea_extension_size((op >> 3) & 0x7, op & 0x7, 2, source=False)
+        if extension is None:
+            return None
+        return M68KInstruction(offset, 2 + extension, "MOVE.W SR,<EA>")
+
 
     if op == 0x4E71:
         return M68KInstruction(offset, 2, "NOP")
