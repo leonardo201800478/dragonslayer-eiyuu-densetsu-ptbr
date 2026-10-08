@@ -38,14 +38,25 @@ def _delimiter_runs(
             continue
 
         size = offset - start
-        if minimum_size <= size <= maximum_size:
+        run_start = start
+        run_end = offset
+
+        # Ignore padding FF surrounding a candidate. This keeps the
+        # candidate offset tied to the actual payload rather than padding.
+        while run_start < run_end and data[run_start] == 0xFF:
+            run_start += 1
+        while run_end > run_start and data[run_end - 1] == 0xFF:
+            run_end -= 1
+
+        candidate_size = run_end - run_start
+        if minimum_size <= candidate_size <= maximum_size:
             runs.append(
                 {
-                    "offset": start,
-                    "end": offset,
-                    "size": size,
+                    "offset": run_start,
+                    "end": run_end,
+                    "size": candidate_size,
                     "delimiter": delimiter,
-                    "data": data[start:offset],
+                    "data": data[run_start:run_end],
                 }
             )
         start = offset + 1
