@@ -256,7 +256,7 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         mnemonic = "LEA abs.l" if op == 0x41F9 else "PEA abs.l"
         return M68KInstruction(offset, 6, mnemonic, target)
 
-    if (op & 0xF1FF) == 0x4BFA:
+    if (op & 0xF1FF) == 0x41FA:
         if offset + 4 > len(data):
             return None
         displacement = _signed16(_word(data, offset + 2))
