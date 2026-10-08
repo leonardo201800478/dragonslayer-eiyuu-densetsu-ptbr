@@ -479,9 +479,10 @@ def build_control_flow_graph(
                 break
 
             if current.mnemonic == "BSR":
-                reason = "call"
+                # BSR é uma chamada com retorno: o destino entra no CFG,
+                # mas a execução sequencial continua após a instrução.
                 offset = next_offset
-                break
+                continue
 
             if current.mnemonic.startswith("B"):
                 reason = "conditional_branch"
