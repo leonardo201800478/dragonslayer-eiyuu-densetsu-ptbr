@@ -298,6 +298,13 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
     if (op & 0xF100) == 0x0100:
         return M68KInstruction(offset, 2, "BIT dynamic")
 
+    # Bit operation with immediate bit number. The extension word carries
+    # the bit number, so the instruction occupies four bytes.
+    if (op & 0xFFC0) == 0x0800:
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "BTST #imm,<EA>")
+
     if (op & 0xFF00) == 0x0C00:
         if offset + 4 > len(data):
             return None
