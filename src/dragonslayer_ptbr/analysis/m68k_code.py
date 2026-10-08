@@ -150,6 +150,42 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
             return None
         return M68KInstruction(offset, 4, "LEA d16(An),An")
 
+    # MOVEM com lista de registradores.
+    if (op & 0xFB80) in (0x4880, 0x4C80):
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "MOVEM")
+
+    # DBcc: opcode + deslocamento de 16 bits.
+    if (op & 0xF0F8) == 0x50C8:
+        if offset + 4 > len(data):
+            return None
+        displacement = _signed16(_word(data, offset + 2))
+        target = offset + 4 + displacement
+        return M68KInstruction(offset, 4, "DBcc", target)
+
+    # Shift/rotate.
+    if (op & 0xF000) == 0xE000:
+        return M68KInstruction(offset, 2, "SHIFT/ROTATE")
+
+    # Imediatos byte para registrador.
+    if (op & 0xFF00) in (0x0200, 0x0400, 0x0600, 0x0A00, 0x0C00):
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "IMMEDIATE.B")
+
+    # MOVE.L #imm,An.
+    if (op & 0xF1FF) == 0x207C:
+        if offset + 6 > len(data):
+            return None
+        return M68KInstruction(offset, 6, "MOVE.L #imm,An")
+
+    # MOVE d16(An),Dn.
+    if (op & 0xF1C0) in (0x1028, 0x3028):
+        if offset + 4 > len(data):
+            return None
+        return M68KInstruction(offset, 4, "MOVE d16(An),Dn")
+
     if (op & 0xFF00) == 0x0C00:
         if offset + 4 > len(data):
             return None
