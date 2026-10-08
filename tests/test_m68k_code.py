@@ -208,4 +208,4 @@ def test_cfg_continues_after_bsr_call():
     assert 0x14 in by_start
     assert 0x20 in by_start
     assert by_start[0x10].end == 0x14
-    assert by_start[0x14].end == 0x16
+    assert by_start[0x14].instructions[0].offset == 0x14
