@@ -158,3 +158,25 @@ def test_cfg_blocks_do_not_overlap_instruction_ranges():
     for index, (start, end) in enumerate(ranges):
         for other_start, other_end in ranges[index + 1 :]:
             assert end <= other_start or other_end <= start
+
+
+
+def test_decode_lea_absolute_all_address_registers():
+    instruction = decode_instruction(
+        bytes.fromhex("4F F9 00 FF 18 3E"),
+        0,
+    )
+    assert instruction is not None
+    assert instruction.mnemonic == "LEA abs.l,A7"
+    assert instruction.size == 6
+    assert instruction.target == 0x00FF183E
+
+
+def test_decode_lea_absolute_a1():
+    instruction = decode_instruction(
+        bytes.fromhex("43 F9 00 FF 00 00"),
+        0,
+    )
+    assert instruction is not None
+    assert instruction.mnemonic == "LEA abs.l,A1"
+    assert instruction.target == 0x00FF0000
