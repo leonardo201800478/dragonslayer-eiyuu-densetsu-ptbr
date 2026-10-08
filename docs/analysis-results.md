@@ -1564,3 +1564,117 @@ A tradução PT-BR só começa quando houver, para pelo menos uma entrada:
 O primeiro teste será chamado **M1 — Primeiro Texto PT-BR Executável**.
 
 Até esse marco, o código de escrita deve permanecer separado das ferramentas de análise e nenhuma alteração deve ser aplicada à ROM original.
+
+
+---
+
+## 39. Início da análise de fluxo 68000
+
+A investigação passou a utilizar o vetor de reset real da ROM como ponto de entrada.
+
+O vetor encontrado no cabeçalho Mega Drive contém:
+
+```
+PC inicial = 0x010620
+```
+
+Os primeiros bytes executáveis nessa posição são:
+
+```
+0x010620  4A B9 00 A1 00 08
+0x010626  66 06
+0x010628  4A 79 00 A1 00 0C
+0x01062E  66 7C
+0x010630  4B FA 00 7C
+0x010634  4C 9D 00 E0
+...
+```
+
+Isso é uma evidência importante porque permite deixar de tratar a ROM inteira como um conjunto indiferenciado de bytes e começar o rastreamento por um ponto de execução real.
+
+### Analisador criado
+
+Foi adicionado:
+
+```
+src/dragonslayer_ptbr/analysis/m68k_code.py
+```
+
+com testes em:
+
+```
+tests/test_m68k_code.py
+```
+
+e comando:
+
+```powershell
+python -m dragonslayer_ptbr scan-m68k-code `
+  --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" `
+  --output reports/m68k-code-flow.md
+```
+
+O analisador atualmente reconhece um subconjunto conservador de instruções 68000, incluindo:
+
+- `RTS`, `RTE`, `RTR`;
+- `BRA`, `BSR` e condicionais;
+- `JSR abs.l` e `JMP abs.l`;
+- `LEA`;
+- `TAS`;
+- `MOVEQ`;
+- leituras `MOVE.B`;
+- `MOVEA`;
+- `CMPI`;
+- `MOVEM`;
+- `DBcc`;
+- operações imediatas e shifts em formas reconhecidas.
+
+O objetivo não é substituir um desassembler completo. Quando o opcode não é reconhecido, o bloco é encerrado em vez de adivinhar seu tamanho.
+
+### Critério de interpretação
+
+Os blocos produzidos pelo analisador são classificados como **evidência de fluxo candidato**, não como prova absoluta de código.
+
+A próxima etapa será usar esses blocos para filtrar:
+
+- `MOVE.B (An)+,Dn`;
+- `MOVE.B (An,Dn.W/L),Dm`;
+- comparações com `0x01`;
+- comparações com `0x06`;
+- comparações com `0x0E`;
+- tratamento de `0x00`;
+- chamadas `JSR/BSR`.
+
+O objetivo é encontrar uma cadeia de execução que tenha relação comprovada com as regiões textuais já identificadas.
+
+### Observação importante
+
+A análise inicial mostrou que o ponto de entrada começa com instruções que não estavam cobertas pelo scanner anterior, como `TAS abs.l`. Por isso, o novo decodificador está sendo ampliado incrementalmente.
+
+Isso é intencional: é preferível ampliar a cobertura de instruções conforme surgem evidências reais na ROM do que implementar um desassembler especulativo e produzir um CFG aparentemente completo, porém incorreto.
+
+---
+
+## 40. Próximo cruzamento de evidências
+
+Com o fluxo 68000 inicial disponível, a próxima investigação será:
+
+```
+blocos de código alcançáveis
+        ↓
+leituras MOVE.B
+        ↓
+CMPI #controle
+        ↓
+branches/JSR/BSR
+        ↓
+origem dos registradores A0–A3
+        ↓
+dados apontados
+        ↓
+regiões de texto
+```
+
+Em paralelo, será feita a correlação com a tabela `0x1A551A`.
+
+O objetivo não é encontrar simplesmente uma instrução que "pareça" ser parser, mas obter uma cadeia reproduzível desde a leitura de dados até o processamento do texto.
