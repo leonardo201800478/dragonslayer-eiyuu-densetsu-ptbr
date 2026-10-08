@@ -56,3 +56,30 @@ def test_block_size_must_be_positive(tmp_path: Path):
 
     with pytest.raises(ValueError, match="block_size"):
         analyze_rom(path, block_size=0)
+
+
+def test_pointer_candidates_find_repeated_big_endian_targets():
+    """Verifica a descoberta de referências repetidas a um offset da ROM."""
+    from dragonslayer_ptbr.analysis.pointers import scan_pointer_candidates
+
+    target = 0x120
+    pointer = target.to_bytes(2, byteorder="big")
+    rom = bytearray(0x200)
+    rom[0x10:0x12] = pointer
+    rom[0x20:0x22] = pointer
+    rom[0x30:0x32] = pointer
+
+    result = scan_pointer_candidates(bytes(rom), minimum_references=2)
+    candidates = result["16_bit"]["candidates"]
+
+    assert candidates
+    assert candidates[0]["target"] == target
+    assert candidates[0]["references"] == 3
+
+
+def test_pointer_scan_rejects_invalid_minimum_references():
+    """Garante validação do parâmetro mínimo de referências."""
+    from dragonslayer_ptbr.analysis.pointers import scan_pointer_candidates
+
+    with pytest.raises(ValueError, match="minimum_references"):
+        scan_pointer_candidates(b"\x00" * 32, minimum_references=0)
