@@ -94,7 +94,7 @@ def _candidate_score(data: bytes, delimiter: int | None) -> tuple[float, list[st
         score += 0.15
         evidence.append("entropia intermediária")
     if ff_ratio > 0.20:
-        score -= 0.25
+        score -= 0.40
         evidence.append("alto preenchimento FF")
 
     if zero_ratio <= 0.20 and ff_ratio <= 0.20:
