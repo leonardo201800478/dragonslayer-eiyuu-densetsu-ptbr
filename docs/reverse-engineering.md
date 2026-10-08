@@ -384,3 +384,43 @@ A meta passa a ser reconstruir uma pequena cadeia de execução:
     renderização
 
 Somente quando essa cadeia for demonstrada um bloco será promovido a rotina de texto.
+
+## 29. Rastreamento estático de A3
+
+Foi adicionada a ferramenta:
+
+    src/dragonslayer_ptbr/analysis/m68k_a3_flow.py
+
+Ela procura definições explícitas de A3 por LEA, MOVEA.L e MOVEA.W, além de usos MOVE.B (A3)+,Dn.
+
+Novo comando:
+
+    python -m dragonslayer_ptbr scan-a3-flow --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-a3-flow.md
+
+### Resultado preliminar na ROM
+
+A análise local encontrou muitos usos de (A3)+, mas a região de maior interesse apresentou uma diferença importante:
+
+- 0x026ADA: MOVEA.L $12(A1),A3;
+- 0x026AE0: MOVE.B (A3)+,D0.
+
+Isso demonstra uma origem concreta de A3 imediatamente antes de uma rotina que compara o byte lido com 0x00 até 0x05. Esse bloco continua sendo CANDIDATO, porque a comparação aparenta ser um dispatcher de estados e não há ainda ligação com o protocolo textual da abertura.
+
+Na família 0x0308xx–0x030cxx, o uso de (A3)+ ocorre sem uma definição local próxima de A3. A definição estática anterior mais próxima é 0x0309EE, onde aparece LEA abs.l 0x00FF20AE,A3. Isso constitui evidência contra a interpretação imediata dessa família como parser de script: A3 pode estar apontando para uma estrutura de RAM do jogo.
+
+Outra ocorrência relevante é 0x02B344:
+
+    LEA $0001(A3),A3
+    MOVE.B (A3)+,D0
+
+Ela demonstra consumo sequencial de um byte a partir de um A3 recebido de contexto anterior, mas a rotina que fornece esse A3 ainda não foi identificada.
+
+### Estado da hipótese
+
+DESCARTADO como conclusão: MOVE.B (A3)+,D0 + CMPI.B não é suficiente para identificar o engine de texto.
+
+CANDIDATO: 0x02B344 merece rastreamento adicional porque há alteração explícita do ponteiro A3 imediatamente antes da leitura.
+
+CANDIDATO: 0x026ADA–0x026AE0 demonstra uma cadeia completa de definição de A3 → leitura → despacho, mas ainda não foi ligada ao texto.
+
+O próximo passo deve ser encontrar os chamadores indiretos ou tabelas de entrada dessas rotinas e, principalmente, verificar se A3 pode ser alimentado por dados derivados da região 0x01626B.
