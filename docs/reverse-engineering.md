@@ -97,3 +97,40 @@ Toda informação específica do jogo deve ser classificada como:
 - **DESCARTADO** — testado e considerado incompatível.
 
 Nenhum item classificado como REFERÊNCIA ou HIPÓTESE deve ser usado como offset definitivo do jogo.
+
+
+## Primeira confirmação direta da ROM
+
+Com a ROM japonesa local de 2 MiB, identificada por CRC32 **01BC1604** e SHA-1 **F67C9139BBC93F171E274A5CD3FBA66480CD8244**, foi possível confirmar diretamente o charset em regiões de texto:
+
+- **CONFIRMADO — Shift-JIS:** nomes e frases japonesas presentes na ROM decodificam corretamente com o codec shift_jis.
+- Exemplos de evidência binária: **セリオス** em **0x016529** e **アクダム** em **0x016583**.
+- A abertura narrativa forma uma região textual contínua aproximadamente entre **0x01626B** e **0x01667F**.
+- Há outras regiões textuais confirmáveis, entre elas aproximadamente **0x02DF10–0x02E14D**, **0x02EE63–0x02F036** e **0x032325–0x03267A**.
+
+Também foi confirmado o uso de bytes de controle misturados ao Shift-JIS:
+
+- **0x01** aparece como separador de linha na abertura;
+- **0x06 xx yy** aparece repetidamente como controle de três bytes;
+- **0x00** aparece como terminador em diversas estruturas;
+- outros bytes abaixo de **0x20** (**0x05**, **0x07**, **0x0A**, **0x0D**, **0x0F**, **0x1E** e **0x1F**) também aparecem no script e ainda não tiveram sua semântica determinada.
+
+Isso permite afirmar que o problema não é mais "descobrir se existe texto": **o texto japonês foi localizado e o charset foi confirmado**. O próximo problema é reconstruir o formato lógico das entradas, seus ponteiros e a semântica dos controles.
+
+## Ferramenta inicial de leitura
+
+Foi adicionado o módulo text/script_codec.py, que:
+
+- decodifica caracteres Shift-JIS;
+- preserva controles simples;
+- preserva 0x06 mais dois bytes como controle estendido;
+- preserva bytes desconhecidos como RAW;
+- pode parar no terminador 0x00;
+- não modifica a ROM;
+- não atribui significado aos controles ainda.
+
+A CLI agora possui o comando decode-text. Exemplo:
+
+    python -m dragonslayer_ptbr decode-text --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --offset 0x1626B --size 0x420 --output reports/opening-script.txt
+
+Esse comando é deliberadamente de leitura. A etapa de encoder/inserção permanece bloqueada até que o formato das referências e o significado dos controles sejam confirmados.
