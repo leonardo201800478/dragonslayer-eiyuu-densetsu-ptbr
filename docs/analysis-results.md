@@ -1439,3 +1439,96 @@ entrada de script
 ```
 
 Essa cadeia será a referência para generalizar o extrator para as demais regiões.
+
+
+---
+
+## 17. Análise dos caracteres latinos e acentuação PT-BR
+
+A investigação da tabela localizada em `0x1A551A` produziu uma descoberta relevante.
+
+O intervalo observado até `0x1A62D2` contém **1756 entradas de 16 bits** e não é composto somente por códigos Shift-JIS japoneses. Há também códigos latinos de um byte.
+
+A tabela contém, entre outros, os códigos:
+
+```text
+00C0 À
+00C1 Á
+00C2 Â
+00C3 Ã
+00C7 Ç
+00C9 É
+00CA Ê
+00CD Í
+00D3 Ó
+00D4 Ô
+00D5 Õ
+00DA Ú
+```
+
+Por outro lado, os códigos necessários para os minúsculos acentuados portugueses não aparecem:
+
+```text
+00E0 à
+00E1 á
+00E2 â
+00E3 ã
+00E7 ç
+00E9 é
+00EA ê
+00ED í
+00F3 ó
+00F4 ô
+00F5 õ
+00FA ú
+```
+
+### Consequência
+
+A hipótese anterior de que seria necessário criar toda a acentuação a partir de uma tabela Shift-JIS nova foi refinada.
+
+O jogo possui uma tabela de caracteres **híbrida/proprietária**, com códigos japoneses de dois bytes e códigos latinos de um byte.
+
+Isso abre uma possibilidade particularmente interessante para a tradução PT-BR: os minúsculos acentuados podem potencialmente receber códigos de um byte já aceitos pela rotina, desde que consigamos identificar entradas substituíveis ou estender a tabela sem quebrar o mecanismo de lookup.
+
+Ainda não é seguro escolher quais caracteres japoneses podem ser substituídos. A ausência de um código nas 47 regiões textuais detectadas não prova que ele nunca seja usado pelo jogo.
+
+### Próxima cadeia de evidência
+
+A investigação agora deve localizar:
+
+```
+código do script
+    ↓
+rotina de leitura/conversão
+    ↓
+consulta à tabela 0x1A551A
+    ↓
+índice do glifo
+    ↓
+endereço/formato da fonte
+    ↓
+renderização
+```
+
+Somente depois dessa confirmação será criado o patch de fonte PT-BR.
+
+O catálogo programático foi adicionado em:
+
+```
+src/dragonslayer_ptbr/analysis/character_table.py
+```
+
+com testes em:
+
+```
+tests/test_character_table.py
+```
+
+e relatório dedicado em:
+
+```
+reports/latin-character-analysis.md
+```
+
+Nenhuma dessas alterações modifica a ROM original.
