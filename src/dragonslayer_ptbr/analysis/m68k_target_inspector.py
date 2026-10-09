@@ -21,8 +21,10 @@ def _format_raw_context(data: bytes, target: int) -> list[str]:
     start = max(0, target - RAW_CONTEXT_BEFORE)
     end = min(len(data), target + RAW_CONTEXT_AFTER)
     lines = [
-        f"- Janela bruta: `0x{start:06X}`–`0x{end:06X}` "
-        f"({end - start} bytes; sem interpretação de instruções)."
+        (
+            f"- Janela bruta: `0x{start:06X}`–`0x{end:06X}` "
+            f"({end - start} bytes; sem interpretação de instruções)."
+        )
     ]
     for offset in range(start, end, 8):
         chunk = data[offset : min(offset + 8, end)]
