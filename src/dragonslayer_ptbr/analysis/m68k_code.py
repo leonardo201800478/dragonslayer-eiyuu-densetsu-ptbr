@@ -350,6 +350,21 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
     if (op & 0xF100) == 0x7000:
         return M68KInstruction(offset, 2, "MOVEQ")
 
+    # ADDA/SUBA.W/L, incluindo operando imediato. O modo de EA e o
+    # tamanho da extensão precisam ser respeitados para manter o alinhamento.
+    if (op & 0xF000) in (0x9000, 0xD000) and ((op >> 6) & 0x7) in (3, 7):
+        source_mode = (op >> 3) & 0x7
+        source_register = op & 0x7
+        operand_size = 4 if ((op >> 6) & 0x7) == 7 else 2
+        extension = _ea_extension_size(
+            source_mode, source_register, operand_size, source=True
+        )
+        if extension is None:
+            return None
+        operation = "ADDA" if (op & 0xF000) == 0xD000 else "SUBA"
+        size_name = "L" if operand_size == 4 else "W"
+        return M68KInstruction(offset, 2 + extension, f"{operation}.{size_name}")
+
     # Todas as formas gerais de MOVE/MOVEA.
     move = _decode_move(data, offset, op)
     if move is not None:
