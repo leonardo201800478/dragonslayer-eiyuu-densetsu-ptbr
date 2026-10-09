@@ -437,3 +437,30 @@ O decoder foi ampliado somente quando os bytes reais encontrados no fluxo exigir
 A presença isolada de MOVE.B (An)+,Dn ou CMPI.B #imm,Dn continua insuficiente para classificar uma rotina como parser. A promoção exige uma cadeia de execução que conecte dados de script, leitura sequencial, identificação de caracteres/controles e processamento/renderização.
 
 O próximo passo permanece o rastreamento de A0–A3, leituras de bytes e chamadas dentro dos blocos alcançáveis, cruzando os resultados com as regiões textuais e a tabela 0x1A551A.
+
+
+## 30. Rastreamento conservador de A0-A3
+
+Foi adicionada a ferramenta:
+
+    src/dragonslayer_ptbr/analysis/m68k_register_flow.py
+
+e o comando:
+
+    python -m dragonslayer_ptbr scan-m68k-register-flow --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-register-flow.md
+
+O rastreamento parte do CFG alcançável pelo vetor de reset e procura, dentro de cada bloco básico:
+
+- definições constantes de A0-A3 por LEA abs.l;
+- definições relativas por LEA d16(PC);
+- MOVEA.L/W com imediato;
+- redefinições de A0-A3 por MOVEA;
+- leituras MOVE.B (A0-A3) e (A0-A3)+;
+- chamadas JSR.
+
+A origem só é associada a uma leitura quando está no mesmo bloco básico e não houve JSR entre a definição e a leitura. Não há propagação artificial através de fronteiras de blocos ou chamadas.
+
+**Objetivo desta etapa:** reduzir a busca por rotinas que consomem bytes sequencialmente e identificar candidatos em que o ponteiro de dados tenha uma origem concreta.
+
+**Limite:** mesmo uma associação A3 → MOVE.B (A3)+ não prova que os dados sejam texto. A promoção para engine de texto continua dependendo da correlação com controles 0x01/0x06/0x0E/0x00 e com a renderização/fonte.
+
