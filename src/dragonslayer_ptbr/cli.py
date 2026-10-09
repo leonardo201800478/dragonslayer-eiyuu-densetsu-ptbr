@@ -11,6 +11,7 @@ from .analysis.m68k_a3_flow import (
 )
 from .analysis.m68k_code import build_control_flow_graph, write_code_report
 from .analysis.m68k_control_tests import scan_control_tests, write_control_test_report
+from .analysis.m68k_register_flow import trace_register_flow, write_register_flow_report
 from .analysis.m68k_indexed_reads import (
     scan_indexed_byte_reads,
     write_indexed_byte_report,
@@ -166,6 +167,20 @@ def main() -> int:
         write_code_report(blocks, args.output)
         print(f"Blocos de código alcançáveis: {len(blocks)}")
         print(f"Instruções reconhecidas: {sum(len(block.instructions) for block in blocks)}")
+        print(f"Relatório: {args.output}")
+        return 0
+
+    if args.command == "scan-m68k-register-flow":
+        if args.max_blocks < 1:
+            raise SystemExit("max-blocks deve ser maior que zero")
+        data = args.rom.read_bytes()
+        blocks = build_control_flow_graph(data, max_blocks=args.max_blocks)
+        report = trace_register_flow(data, blocks)
+        write_register_flow_report(report, args.output)
+        print(f"Blocos analisados: {report.blocks}")
+        print(f"Definições A0-A3: {len(report.definitions)}")
+        print(f"Leituras de byte: {len(report.reads)}")
+        print(f"Chamadas JSR: {len(report.calls)}")
         print(f"Relatório: {args.output}")
         return 0
 
