@@ -89,15 +89,16 @@ def render_entry_overlap_report(
         lines.append("Nenhuma sobreposição entre as entradas analisadas e instruções reconhecidas.")
     else:
         lines.extend([
-            "| Entrada dentro da instrução | Instrução decodificada | Origem da análise |",
-            "|---:|---|---:|",
+            "| Entrada dentro da instrução | Instrução decodificada (intervalo `[início, fim)`) | Bytes | Origem da análise |",
+            "|---:|---|---|---:|",
         ])
         for item in overlaps:
+            instruction_bytes = item.instruction_bytes.hex(" ").upper()
             lines.append(
                 f"| `0x{item.entry_point:06X}` | "
                 f"`0x{item.instruction_offset:06X}–0x{item.instruction_end:06X}` "
                 f"(`{item.instruction_mnemonic}`) | "
-                f"`{item.instruction_bytes.hex(\" \").upper()}` | `0x{item.source_entry:06X}` |"
+                f"`{instruction_bytes}` | `0x{item.source_entry:06X}` |"
             )
     lines.extend([
         "",
