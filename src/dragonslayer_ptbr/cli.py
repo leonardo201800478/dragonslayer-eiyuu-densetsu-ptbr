@@ -17,6 +17,10 @@ from .analysis.m68k_indexed_reads import (
 )
 from .analysis.m68k_references import scan_known_targets, write_reference_report
 from .analysis.m68k_register_flow import trace_register_flow, write_register_flow_report
+from .analysis.m68k_reachable_text import (
+    scan_reachable_text_candidates,
+    write_reachable_text_report,
+)
 from .analysis.m68k_target_inspector import DEFAULT_TARGETS, write_target_inspection_report
 from .analysis.m68k_text_parser_candidates import (
     scan_text_parser_candidates,
@@ -95,6 +99,16 @@ def build_parser() -> argparse.ArgumentParser:
     ))
     parser_candidates.add_argument("--max-distance", type=lambda value: int(value, 0), default=16)
     parser_candidates.add_argument("--context", type=lambda value: int(value, 0), default=16)
+
+    reachable_text = sub.add_parser(
+        "scan-reachable-text",
+        help="cruza leituras e controles apenas nos blocos do CFG alcançável",
+    )
+    reachable_text.add_argument("--rom", required=True, type=Path)
+    reachable_text.add_argument(
+        "--output", type=Path, default=Path("reports/m68k-reachable-text.md")
+    )
+    reachable_text.add_argument("--max-distance", type=lambda value: int(value, 0), default=16)
 
     a3_flow = sub.add_parser("scan-a3-flow", help="mapeia definições e leituras do registrador A3")
     a3_flow.add_argument("--rom", required=True, type=Path)
@@ -231,6 +245,20 @@ def main() -> int:
         occurrences = scan_indexed_byte_reads(data, context_size=args.context)
         write_indexed_byte_report(occurrences, args.output)
         print(f"Leituras indexadas encontradas: {len(occurrences)}")
+        print(f"Relatório: {args.output}")
+        return 0
+
+    if args.command == "scan-reachable-text":
+        if args.max_distance < 0:
+            raise SystemExit("max-distance deve ser maior ou igual a zero")
+        data = args.rom.read_bytes()
+        blocks = build_control_flow_graph(data)
+        candidates = scan_reachable_text_candidates(
+            data, blocks, max_distance=args.max_distance
+        )
+        write_reachable_text_report(candidates, args.output)
+        print(f"Candidatos em blocos alcançáveis: {len(candidates)}")
+        print(f"Blocos analisados: {len(blocks)}")
         print(f"Relatório: {args.output}")
         return 0
 
