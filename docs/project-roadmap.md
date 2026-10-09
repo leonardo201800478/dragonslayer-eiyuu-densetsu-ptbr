@@ -520,3 +520,26 @@ Ferramentas de terceiros serão auxiliares e opcionais. Não devem se tornar dep
 Não considerar o engine de texto localizado apenas por encontrar `MOVE.B (An)+,Dn`, comparações com `0x01/0x06/0x0E/0x00` ou uma sequência plausível de instruções. A promoção de um candidato exige evidência estática coerente e, quando viável, confirmação durante a execução do jogo.
 
 **Estado deste checkpoint:** ferramentas selecionadas para avaliação; ainda não há evidência de que tenham sido executadas contra esta ROM. CI e divergência do CFG permanecem pendentes até nova execução documentada.
+
+## 12. Hipótese de compressão da fonte
+
+**Estado: HIPÓTESE aberta; não confirmada na ROM atual.**
+
+Uma referência comunitária secundária menciona ferramentas/notas históricas de compressão de texto e fonte relacionadas à série, mas os arquivos originais ainda não foram recuperados nem verificados. O projeto passa a considerar explicitamente a possibilidade de compressão sem tratá-la como fato.
+
+Investigar separadamente:
+
+- fonte armazenada como tiles sem compressão;
+- fonte comprimida e expandida em tempo de execução;
+- fonte sem compressão com mapeamento/tabelas próprias;
+- combinação de formatos diferentes para tiles e tabelas.
+
+### Tarefas
+
+1. Procurar os utilitários e as notas originais, registrando procedência e integridade.
+2. Identificar glifos visíveis no jogo e procurar correspondência nos dados gráficos da ROM.
+3. Usar debugger para observar origem, destino, tamanho dos dados e transferência para VRAM.
+4. Comparar resultados estáticos com os dados gráficos reais em runtime.
+5. Registrar testes que descartem ou sustentem cada hipótese em reports/, sem adicionar binários de terceiros ou ROM ao Git.
+
+**Gate:** só marcar compressão como confirmada quando uma transformação reproduzível ligar dados de origem identificados aos glifos observados no jogo. Não implementar um descompressor presumido e não alterar a ROM original. O plano de validação está detalhado na seção 9 de docs/third-party-tooling-and-validation-plan.md.
