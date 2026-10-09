@@ -511,3 +511,26 @@ O rastreador é intencionalmente conservador e limpa as associações locais em 
 2. Mapear os registradores preparados imediatamente antes das chamadas e observados após o retorno.
 3. Cruzar esses caminhos com a leitura dos bytes da abertura em `0x01626B)–`0x01668A` e com os controles `0x01`, `0x06 xx yy`, `0x0E` e `0x00`.
 4. Comparar os resultados com o candidato previamente documentado em `0x026ADA`–`0x026AE0`, sem promovê-lo a parser enquanto a conexão com o script não for demonstrada.
+
+
+## 32. Inspeção dos alvos de chamada candidatos
+
+Foi adicionada a ferramenta `src/dragonslayer_ptbr/analysis/m68k_target_inspector.py` e o comando:
+
+```powershell
+python -m dragonslayer_ptbr inspect-m68k-targets --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md"
+```
+
+Por padrão, o relatório `reports/m68k-target-inspection.md` inspeciona os alvos `0x001D1E`, `0x001EC0` e `0x00D8F0`. Para informar outros offsets:
+
+```powershell
+python -m dragonslayer_ptbr inspect-m68k-targets --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --targets 0x1D1E 0x1EC0 0xD8F0 --output reports/m68k-target-inspection.md
+```
+
+O relatório reúne:
+- chamadas diretas reconhecidas no CFG iniciado pelo vetor de reset;
+- instruções e bytes de cada bloco chamador encontrado;
+- fluxo decodificado ao iniciar uma análise separada em cada alvo;
+- avisos quando o decoder não reconhece instruções no offset.
+
+O início de uma análise em um alvo é intencional: permite inspecionar uma rotina mesmo que o CFG principal não a alcance devido a limitações do decoder. **Isso não prova que o alvo seja código executado em runtime.** Chamadas indiretas como `JSR (An)` permanecem sem destino resolvido. O relatório também não atribui semântica de parser a uma rotina sem demonstrar a ligação com scripts, controles e renderização.
