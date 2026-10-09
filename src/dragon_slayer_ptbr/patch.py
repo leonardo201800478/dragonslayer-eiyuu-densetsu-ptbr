@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -46,7 +47,7 @@ def load_manifest(path: Path) -> list[dict[str, Any]]:
         validated.append({"offset": offset, "original": original, "replacement": replacement})
 
     validated.sort(key=lambda patch: patch["offset"])
-    for previous, current in zip(validated, validated[1:]):
+    for previous, current in pairwise(validated):
         if current["offset"] < previous["offset"] + len(previous["original"]):
             raise PatchError("O manifesto contém alterações sobrepostas.")
     return validated
