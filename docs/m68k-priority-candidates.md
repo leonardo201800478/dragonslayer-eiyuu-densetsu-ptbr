@@ -222,3 +222,35 @@ python -m dragonslayer_ptbr inspect-m68k-targets --rom "roms/original/Dragon Sla
 ```
 
 Compare a contagem impressa de blocos alcançados com os relatórios anteriores. Não considere a suíte aprovada nem a discrepância resolvida até obter a saída real desses comandos.
+
+
+## Atualização com a saída mais recente de inspect-m68k-targets
+
+A saída fornecida após a correção do CFG registra **39 blocos alcançados desde o vetor de reset**, não 44 nem aproximadamente 2.100. A inspeção dos quatro alvos produziu:
+
+| Alvo forçado | Blocos decodificados |
+|---|---:|
+| `0x01E9C0` | 19 |
+| `0x01E9E4` | 17 |
+| `0x01EA5E` | 7 |
+| `0x02930A` | 1 |
+
+O relatório continua sem reconhecer chamadores diretos para os quatro alvos no CFG do reset. Como o CFG alcança somente 39 blocos, essa ausência **não pode ser usada como evidência forte de que as rotinas não são chamadas**.
+
+### Observações que a saída permite afirmar
+
+- Em `0x01E9C0`, o fluxo forçado mostra preparação de registradores, uma chamada para `0x02930A`, leituras de bytes com pós-incremento, chamadas para `0x01EA5E`, gravações e laços `DBcc`.
+- Em `0x01EA5E`, a rotina lê o endereço absoluto `0x00FF1B07`, compara bytes e ramifica. Isso sugere lógica de decisão, mas não estabelece relação com controles de texto.
+- Em `0x02930A`, a decodificação para após os bytes `78 00 E5 8B`; portanto, a função chamada por `0x01E9C8` permanece desconhecida.
+- O próprio relatório avisa que cada alvo foi forçado como entrada. Os blocos podem começar no meio de instruções ou em dados, e os mnemônicos genéricos do decoder não equivalem a uma desassemblagem validada.
+
+### Próxima ação técnica
+
+A discrepância de cobertura deve ser tratada como problema de qualidade do analisador antes de avançar na hipótese do parser. A sequência recomendada é:
+
+1. Reexecutar `python -m pytest tests/test_m68k_code.py -q` e guardar a saída completa.
+2. Registrar o primeiro endereço/opcode em que a travessia iniciada no vetor de reset para, incluindo o motivo da parada.
+3. Comparar a sequência a partir do vetor de reset com um segundo disassembler 68000, conferindo tamanhos de instrução e destinos de branch.
+4. Só depois repetir a contagem do CFG e comparar os resultados no mesmo checkout e na mesma ROM.
+
+Não há, nesta saída, evidência suficiente para atribuir a queda para 39 blocos especificamente à correção de `BTST`. Essa relação continua sendo uma hipótese até haver comparação controlada antes/depois. A ROM original permanece intocada.
