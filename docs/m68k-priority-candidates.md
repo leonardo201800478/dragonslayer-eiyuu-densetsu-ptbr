@@ -131,3 +131,14 @@ A sequência continua consistente com `MOVE.B Dn,(An)+`, comparação com zero, 
 - **Inferência:** `0x02AF90` pode ser código executável, e a falha anterior era explicada por uma instrução ainda não suportada.
 - **Não demonstrado:** que `0x01E9BC` seja uma entrada válida, que as rotinas sejam alcançadas em runtime ou que qualquer uma delas processe texto.
 - **Próximo passo:** executar novamente `inspect-m68k-targets` após atualizar o projeto e analisar o fluxo expandido a partir de `0x02AF90`; depois rastrear os registradores de endereço usados como origem e destino.
+## Atualização após o segundo relatório
+
+O segundo relatório informou 2.100 blocos alcançados desde o vetor de reset, mas ainda parou em `0x02AF90`. O motivo identificado é anterior às instruções `ADDA`: o decoder não reconhecia `42 00`, que corresponde a `CLR.B D0`.
+
+O decoder foi atualizado para reconhecer `CLR.B/W/L` e consumir eventuais extensões do effective address. Foram adicionados testes para `CLR.B D0` e para a sequência `CLR.B D0; ADDA.L #$00000003,...; ADDA.L #$0000001A,...`. Os testes estão no repositório, mas ainda não se deve afirmar que passaram até conferir o CI.
+
+Referências:
+- [Decoder 68000](../src/dragonslayer_ptbr/analysis/m68k_code.py)
+- [Testes do decoder](../tests/test_m68k_code.py)
+
+Depois de atualizar o checkout local, execute novamente `inspect-m68k-targets` nos três destinos. O objetivo imediato é verificar se a decodificação de `0x02AF90` avança além de `CLR.B D0` e das duas instruções `ADDA.L`. A sequência decodificada ainda precisa ser validada como código e relacionada a chamadores antes de inferir sua função.
