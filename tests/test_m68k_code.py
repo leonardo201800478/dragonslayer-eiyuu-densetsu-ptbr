@@ -252,3 +252,22 @@ def test_decode_suba_word_immediate_consumes_word_extension():
 
 def test_rejects_invalid_moveq_encoding():
     assert decode_instruction(bytes.fromhex("7F FF"), 0) is None
+
+
+def test_decode_clr_byte_data_register():
+    instruction = decode_instruction(bytes.fromhex("42 00"), 0)
+    assert instruction is not None
+    assert instruction.mnemonic == "CLR.B <EA>"
+    assert instruction.size == 2
+
+
+def test_decode_adda_long_immediate_after_clr():
+    rom = bytes.fromhex("42 00 DB FC 00 00 00 03 DD FC 00 00 00 1A")
+    first = decode_instruction(rom, 0)
+    second = decode_instruction(rom, 2)
+    third = decode_instruction(rom, 8)
+    assert first is not None and first.mnemonic == "CLR.B <EA>"
+    assert second is not None and second.mnemonic == "ADDA.L"
+    assert second.size == 6
+    assert third is not None and third.mnemonic == "ADDA.L"
+    assert third.size == 6
