@@ -60,8 +60,8 @@ def scan_text_parser_candidates(
 
     for offset in range(0, len(data) - 2, 2):
         opcode = int.from_bytes(data[offset : offset + 2], "big")
-        # MOVE.B (An)+,Dn: source mode=3 and byte size.
-        if (opcode & 0xF1F8) != 0x1010:
+        # MOVE.B (An)+,Dn: source mode=3 (opcode pattern 0x1018 after masking).
+        if (opcode & 0xF1F8) != 0x1018:
             continue
         reads.append((offset, (opcode >> 9) & 0x7))
 
