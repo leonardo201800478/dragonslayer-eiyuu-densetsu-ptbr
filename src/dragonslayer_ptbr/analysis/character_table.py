@@ -101,7 +101,6 @@ def write_character_table_report(
     path = Path(output)
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    missing = missing_portuguese_accents(entries)
     present = present_portuguese_accents(entries)
 
     lines = [
