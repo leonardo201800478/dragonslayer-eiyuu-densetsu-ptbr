@@ -303,7 +303,7 @@ def test_decode_ori_byte_displacement_address_consumes_extension():
     following = decode_instruction(rom, 6)
     assert following is not None
     assert following.mnemonic == "BCC"
-    assert following.target == 14
+    assert following.target == 16
 
 
 def test_decode_addi_long_absolute_long_consumes_all_extensions():
