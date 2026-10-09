@@ -555,3 +555,19 @@ o engine de texto. O scanner ainda busca padrões binários na ROM inteira e pod
 encontrar bytes que coincidam com instruções em áreas de dados. Os resultados
 continuam sendo candidatos até serem cruzados com o fluxo de controle alcançável
 e com evidências do protocolo textual.
+
+
+## 34. Cruzamento de leitura e controles no CFG alcançável
+
+Foi adicionada a análise `m68k_reachable_text.py` e o comando:
+
+```powershell
+python -m dragonslayer_ptbr scan-reachable-text --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-reachable-text.md
+```
+
+Diferente do scanner amplo `scan-text-parser-candidates`, esta ferramenta primeiro constrói o grafo de fluxo de controle a partir do vetor de reset e só avalia instruções cujos offsets aparecem nos blocos reconhecidos. Procura `MOVE.B (An)+,Dn` seguido, dentro do mesmo bloco e em uma distância limitada, por `CMPI.B #controle,Dn` para os valores `0x01`, `0x06`, `0x0E` e `0x00`.
+
+O relatório inclui bloco, offset da leitura, offset do teste, registrador de endereço, registrador de dados e controle comparado. O teste unitário garante também que um padrão binário fora dos blocos fornecidos não seja incluído.
+
+**Limites:** o CFG depende de um decoder parcial, e bytes de dados podem ocasionalmente ser alcançados por um fluxo incorreto. A associação no mesmo bloco não prova que o ponteiro contenha script nem que o teste faça parte do engine de texto. O resultado é um filtro mais forte para priorização, não uma confirmação semântica.
+
