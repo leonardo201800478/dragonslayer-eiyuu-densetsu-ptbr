@@ -11,6 +11,7 @@ from .analysis.m68k_a3_flow import (
 )
 from .analysis.m68k_code import build_control_flow_graph, write_code_report
 from .analysis.m68k_control_tests import scan_control_tests, write_control_test_report
+from .analysis.m68k_entry_overlap import DEFAULT_ENTRIES, write_entry_overlap_report
 from .analysis.m68k_indexed_reads import (
     scan_indexed_byte_reads,
     write_indexed_byte_report,
@@ -238,7 +239,7 @@ def main() -> int:
         print(f"Relatório: {args.output}")
         return 0
 
-    if args.command == "scan-indexed-reads":
+    if args.command == "audit-m68k-entry-overlaps":\n        if args.max_blocks_per_entry < 1:\n            raise SystemExit("max-blocks-per-entry deve ser maior que zero")\n        try:\n            overlaps = write_entry_overlap_report(\n                args.rom.read_bytes(), args.entries, args.output,\n                max_blocks_per_entry=args.max_blocks_per_entry,\n            )\n        except ValueError as exc:\n            raise SystemExit(str(exc)) from exc\n        print(f"Sobreposições encontradas: {len(overlaps)}")\n        print(f"Relatório: {args.output}")\n        return 0\n\n    if args.command == "scan-indexed-reads":
         if args.context < 0:
             raise SystemExit("context deve ser maior ou igual a zero")
         data = args.rom.read_bytes()

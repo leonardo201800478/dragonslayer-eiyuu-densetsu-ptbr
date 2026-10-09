@@ -164,3 +164,21 @@ Entretanto, a inspeção forçada não prova que 0x01E9C0 seja uma entrada real.
 - **Sinal de alerta:** o destino 0x02AF94 sobrepõe o operando imediato da instrução que começa em 0x02AF92 quando se aceita a decodificação local de 0x02AF90.
 - **Ainda não demonstrado:** que os laços sejam parser de texto, que os bytes de entrada venham de um script ou que a rotina esteja alcançável em runtime.
 - **Próximo passo recomendado:** validar a região 0x01E9C0 com uma segunda implementação de desassemblagem e rastrear os registradores que alimentam as leituras de byte; tratar 0x02AF90 como ambíguo até resolver a sobreposição de fluxo.
+
+## Auditoria reproduzível de entradas sobrepostas
+
+Foi adicionada a ferramenta `audit-m68k-entry-overlaps`, que compara o fluxo 68000 decodificado a partir de várias entradas candidatas independentes e sinaliza quando uma entrada cai dentro dos bytes de uma instrução reconhecida a partir de outra entrada.
+
+O conjunto padrão inclui `0x02AF20`, `0x02AF90` e `0x02AF94`. O resultado é um diagnóstico de ambiguidade, não uma prova de execução nem de parser.
+
+```powershell
+python -m dragonslayer_ptbr audit-m68k-entry-overlaps --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-entry-overlaps.md
+```
+
+Para limitar a comparação:
+
+```powershell
+python -m dragonslayer_ptbr audit-m68k-entry-overlaps --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --entries 0x2AF20 0x2AF90 0x2AF94
+```
+
+A validação decisiva continua sendo comparar `0x02AF20–0x02AFA6` com um segundo disassembler 68000 e verificar as chamadas reais no fluxo alcançável.
