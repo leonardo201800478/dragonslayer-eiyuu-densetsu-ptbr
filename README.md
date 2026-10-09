@@ -50,6 +50,7 @@ A regra do projeto é não transformar uma hipótese em conhecimento específico
 - **[docs/analysis-results.md](docs/analysis-results.md)** — evidências e resultados técnicos consolidados.
 - **[docs/reverse-engineering.md](docs/reverse-engineering.md)** — estratégia e critérios da engenharia reversa.
 - **[docs/project-roadmap.md](docs/project-roadmap.md)** — roadmap completo, gates e critérios para chegar ao primeiro teste PT-BR seguro.
+- **[docs/third-party-tooling-and-validation-plan.md](docs/third-party-tooling-and-validation-plan.md)** — plano de validação, comparação de ferramentas externas, gates e evidências necessárias antes de escrever a ROM.
 - `reports/` — resultados reproduzíveis das análises.
 - `tests/` — testes automatizados.
 
@@ -60,6 +61,8 @@ A próxima etapa é a **localização do engine 68000**, não a escrita da ROM.
 O objetivo é comprovar uma cadeia:
 
 `seleção do script → referência → leitura do byte → teste de controle → processamento → acesso à fonte/renderização`.
+
+O plano atual prioriza estabilizar o CI, reproduzir as contagens do CFG e comparar o decoder próprio com desassembladores externos antes de tentar rastrear a execução em emulador. Consulte o [plano de ferramentas e validação](docs/third-party-tooling-and-validation-plan.md).
 
 Somente depois serão implementados encoder, ponteiros de escrita, realocação e patch.
 
@@ -110,19 +113,18 @@ src/dragonslayer_ptbr/
 └── cli.py
 ```
 
-
 ## Ponto de parada atual
 
 A análise M68K avançou para um CFG conservador baseado no vetor de reset real da ROM.
 
 - vetor de reset: 0x010620;
-- último relatório analisado: 43 blocos / 155 instruções reconhecidas;
-- chamadas JSR abs.l e destinos acompanhados;
-- várias rotinas com RTS identificadas;
+- os relatórios históricos contêm contagens divergentes de blocos e devem ser reproduzidos com a mesma configuração antes de comparação;
+- chamadas JSR abs.l e destinos foram acompanhados em análises anteriores;
+- várias rotinas com RTS foram identificadas;
 - decoder ampliado incrementalmente conforme os opcodes reais foram confirmados.
 
 Suporte/testes adicionados nesta etapa incluem BTST #imm,<EA>, MOVE.W SR,<EA>, NEGX.B/W/L <EA> e LEA abs.l para A0–A7.
 
-Isso ainda não significa que o engine de texto foi localizado. A próxima investigação continua sendo o rastreamento de registradores, leituras de bytes, controles e chamadas até chegar à fonte/renderização.
+Isso ainda não significa que o engine de texto foi localizado. A próxima investigação continua sendo corrigir/verificar o CI, estabilizar o CFG, comparar desassemblagem, e rastrear registradores, leituras de bytes, controles e chamadas até chegar à fonte/renderização.
 
 O projeto permanece em análise somente leitura; a ROM japonesa original não é modificada nem distribuída.
