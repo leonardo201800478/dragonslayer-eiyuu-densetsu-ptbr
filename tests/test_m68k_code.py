@@ -271,3 +271,24 @@ def test_decode_adda_long_immediate_after_clr():
     assert second.size == 6
     assert third is not None and third.mnemonic == "ADDA.L #$0000001A,A6"
     assert third.size == 6
+
+
+def test_decode_cmpi_byte_absolute_long_consumes_all_extensions():
+    instruction = decode_instruction(
+        bytes.fromhex("0C 39 00 01 00 FF 1B 07 4E 75"),
+        0,
+    )
+    assert instruction is not None
+    assert instruction.mnemonic == "CMPI.B #imm,<EA>"
+    assert instruction.size == 8
+
+    following = decode_instruction(bytes.fromhex("0C 39 00 01 00 FF 1B 07 4E 75"), 8)
+    assert following is not None
+    assert following.mnemonic == "RTS"
+
+
+def test_decode_cmpi_byte_data_register_remains_four_bytes():
+    instruction = decode_instruction(bytes.fromhex("0C 00 00 01"), 0)
+    assert instruction is not None
+    assert instruction.mnemonic == "CMPI.B #imm,Dn"
+    assert instruction.size == 4
