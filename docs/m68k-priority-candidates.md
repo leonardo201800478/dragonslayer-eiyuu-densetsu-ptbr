@@ -182,3 +182,24 @@ python -m dragonslayer_ptbr audit-m68k-entry-overlaps --rom "roms/original/Drago
 ```
 
 A validação decisiva continua sendo comparar `0x02AF20–0x02AFA6` com um segundo disassembler 68000 e verificar as chamadas reais no fluxo alcançável.
+
+
+## Atualização: discrepância na cobertura do CFG
+
+O relatório recente de `inspect-m68k-targets` informa 44 blocos alcançados desde o vetor de reset, enquanto relatórios anteriores registravam aproximadamente 2.100. Essa diferença precisa ser explicada antes de interpretar a ausência de chamadores diretos. Pode decorrer de versão do código, configuração ou ROM diferente; a causa ainda não está confirmada.
+
+A inspeção forçada de `0x01E9C0` continua mostrando laços com `MOVE.B (An)+,Dn`, chamada para `0x01EA5E`, gravação de bytes e instruções `DBcc`. Isso é compatível com processamento sequencial de dados, mas não confirma um parser. `0x01EA5E` contém comparações e desvios, sem demonstrar que os valores correspondem aos controles textuais `0x01`, `0x06`, `0x0E` e `0x00`. `0x02930A` continua com decodificação interrompida.
+
+### Próxima etapa: reproduzir a cobertura antes de inferir semântica
+
+Execute os três comandos no mesmo checkout e usando a mesma ROM:
+
+```powershell
+python -m dragonslayer_ptbr inspect-m68k-targets --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --targets 0x01E9C0 0x01E9E4 0x01EA5E 0x02930A --max-blocks-per-target 120 --output reports/m68k-text-processing-region.md
+python -m dragonslayer_ptbr scan-reachable-text --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-reachable-text.md
+python -m dragonslayer_ptbr audit-m68k-entry-overlaps --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-entry-overlaps.md
+```
+
+Se a contagem de 44 blocos persistir, investigar o vetor de reset, o primeiro opcode desconhecido no fluxo e as instruções de inicialização reconhecidas. A ausência de chamadores diretos no CFG incompleto não demonstra que os alvos sejam inalcançáveis.
+
+**Estado:** a hipótese de processamento de bytes permanece aberta; o parser não foi confirmado. Nenhuma alteração deve ser feita na ROM original até validar o CFG e rastrear os registradores de origem/destino com uma segunda implementação de desassemblagem 68000.
