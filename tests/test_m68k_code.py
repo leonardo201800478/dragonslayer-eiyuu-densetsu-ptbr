@@ -234,3 +234,21 @@ def test_decode_negx_effective_address_forms():
         assert instruction is not None
         assert instruction.mnemonic == f"NEGX.{suffix} <EA>"
         assert instruction.size == 2
+
+
+def test_decode_adda_long_immediate_consumes_long_extension():
+    instruction = decode_instruction(bytes.fromhex("DB FC 00 00 00 03"), 0)
+    assert instruction is not None
+    assert instruction.mnemonic == "ADDA.L"
+    assert instruction.size == 6
+
+
+def test_decode_suba_word_immediate_consumes_word_extension():
+    instruction = decode_instruction(bytes.fromhex("96 FC 00 03"), 0)
+    assert instruction is not None
+    assert instruction.mnemonic == "SUBA.W"
+    assert instruction.size == 4
+
+
+def test_rejects_invalid_moveq_encoding():
+    assert decode_instruction(bytes.fromhex("7F FF"), 0) is None
