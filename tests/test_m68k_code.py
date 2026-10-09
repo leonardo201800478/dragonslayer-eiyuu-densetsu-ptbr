@@ -294,7 +294,7 @@ def test_decode_cmpi_byte_data_register_remains_four_bytes():
     assert instruction.size == 4
 
 def test_decode_ori_byte_displacement_address_consumes_extension():
-    rom = bytes.fromhex("00 A1 00 FF 18 4E 64 00 00 06")
+    rom = bytes.fromhex("00 29 00 FF 18 4E 64 00 00 06")
     instruction = decode_instruction(rom, 0)
     assert instruction is not None
     assert instruction.mnemonic == "ORI.B #imm,<EA>"
