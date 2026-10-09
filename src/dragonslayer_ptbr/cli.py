@@ -80,6 +80,25 @@ def build_parser() -> argparse.ArgumentParser:
     refs.add_argument("--output", type=Path, default=Path("reports/m68k-references.md"))
     refs.add_argument("--context", type=lambda value: int(value, 0), default=8)
 
+    address_refs = sub.add_parser(
+        "scan-address-references",
+        help="procura referências literais a endereços 68000 personalizados",
+    )
+    address_refs.add_argument("--rom", required=True, type=Path)
+    address_refs.add_argument(
+        "--targets",
+        nargs="+",
+        required=True,
+        type=lambda value: int(value, 0),
+        help="endereços/alvos em decimal ou hexadecimal",
+    )
+    address_refs.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/m68k-address-references.md"),
+    )
+    address_refs.add_argument("--context", type=lambda value: int(value, 0), default=8)
+
     control_tests = sub.add_parser(
         "scan-control-tests",
         help="localiza comparações 68000 explícitas com bytes de controle",
@@ -335,6 +354,27 @@ def main() -> int:
             {"opening_script": 0x01626B, "character_table": 0x1A551A},
             context_size=args.context,
         )
+        write_reference_report(references, args.output)
+        for name, items in references.items():
+            print(f"{name}: {len(items)} referências")
+        print(f"Relatório: {args.output}")
+        return 0
+
+    if args.command == "scan-address-references":
+        if args.context < 0:
+            raise SystemExit("context deve ser maior ou igual a zero")
+        if len(set(args.targets)) != len(args.targets):
+            raise SystemExit("os alvos não podem estar duplicados")
+        data = args.rom.read_bytes()
+        targets = {f"target_0x{target:06X}": target for target in args.targets}
+        try:
+            references = scan_known_targets(
+                data,
+                targets,
+                context_size=args.context,
+            )
+        except ValueError as exc:
+            raise SystemExit(str(exc)) from exc
         write_reference_report(references, args.output)
         for name, items in references.items():
             print(f"{name}: {len(items)} referências")
