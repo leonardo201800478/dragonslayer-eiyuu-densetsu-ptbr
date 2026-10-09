@@ -48,3 +48,20 @@ def test_trace_clears_local_origin_after_jsr():
 
     read = next(item for item in report.reads if item.offset == 0x1C)
     assert read.definition_offset is None
+
+ 
+
+def test_movea_word_immediate_sign_extends_address_register():
+    rom = bytearray(0x40)
+    rom[4:8] = (0x10).to_bytes(4, "big")
+    # MOVEA.W #$FFFF,A3; MOVE.B (A3),D0; RTS
+    rom[0x10:0x14] = bytes.fromhex("36 7C FF FF")
+    rom[0x14:0x16] = bytes.fromhex("10 13")
+    rom[0x16:0x18] = bytes.fromhex("4E 75")
+
+    blocks = build_control_flow_graph(bytes(rom))
+    report = trace_register_flow(bytes(rom), blocks)
+
+    read = next(item for item in report.reads if item.offset == 0x14)
+    assert read.definition_offset == 0x10
+    assert read.definition_value == 0xFFFFFFFF
