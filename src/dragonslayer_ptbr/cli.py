@@ -108,6 +108,16 @@ def build_parser() -> argparse.ArgumentParser:
     code_flow.add_argument("--entry", type=lambda value: int(value, 0))
     code_flow.add_argument("--max-blocks", type=int, default=5000)
 
+    register_flow = sub.add_parser(
+        "scan-m68k-register-flow",
+        help="rastreia definições e leituras locais de A0-A3 no código alcançável",
+    )
+    register_flow.add_argument("--rom", required=True, type=Path)
+    register_flow.add_argument(
+        "--output", type=Path, default=Path("reports/m68k-register-flow.md")
+    )
+    register_flow.add_argument("--max-blocks", type=int, default=5000)
+
     indexed = sub.add_parser(
         "scan-indexed-reads",
         help="localiza leituras MOVE.B com endereçamento indexado",
