@@ -73,6 +73,8 @@ def _constant_definition(
         if offset + 2 + size > len(data):
             return None
         value = int.from_bytes(data[offset + 2 : offset + 2 + size], "big")
+        if top == 3 and value & 0x8000:
+            value |= 0xFFFF0000
         return register, value, "MOVEA.L #imm" if top == 2 else "MOVEA.W #imm"
 
     return None
