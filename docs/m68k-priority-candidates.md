@@ -254,3 +254,22 @@ A discrepância de cobertura deve ser tratada como problema de qualidade do anal
 4. Só depois repetir a contagem do CFG e comparar os resultados no mesmo checkout e na mesma ROM.
 
 Não há, nesta saída, evidência suficiente para atribuir a queda para 39 blocos especificamente à correção de `BTST`. Essa relação continua sendo uma hipótese até haver comparação controlada antes/depois. A ROM original permanece intocada.
+
+
+## Checkpoint de 2026-10-08 — reavaliação dos candidatos
+
+O relatório mais recente de `scan-m68k-register-flow` registra 39 blocos alcançados desde o vetor de reset, 14 definições de A0–A3, duas leituras de byte e oito chamadas `JSR`. Essa cobertura é pequena e não permite usar a ausência de chamadores diretos como prova de que os alvos são inalcançáveis. O inspetor reconhece chamadas diretas `JSR abs.l` e `BSR`, mas não resolve chamadas indiretas como `JSR (An)`.
+
+A auditoria atual de sobreposição foi executada com entradas `0x02AF20`, `0x02AF90` e `0x02AF94`. O relatório indica que `0x02AF94` cai dentro da instrução de seis bytes decodificada em `0x02AF92–0x02AF97` (`ADDA.L #$00000003,A5`). A ambiguidade continua sem resolução; não classificar `0x02AF90` como rotina confirmada.
+
+### Ordem de prioridade atualizada
+
+1. **`0x0262C4` — primeiro para aprofundar:** o fluxo compara `0x00` e `0x06`, apresenta dois laços e termina em `RTS`. A relação com scripts e renderização ainda não foi demonstrada.
+2. **`0x01E9AC` — segundo:** laço aparente de leitura/cópia até `0x06`, mas faltam a origem concreta do ponteiro e a ligação ao texto.
+3. **`0x02AF80` — manter em espera:** o laço inicial parece semelhante, porém a sequência seguinte está sujeita à ambiguidade de entrada/alinhamento envolvendo `0x02AF94`.
+
+A diferença entre os números de CFG históricos (aproximadamente 2.100, 44, 43 e agora 39) permanece sem explicação confirmada. Não atribuir a discrepância à correção de classificação de `BTST` sem reproduzir as execuções no mesmo checkout, com a mesma ROM e os mesmos parâmetros.
+
+O checkpoint detalhado, incluindo as tabelas de fluxo de registradores e os comandos de retomada, está em [`checkpoint-2026-10-08.md`](checkpoint-2026-10-08.md).
+
+**Conclusão:** nenhum candidato foi confirmado como parser principal. A ROM original continua sem alterações. Antes de inferir semântica, validar os limites das instruções com um segundo disassembler 68000 e rastrear como os ponteiros de origem/destino são preparados.
