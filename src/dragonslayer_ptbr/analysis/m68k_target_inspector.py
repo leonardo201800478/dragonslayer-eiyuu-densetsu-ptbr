@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 from collections.abc import Sequence
+from pathlib import Path
 
 from .m68k_code import CodeBlock, M68KInstruction, build_control_flow_graph
 
