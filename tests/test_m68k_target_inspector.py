@@ -18,7 +18,7 @@ def test_inspector_reports_direct_caller_and_target_flow():
     assert "RTS" in report
 
 
-def test_inspector_reports_undecodable_target():
+def test_inspector_reports_raw_context_for_undecodable_target():
     rom = bytearray(0x40)
     rom[4:8] = (0x10).to_bytes(4, "big")
     rom[0x10:0x12] = bytes.fromhex("4E 75")
@@ -28,6 +28,9 @@ def test_inspector_reports_undecodable_target():
     report = inspect_targets(bytes(rom), (0x20,))
 
     assert "não reconheceu uma instrução válida" in report
+    assert "Bytes brutos ao redor do alvo" in report
+    assert "`0x000018`" in report
+    assert "FF FF" in report
 
 
 def test_inspector_rejects_invalid_target():
