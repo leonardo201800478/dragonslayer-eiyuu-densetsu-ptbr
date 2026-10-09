@@ -104,3 +104,30 @@ python -m dragonslayer_ptbr inspect-m68k-targets `
 ```
 
 Envie a nova versão de `reports/m68k-control-destinations.md`. O conteúdo hexadecimal permitirá verificar se os destinos começam com uma instrução conhecida, se parecem estar no meio de uma sequência ou se precisamos ampliar o decoder. Ainda assim, a janela isolada não comprova fluxo de execução.
+
+## Reavaliação dos destinos com os bytes brutos
+
+O relatório fornecido para `0x01E9BC`, `0x02AF90` e `0x0262DC` permite distinguir melhor os casos.
+
+### Destino `0x01E9BC`
+
+Os bytes começam com `7F FF 4E 75`. `0x7FFF` não é uma codificação válida de `MOVEQ` no 68000, pois o bit 8 dessa instrução deve ser zero. Assim, o decoder interromper nesse endereço é coerente com seu comportamento conservador; não devemos interpretar `7F FF` como uma instrução válida. O `RTS` seguinte, em `0x01E9BE`, é reconhecível, mas isso não esclarece se o primeiro word é dado, preenchimento ou parte de um fluxo iniciado em outro ponto.
+
+Em `0x01E9C0`, os bytes `48 E7 FF FE` codificam `MOVEM.L` com máscara de registradores para salvar registradores na pilha, padrão compatível com início de rotina. Isso não demonstra uma ligação de execução entre `0x01E9BC` e a rotina em `0x01E9C0`.
+
+### Destino `0x02AF90`
+
+Os bytes `42 00` codificam `CLR.B D0`. Em seguida, `DB FC 00 00 00 03` codifica `ADDA.L` com operando imediato e `DD FC 00 00 00 1A` codifica outra `ADDA.L` imediata. O decoder anterior não suportava essa forma de `ADDA`, motivo suficiente para interromper o fluxo mesmo diante de bytes que podem ser código válido.
+
+O decoder foi atualizado para consumir corretamente as extensões imediatas de `ADDA.W/L` e `SUBA.W/L`, evitando perder o alinhamento em sequências desse tipo. Foram acrescentados testes para `ADDA.L`, `SUBA.W` e para a codificação inválida `7F FF`. Esses testes foram adicionados ao repositório; o resultado de CI ainda precisa ser consultado separadamente antes de declarar a suíte aprovada.
+
+### Destino `0x0262DC`
+
+A sequência continua consistente com `MOVE.B Dn,(An)+`, comparação com zero, desvio de retorno ao laço e `RTS`. Ela pode descrever cópia de bytes até o terminador zero, mas ainda não foi relacionada a uma entrada de script ou a uma rotina de renderização.
+
+## Estado após esta revisão
+
+- **Confirmado pela decodificação dos bytes:** `0x42 0x00` é `CLR.B D0`; `0xDBFC` e `0xDDFC` iniciam formas imediatas de `ADDA.L`; `0x7FFF` não é um `MOVEQ` válido no 68000.
+- **Inferência:** `0x02AF90` pode ser código executável, e a falha anterior era explicada por uma instrução ainda não suportada.
+- **Não demonstrado:** que `0x01E9BC` seja uma entrada válida, que as rotinas sejam alcançadas em runtime ou que qualquer uma delas processe texto.
+- **Próximo passo:** executar novamente `inspect-m68k-targets` após atualizar o projeto e analisar o fluxo expandido a partir de `0x02AF90`; depois rastrear os registradores de endereço usados como origem e destino.
