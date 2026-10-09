@@ -316,3 +316,19 @@ def test_decode_addi_long_absolute_long_consumes_all_extensions():
     following = decode_instruction(rom, 10)
     assert following is not None
     assert following.mnemonic == "RTS"
+
+
+
+def test_cfg_does_not_treat_btst_as_conditional_branch():
+    rom = bytearray(0x20)
+    rom[4:8] = (0x10).to_bytes(4, "big")
+    rom[0x10:0x14] = bytes.fromhex("08 00 00 01")
+    rom[0x14:0x16] = bytes.fromhex("4E 75")
+
+    blocks = build_control_flow_graph(bytes(rom))
+    by_start = {block.start: block for block in blocks}
+
+    assert 0x10 in by_start
+    assert by_start[0x10].instructions[0].mnemonic == "BTST #imm,<EA>"
+    assert by_start[0x10].instructions[-1].mnemonic == "RTS"
+    assert by_start[0x10].stopped_reason == "return"
