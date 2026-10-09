@@ -46,8 +46,7 @@ def inspect_targets(
     lines = [
         "# Inspeção de alvos 68000",
         "",
-        "> Relatório estático exploratório. Instruções desconhecidas interrompem o bloco; "
-        "um alvo forçado como entrada não comprova execução em runtime.",
+        "> Relatório estático exploratório. Instruções desconhecidas interrompem o bloco; um alvo forçado como entrada não comprova execução em runtime.",
         "",
         f"- Blocos alcançados a partir do vetor de reset: {len(main_blocks)}",
         f"- Alvos solicitados: {len(normalized)}",
