@@ -46,7 +46,7 @@ As ferramentas abaixo foram selecionadas para complementar — não substituir a
 
 | Ferramenta | Uso proposto | Prioridade | Limites / cautelas |
 |---|---|---|---|
-| [sega2asm](https://github.com/hansbonini/sega2asm) | Desassemblagem/splitting específico para Mega Drive; rotular segmentos de código e dados; explorar tabelas de ponteiros e charmap; extrair gráficos quando suportado | **P1 — primeira comparação estática** | Exige configuração de segmentos e hints; resultados dependem da classificação correta. Requer Go 1.21+ conforme o README consultado. Não tratar saída automática como verdade. |
+| [sega2asm](https://github.com/hansbonini/sega2asm) | Desassemblagem/splitting específico para Mega Drive; rotular segmentos de código e dados; explorar tabelas de ponteiros e charmap; extrair gráficos quando suportado | **P1 — primeira comparação estática** | Exige configuração de segmentos e hints; resultados dependem da classificação correta. Requer Go 1.21+ conforme o README consultado. Há relato público de erros de desassemblagem em instruções do código de inicialização; usar apenas como uma das referências e inspecionar os bytes originais. |
 | [Oxore m68k-disasm](https://github.com/Oxore/m68k-disasm) | Segunda implementação 68000; comparar limites de instrução, branches e alvos; potencial uso de PC trace | **P1 — segunda comparação estática** | Build CMake/C++; o próprio projeto informa que Windows não é seu ambiente mais testado. Sem PC trace, desassemblar uma ROM inteira pode interpretar dados como código. |
 | [BlastEm](https://github.com/libretro/blastem) | Debugger do Mega Drive para breakpoints, execução passo a passo, inspeção de registradores e memória durante a abertura | **P2 — evidência dinâmica** | A documentação consultada descreve debugger interativo; watchpoints/tracepoints não são suportados em todas as interfaces. Confirmar capacidades na build utilizada. |
 | [MAME Debugger](https://docs.mamedev.org/debugger/index.html) | Alternativa para breakpoints, memória e disassemblagem durante execução | **P2 — alternativa dinâmica** | Configuração e comandos diferem do BlastEm; registrar versão e sistema em uso. |
@@ -187,7 +187,7 @@ Não iniciar encoder de produção, realocação nem patch até que:
 
 ## 7. Referências externas consultadas
 
-- [sega2asm — Sega Genesis / Mega Drive disassembler and splitter](https://github.com/hansbonini/sega2asm): desassemblagem 68000/Z80, segmentação, charmap TBL, tabelas de ponteiros e extração gráfica.
+- [sega2asm — Sega Genesis / Mega Drive disassembler and splitter](https://github.com/hansbonini/sega2asm): desassemblagem 68000/Z80, segmentação, charmap TBL, tabelas de ponteiros e extração gráfica. O issue [#2](https://github.com/hansbonini/sega2asm/issues/2) reporta erros em instruções de inicialização; isso reforça a necessidade de comparação independente.
 - [Oxore m68k-disasm](https://github.com/Oxore/m68k-disasm): desassemblador 68000 com saída voltada a remontagem e suporte a tabela de PC trace.
 - [BlastEm — debugger](https://github.com/libretro/blastem): debugger interativo com breakpoints, execução passo a passo e inspeção de memória/registradores.
 - [MAME Debugger documentation](https://docs.mamedev.org/debugger/index.html): debugger interativo, janelas de memória e desassemblagem.
