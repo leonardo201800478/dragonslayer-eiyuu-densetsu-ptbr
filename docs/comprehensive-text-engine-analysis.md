@@ -201,3 +201,14 @@ O próximo resultado útil deve ser uma ficha do **primeiro candidato que aprese
 Esta análise será considerada produtiva quando reduzir o conjunto de candidatos e entregar pelo menos uma cadeia verificável entre dados de texto conhecidos e código 68000 plausivelmente responsável por processá-los. Gerar mais ocorrências sem aumentar a qualidade das ligações não conta como progresso.
 
 Nenhuma tradução, realocação, gravação de ponteiros ou alteração da ROM deve começar com base apenas neste relatório.
+
+
+## Integração do plano de ferramentas externas — 2026-10-09
+
+A execução desta análise deve seguir o plano versionado em [third-party-tooling-and-validation-plan.md](third-party-tooling-and-validation-plan.md). A prioridade é comparar o decoder próprio com sega2asm e Oxore m68k-disasm, depois buscar evidência dinâmica em BlastEm ou MAME.
+
+Antes de comparar novas contagens de CFG, reproduzir o baseline com a mesma ROM, commit e parâmetros. Os relatórios históricos apresentam contagens divergentes, e a causa ainda não deve ser presumida. O teste `test_scan_address_references_accepts_custom_targets` também precisa ser corrigido e validado por uma execução real de CI.
+
+Os intervalos `0x01E9A4–0x01E9C8`, `0x0262C0–0x0262E8` e `0x02AF20–0x02AFA6` são alvos de comparação, não funções confirmadas. Para cada um, registrar bytes brutos, alinhamento, comprimento das instruções, destinos de branch e eventuais diferenças entre ferramentas.
+
+Não iniciar encoder de produção, realocação ou patch até demonstrar a relação entre uma entrada conhecida, sua leitura em runtime e o processamento/renderização. O fato de um teste reconhecer os códigos dos caracteres portugueses não comprova que a ROM possua os glifos correspondentes.
