@@ -169,7 +169,7 @@ Entretanto, a inspeção forçada não prova que 0x01E9C0 seja uma entrada real.
 
 Foi adicionada a ferramenta `audit-m68k-entry-overlaps`, que compara o fluxo 68000 decodificado a partir de várias entradas candidatas independentes e sinaliza quando uma entrada cai dentro dos bytes de uma instrução reconhecida a partir de outra entrada.
 
-O conjunto padrão inclui `0x02AF20`, `0x02AF90` e `0x02AF94`. O resultado é um diagnóstico de ambiguidade, não uma prova de execução nem de parser.
+O conjunto padrão inclui `0x02AF20`, `0x02AF90` e `0x02AF94`. O resultado é um diagnóstico de ambiguidade, não uma prova de execução nem de parser. O relatório inclui os bytes brutos de cada instrução e representa o intervalo como `[início, fim)`: o endereço final é exclusivo (por exemplo, uma instrução de seis bytes iniciada em `0x02AF92` termina no limite `0x02AF98`, ocupando os bytes até `0x02AF97`). Isso evita confundir o limite final com o último byte da instrução.
 
 ```powershell
 python -m dragonslayer_ptbr audit-m68k-entry-overlaps --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-entry-overlaps.md
