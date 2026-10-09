@@ -246,7 +246,7 @@ def test_decode_adda_long_immediate_consumes_long_extension():
 def test_decode_suba_word_immediate_consumes_word_extension():
     instruction = decode_instruction(bytes.fromhex("96 FC 00 03"), 0)
     assert instruction is not None
-    assert instruction.mnemonic == "SUBA.W"
+    assert instruction.mnemonic == "SUBA.W #$0003,A3"
     assert instruction.size == 4
 
 
@@ -267,7 +267,7 @@ def test_decode_adda_long_immediate_after_clr():
     second = decode_instruction(rom, 2)
     third = decode_instruction(rom, 8)
     assert first is not None and first.mnemonic == "CLR.B <EA>"
-    assert second is not None and second.mnemonic == "ADDA.L"
+    assert second is not None and second.mnemonic == "ADDA.L #$00000003,A5"
     assert second.size == 6
-    assert third is not None and third.mnemonic == "ADDA.L"
+    assert third is not None and third.mnemonic == "ADDA.L #$0000001A,A6"
     assert third.size == 6
