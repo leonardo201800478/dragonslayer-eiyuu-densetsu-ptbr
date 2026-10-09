@@ -3,10 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from .m68k_code import (
-    M68KInstruction,
-    build_control_flow_graph,
-)
+from .m68k_code import M68KInstruction, build_control_flow_graph
 
 
 DEFAULT_ENTRIES = (0x01E9AC, 0x01E9C0, 0x0262C4, 0x02AF20, 0x02AF80, 0x02AF90, 0x02AF94)
