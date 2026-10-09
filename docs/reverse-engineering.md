@@ -534,3 +534,24 @@ O relatório reúne:
 - avisos quando o decoder não reconhece instruções no offset.
 
 O início de uma análise em um alvo é intencional: permite inspecionar uma rotina mesmo que o CFG principal não a alcance devido a limitações do decoder. **Isso não prova que o alvo seja código executado em runtime.** Chamadas indiretas como `JSR (An)` permanecem sem destino resolvido. O relatório também não atribui semântica de parser a uma rotina sem demonstrar a ligação com scripts, controles e renderização.
+
+
+## 33. Correção do padrão de leitura no scanner de candidatos a parser
+
+A revisão dos opcodes do 68000 revelou uma inconsistência no scanner
+`scan-text-parser-candidates`: o código e a descrição diziam procurar
+`MOVE.B (An)+,Dn`, mas a máscara usada aceitava o modo de endereçamento
+`(An)` sem pós-incremento.
+
+A máscara foi corrigida para reconhecer o padrão `MOVE.B (An)+,Dn`.
+Os testes agora distinguem explicitamente:
+
+- `MOVE.B (A3)+,D0` — deve ser detectado;
+- `MOVE.B (A3),D0` — não deve ser classificado como leitura com pós-incremento;
+- leitura e comparação em registradores diferentes — não devem ser associadas.
+
+Esta correção melhora a confiabilidade do scanner, mas não identifica por si só
+o engine de texto. O scanner ainda busca padrões binários na ROM inteira e pode
+encontrar bytes que coincidam com instruções em áreas de dados. Os resultados
+continuam sendo candidatos até serem cruzados com o fluxo de controle alcançável
+e com evidências do protocolo textual.
