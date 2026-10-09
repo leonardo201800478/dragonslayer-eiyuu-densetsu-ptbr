@@ -206,3 +206,32 @@ Ordem de trabalho:
 5. só então decidir qual debugger usar para o rastreamento dinâmico.
 
 Não adicionar as ferramentas externas como dependências obrigatórias do projeto Python. O avanço deve ser medido por evidência nova, não pelo número de ferramentas instaladas ou de candidatos encontrados.
+
+## 9. Hipótese de compressão da fonte — investigação aberta
+
+**Status: HIPÓTESE; não confirmada nesta ROM.**
+
+Uma referência comunitária secundária sobre o jogo menciona a existência histórica de ferramentas/notas relacionadas à compressão de texto e de fonte para títulos da série. Os arquivos específicos ainda não foram recuperados nem examinados; portanto, essa referência não comprova o algoritmo, a localização dos dados ou sequer que todos os recursos gráficos do jogo sejam comprimidos.
+
+Manter três hipóteses distintas:
+
+1. **Tiles de fonte sem compressão:** os padrões gráficos estão armazenados diretamente na ROM.
+2. **Tiles de fonte comprimidos:** os dados são expandidos por código do jogo antes de serem usados.
+3. **Formato ou mapeamento próprio:** os tiles podem estar sem compressão, mas uma tabela ou rotina converte códigos de texto em índices/tiles; esse cenário não deve ser confundido com compressão.
+
+Também é possível haver uma solução híbrida, com tabelas de códigos, tiles e outros recursos armazenados de maneiras diferentes.
+
+### Testes para discriminar as hipóteses
+
+1. Procurar e recuperar os utilitários/notas históricos; registrar URL de origem, autor, data, licença, hashes e arquivos recebidos.
+2. Examinar os dados de fonte candidatos com visualizadores de tiles e comparar padrões gráficos conhecidos, sem gravar na ROM.
+3. Comparar os bytes da ROM com os dados gráficos efetivamente carregados em VRAM durante a execução. Se houver diferença estrutural reproduzível, rastrear a rotina responsável antes de chamá-la de descompressor.
+4. Observar no debugger o fluxo de origem → buffer de destino → transferência para VRAM, incluindo tamanho de entrada/saída e registradores usados.
+5. Se houver um utilitário histórico, testar primeiro em cópias dos dados extraídos e comparar a saída com os tiles observados em runtime. Não assumir o algoritmo apenas porque a saída “parece” uma fonte.
+6. Documentar evidência positiva e negativa. Falhar em encontrar uma sequência de tiles na ROM não prova compressão; os dados podem estar em outra região, organizados por planos ou codificados de outra forma.
+
+### Critério de confirmação
+
+Só classificar **COMPRESSÃO CONFIRMADA** quando um método reproduzível transformar dados de origem identificados em dados gráficos compatíveis com a fonte observada em runtime, com correspondência de conteúdo e tamanho documentada. Até lá, manter **HIPÓTESE: fonte possivelmente comprimida**.
+
+A hipótese justifica priorizar a investigação, mas não autoriza implementar um descompressor presumido nem alterar a ROM.
