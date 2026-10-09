@@ -379,7 +379,17 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
             return None
         operation = "ADDA" if (op & 0xF000) == 0xD000 else "SUBA"
         size_name = "L" if operand_size == 4 else "W"
-        return M68KInstruction(offset, 2 + extension, f"{operation}.{size_name}")
+        destination_register = (op >> 9) & 0x7
+        mnemonic = f"{operation}.{size_name}"
+        if source_mode == 7 and source_register == 4:
+            immediate = int.from_bytes(
+                data[offset + 2 : offset + 2 + extension], "big"
+            )
+            mnemonic = (
+                f"{operation}.{size_name} #$"
+                f"{immediate:0{extension * 2}X},A{destination_register}"
+            )
+        return M68KInstruction(offset, 2 + extension, mnemonic)
 
     # Todas as formas gerais de MOVE/MOVEA.
     move = _decode_move(data, offset, op)
