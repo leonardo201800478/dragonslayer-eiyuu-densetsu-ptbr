@@ -77,3 +77,30 @@ O fluxo decodificado sugere um laço que copia bytes comuns até encontrar `0x00
 - **Hipótese:** os dois laços que comparam `0x06` podem ser rotinas de cópia delimitada.
 - **Não demonstrado:** que qualquer candidato seja o parser principal, que receba a abertura ou que seja alcançado durante a execução.
 - **Próximo objetivo:** validar entradas e destinos dos desvios e rastrear como os registradores de endereço são preparados.
+
+
+## Resultado da inspeção dos destinos dos desvios
+
+O relatório seguinte examinou `0x01E9BC`, `0x02AF90` e `0x0262DC` como entradas exploratórias.
+
+- Em `0x01E9BC` e `0x02AF90`, o decoder não reconheceu uma instrução válida.
+- Em `0x0262DC`, a decodificação reproduziu o laço que grava bytes até encontrar `0x00`, seguido de `RTS`.
+- Nenhum dos três offsets teve chamador direto reconhecido no CFG iniciado pelo vetor de reset.
+
+A falha de decodificação nos dois primeiros destinos **não prova que os bytes sejam dados**. Pode indicar dados, entrada no meio de uma instrução, uma instrução 68000 ainda não suportada pelo decoder ou fluxo incorreto causado por um falso candidato. Sem os bytes brutos ao redor dos destinos, não é possível distinguir essas hipóteses.
+
+## Melhoria no relatório de inspeção
+
+O comando `inspect-m68k-targets` agora inclui uma janela hexadecimal bruta quando não consegue decodificar um alvo. A janela cobre até 8 bytes anteriores e 16 bytes a partir do alvo, respeitando os limites da ROM. Esses bytes são apresentados sem classificação como código ou dados.
+
+Gere novamente o relatório:
+
+```powershell
+python -m dragonslayer_ptbr inspect-m68k-targets `
+  --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" `
+  --targets 0x01E9BC 0x02AF90 0x0262DC `
+  --max-blocks-per-target 120 `
+  --output reports/m68k-control-destinations.md
+```
+
+Envie a nova versão de `reports/m68k-control-destinations.md`. O conteúdo hexadecimal permitirá verificar se os destinos começam com uma instrução conhecida, se parecem estar no meio de uma sequência ou se precisamos ampliar o decoder. Ainda assim, a janela isolada não comprova fluxo de execução.
