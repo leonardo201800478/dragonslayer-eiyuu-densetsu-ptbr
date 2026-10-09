@@ -11,12 +11,12 @@ from .analysis.m68k_a3_flow import (
 )
 from .analysis.m68k_code import build_control_flow_graph, write_code_report
 from .analysis.m68k_control_tests import scan_control_tests, write_control_test_report
-from .analysis.m68k_register_flow import trace_register_flow, write_register_flow_report
 from .analysis.m68k_indexed_reads import (
     scan_indexed_byte_reads,
     write_indexed_byte_report,
 )
 from .analysis.m68k_references import scan_known_targets, write_reference_report
+from .analysis.m68k_register_flow import trace_register_flow, write_register_flow_report
 from .analysis.m68k_text_parser_candidates import (
     scan_text_parser_candidates,
     write_text_parser_report,
