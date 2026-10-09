@@ -142,3 +142,25 @@ Referências:
 - [Testes do decoder](../tests/test_m68k_code.py)
 
 Depois de atualizar o checkout local, execute novamente `inspect-m68k-targets` nos três destinos. O objetivo imediato é verificar se a decodificação de `0x02AF90` avança além de `CLR.B D0` e das duas instruções `ADDA.L`. A sequência decodificada ainda precisa ser validada como código e relacionada a chamadores antes de inferir sua função.
+## Atualização após a inspeção de cinco alvos
+
+O relatório mais recente contém 2.100 blocos alcançados a partir do vetor de reset e examina os alvos 0x01E9BC, 0x01E9C0, 0x02AF26, 0x02AF90 e 0x0262DC. Os resultados exigem uma ressalva importante: o CFG iniciado artificialmente em 0x02AF26 chega a 0x02AF94, enquanto a decodificação iniciada separadamente em 0x02AF90 interpreta 0x02AF92 como ADDA.L #$00000003,A5.
+
+### Sobreposição suspeita na região 0x02AF90
+
+A instrução iniciada em 0x02AF92 ocupa seis bytes, de 0x02AF92 a 0x02AF97. Portanto, 0x02AF94 cai dentro do operando imediato dessa instrução. O relatório do fluxo iniciado em 0x02AF26 chega exatamente a esse endereço por meio do desvio condicional em 0x02AF2C.
+
+Se as duas decodificações estiverem corretas, o fluxo aparenta entrar no meio de uma instrução, o que é um sinal forte de que pelo menos uma das hipóteses de entrada/alinhamento precisa ser revista. Não devemos concluir que 0x02AF90 seja uma rotina validada apenas porque o decoder consegue decodificar seus bytes isoladamente. É necessário conferir os bytes e o fluxo em torno de 0x02AF20 e 0x02AF90, idealmente com um desassembler 68000 independente.
+
+### Sobre 0x01E9C0
+
+A sequência 48 E7 FF FE é compatível com MOVEM.L salvando registradores na pilha. Em seguida há outra instrução MOVEM e uma chamada absoluta a 0x02930A. A região contém laços com leitura e escrita de bytes e chamadas a 0x01EA5E, tornando-a um candidato de análise mais rico do que a janela isolada em 0x01E9BC.
+
+Entretanto, a inspeção forçada não prova que 0x01E9C0 seja uma entrada real. O alvo 0x01E9BC continua começando com 7F FF, que não é um MOVEQ válido no 68000, e não há chamada direta reconhecida no CFG de reset para esse endereço.
+
+### Estado das hipóteses
+
+- **Observado no relatório:** há laços com MOVE.B (An)+,Dn e MOVE.B Dn,(An)+ perto de 0x01E9E4; a região chama 0x01EA5E e 0x02930A.
+- **Sinal de alerta:** o destino 0x02AF94 sobrepõe o operando imediato da instrução que começa em 0x02AF92 quando se aceita a decodificação local de 0x02AF90.
+- **Ainda não demonstrado:** que os laços sejam parser de texto, que os bytes de entrada venham de um script ou que a rotina esteja alcançável em runtime.
+- **Próximo passo recomendado:** validar a região 0x01E9C0 com uma segunda implementação de desassemblagem e rastrear os registradores que alimentam as leituras de byte; tratar 0x02AF90 como ambíguo até resolver a sobreposição de fluxo.
