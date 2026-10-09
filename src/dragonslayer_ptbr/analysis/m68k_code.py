@@ -377,11 +377,37 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
         ea_name = "Dn" if mode == 0 else "<EA>"
         return M68KInstruction(offset, size, f"CMPI.{suffix} #imm,{ea_name}")
 
-    # ANDI/ORI/SUBI/ADDI byte.
+    # ORI/ANDI/SUBI/ADDI/EORI #imm,<EA>. O imediato ocupa uma
+    # palavra para BYTE/WORD e duas para LONG; o EA pode ter extensões.
+    # CMPI é tratado separadamente acima.
     if (op & 0xFF00) in (0x0000, 0x0200, 0x0400, 0x0600, 0x0A00):
-        if offset + 4 > len(data):
+        size_bits = (op >> 6) & 0x3
+        operand_size = {0: 1, 1: 2, 2: 4}.get(size_bits)
+        mode = (op >> 3) & 0x7
+        register = op & 0x7
+        if operand_size is None or mode == 1:
             return None
-        return M68KInstruction(offset, 4, "IMMEDIATE.B")
+        if mode == 7 and register not in (0, 1):
+            return None
+        immediate_size = 4 if operand_size == 4 else 2
+        ea_extension = _ea_extension_size(
+            mode, register, operand_size, source=False
+        )
+        if ea_extension is None:
+            return None
+        size = 2 + immediate_size + ea_extension
+        if offset + size > len(data):
+            return None
+        operation = {
+            0x0000: "ORI",
+            0x0200: "ANDI",
+            0x0400: "SUBI",
+            0x0600: "ADDI",
+            0x0A00: "EORI",
+        }[op & 0xFF00]
+        suffix = {1: "B", 2: "W", 4: "L"}[operand_size]
+        ea_name = "Dn" if mode == 0 else "<EA>"
+        return M68KInstruction(offset, size, f"{operation}.{suffix} #imm,{ea_name}")
 
     # MOVEQ #imm,Dn.
     if (op & 0xF100) == 0x7000:
