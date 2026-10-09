@@ -148,6 +148,21 @@ def build_parser() -> argparse.ArgumentParser:
     )
     target_inspector.add_argument("--max-blocks-per-target", type=int, default=80)
 
+    overlap = sub.add_parser(
+        "audit-m68k-entry-overlaps",
+        help="detecta entradas que caem dentro de instruções decodificadas",
+    )
+    overlap.add_argument("--rom", required=True, type=Path)
+    overlap.add_argument(
+        "--entries", nargs="+", type=lambda value: int(value, 0),
+        default=list(DEFAULT_ENTRIES),
+        help="offsets de entrada em decimal ou hexadecimal",
+    )
+    overlap.add_argument(
+        "--output", type=Path, default=Path("reports/m68k-entry-overlaps.md")
+    )
+    overlap.add_argument("--max-blocks-per-entry", type=int, default=5000)
+
     indexed = sub.add_parser(
         "scan-indexed-reads",
         help="localiza leituras MOVE.B com endereçamento indexado",
@@ -239,7 +254,21 @@ def main() -> int:
         print(f"Relatório: {args.output}")
         return 0
 
-    if args.command == "audit-m68k-entry-overlaps":\n        if args.max_blocks_per_entry < 1:\n            raise SystemExit("max-blocks-per-entry deve ser maior que zero")\n        try:\n            overlaps = write_entry_overlap_report(\n                args.rom.read_bytes(), args.entries, args.output,\n                max_blocks_per_entry=args.max_blocks_per_entry,\n            )\n        except ValueError as exc:\n            raise SystemExit(str(exc)) from exc\n        print(f"Sobreposições encontradas: {len(overlaps)}")\n        print(f"Relatório: {args.output}")\n        return 0\n\n    if args.command == "scan-indexed-reads":
+    if args.command == "audit-m68k-entry-overlaps":
+        if args.max_blocks_per_entry < 1:
+            raise SystemExit("max-blocks-per-entry deve ser maior que zero")
+        try:
+            overlaps = write_entry_overlap_report(
+                args.rom.read_bytes(), args.entries, args.output,
+                max_blocks_per_entry=args.max_blocks_per_entry,
+            )
+        except ValueError as exc:
+            raise SystemExit(str(exc)) from exc
+        print(f"Sobreposições encontradas: {len(overlaps)}")
+        print(f"Relatório: {args.output}")
+        return 0
+
+    if args.command == "scan-indexed-reads":
         if args.context < 0:
             raise SystemExit("context deve ser maior ou igual a zero")
         data = args.rom.read_bytes()
