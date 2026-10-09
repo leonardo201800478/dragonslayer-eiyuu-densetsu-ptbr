@@ -17,6 +17,7 @@ from .analysis.m68k_indexed_reads import (
 )
 from .analysis.m68k_references import scan_known_targets, write_reference_report
 from .analysis.m68k_register_flow import trace_register_flow, write_register_flow_report
+from .analysis.m68k_target_inspector import DEFAULT_TARGETS, write_target_inspection_report
 from .analysis.m68k_text_parser_candidates import (
     scan_text_parser_candidates,
     write_text_parser_report,
@@ -118,6 +119,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     register_flow.add_argument("--max-blocks", type=int, default=5000)
 
+    target_inspector = sub.add_parser(
+        "inspect-m68k-targets",
+        help="inspeciona chamadores e fluxo alcançável de alvos 68000 candidatos",
+    )
+    target_inspector.add_argument("--rom", required=True, type=Path)
+    target_inspector.add_argument(
+        "--targets", nargs="+", type=lambda value: int(value, 0), default=list(DEFAULT_TARGETS),
+        help="offsets de entrada em decimal ou hexadecimal",
+    )
+    target_inspector.add_argument(
+        "--output", type=Path, default=Path("reports/m68k-target-inspection.md")
+    )
+    target_inspector.add_argument("--max-blocks-per-target", type=int, default=80)
+
     indexed = sub.add_parser(
         "scan-indexed-reads",
         help="localiza leituras MOVE.B com endereçamento indexado",
@@ -191,6 +206,21 @@ def main() -> int:
         print(f"Definições A0-A3: {len(report.definitions)}")
         print(f"Leituras de byte: {len(report.reads)}")
         print(f"Chamadas JSR: {len(report.calls)}")
+        print(f"Relatório: {args.output}")
+        return 0
+
+    if args.command == "inspect-m68k-targets":
+        if args.max_blocks_per_target < 1:
+            raise SystemExit("max-blocks-per-target deve ser maior que zero")
+        data = args.rom.read_bytes()
+        try:
+            write_target_inspection_report(
+                data, args.targets, args.output,
+                max_blocks_per_target=args.max_blocks_per_target,
+            )
+        except ValueError as exc:
+            raise SystemExit(str(exc)) from exc
+        print(f"Alvos inspecionados: {len(args.targets)}")
         print(f"Relatório: {args.output}")
         return 0
 
