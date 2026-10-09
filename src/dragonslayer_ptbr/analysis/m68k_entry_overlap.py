@@ -17,6 +17,7 @@ class EntryOverlap:
     instruction_offset: int
     instruction_end: int
     instruction_mnemonic: str
+    instruction_bytes: bytes
     source_entry: int
 
 
@@ -60,7 +61,9 @@ def find_entry_overlaps(
                     overlaps.add(
                         EntryOverlap(
                             candidate, instruction.offset, end,
-                            instruction.mnemonic, source_entry,
+                            instruction.mnemonic,
+                            data[instruction.offset:end],
+                            source_entry,
                         )
                     )
     return tuple(sorted(overlaps, key=lambda item: (
@@ -93,7 +96,8 @@ def render_entry_overlap_report(
             lines.append(
                 f"| `0x{item.entry_point:06X}` | "
                 f"`0x{item.instruction_offset:06X}–0x{item.instruction_end:06X}` "
-                f"(`{item.instruction_mnemonic}`) | `0x{item.source_entry:06X}` |"
+                f"(`{item.instruction_mnemonic}`) | "
+                f"`{item.instruction_bytes.hex(\" \").upper()}` | `0x{item.source_entry:06X}` |"
             )
     lines.extend([
         "",
