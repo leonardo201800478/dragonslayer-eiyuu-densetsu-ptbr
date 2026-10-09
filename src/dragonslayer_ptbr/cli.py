@@ -16,11 +16,11 @@ from .analysis.m68k_indexed_reads import (
     write_indexed_byte_report,
 )
 from .analysis.m68k_references import scan_known_targets, write_reference_report
-from .analysis.m68k_register_flow import trace_register_flow, write_register_flow_report
 from .analysis.m68k_reachable_text import (
     scan_reachable_text_candidates,
     write_reachable_text_report,
 )
+from .analysis.m68k_register_flow import trace_register_flow, write_register_flow_report
 from .analysis.m68k_target_inspector import DEFAULT_TARGETS, write_target_inspection_report
 from .analysis.m68k_text_parser_candidates import (
     scan_text_parser_candidates,
