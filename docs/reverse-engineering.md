@@ -571,3 +571,41 @@ O relatório inclui bloco, offset da leitura, offset do teste, registrador de en
 
 **Limites:** o CFG depende de um decoder parcial, e bytes de dados podem ocasionalmente ser alcançados por um fluxo incorreto. A associação no mesmo bloco não prova que o ponteiro contenha script nem que o teste faça parte do engine de texto. O resultado é um filtro mais forte para priorização, não uma confirmação semântica.
 
+
+
+## 35. Experimento exploratório com Engine9000 e retorno à análise estática
+
+O Engine9000 foi usado durante uma batalha e na tela de vitória para tentar observar a execução em runtime. O experimento foi interrompido por baixo retorno prático: os logs registraram acessos à interface do Z80, mas não demonstraram relação direta com o processamento de texto.
+
+### Evidências observadas
+
+- Um watchpoint de leitura foi cadastrado em `0x016529`, endereço que contém o nome japonês `セリオス`. Nenhum disparo foi confirmado.
+- Um breakpoint foi cadastrado em `0x00D49A`; os avisos seguintes não demonstraram que o 68000 tenha sido interrompido nesse endereço.
+- Um breakpoint em `0x0262C4` foi aceito, mas não houve evidência de que o endereço tenha sido alcançado durante a situação observada.
+- Na tela de vitória, estavam visíveis as mensagens `EP 4 が かくとく。` e `4 Gold 手に入れました。`.
+- Capturas distintas mostraram PCs como `0x016A78` e `0x00D64C`; não constituem um rastreamento contínuo da mesma rotina.
+- A memória em `0x016A00` e os bytes a partir de `0x00D510` foram inspecionados visualmente. Isso não confirmou se todos os bytes observados eram código executado nem identificou uma rotina de texto.
+- Os logs `68k z80 read with no bus` e `write with no bus or reset` mencionaram acessos a `0xA04000`–`0xA04003`. A relação desses acessos com o texto não foi demonstrada; podem estar associados à interface do Z80/subsistema de áudio.
+
+### Conclusão
+
+O experimento não identificou o parser de texto em runtime. O cadastro de um breakpoint, por si só, não demonstra que ele foi atingido. Os endereços e avisos observados devem permanecer como pistas exploratórias, não como descobertas confirmadas.
+
+### Decisão de método
+
+Pausar o rastreamento interativo com Engine9000 por enquanto e retornar ao método estático reproduzível:
+
+1. Executar os scanners 68000 existentes sobre a ROM original.
+2. Priorizar blocos alcançáveis a partir do vetor de reset e leituras sequenciais de bytes associadas a comparações com `0x01`, `0x06`, `0x0E` e `0x00`.
+3. Cruzar os candidatos com a região textual `0x01626B–0x01668A` e a tabela Shift-JIS em `0x1A551A`.
+4. Classificar conclusões como CONFIRMADO, HIPÓTESE ou DESCARTADO; não promover um candidato a parser apenas por semelhança de instruções.
+
+Comandos para retomar a análise estática:
+
+```powershell
+python -m dragonslayer_ptbr scan-reachable-text --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-reachable-text.md
+python -m dragonslayer_ptbr scan-m68k-register-flow --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-register-flow.md
+python -m dragonslayer_ptbr inspect-m68k-targets --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --output reports/m68k-target-inspection.md
+```
+
+Este checkpoint registra observações exploratórias e a decisão de método; não confirma uma rotina de texto nem altera a ROM.
