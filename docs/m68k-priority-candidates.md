@@ -203,3 +203,22 @@ python -m dragonslayer_ptbr audit-m68k-entry-overlaps --rom "roms/original/Drago
 Se a contagem de 44 blocos persistir, investigar o vetor de reset, o primeiro opcode desconhecido no fluxo e as instruções de inicialização reconhecidas. A ausência de chamadores diretos no CFG incompleto não demonstra que os alvos sejam inalcançáveis.
 
 **Estado:** a hipótese de processamento de bytes permanece aberta; o parser não foi confirmado. Nenhuma alteração deve ser feita na ROM original até validar o CFG e rastrear os registradores de origem/destino com uma segunda implementação de desassemblagem 68000.
+
+
+## Revisão do CFG: classificação indevida de instruções BTST
+
+Na revisão do construtor de fluxo de controle, foi encontrado um defeito concreto: os dois percursos classificavam qualquer mnemônico iniciado por `B` como desvio condicional. Como o decoder também emite `BTST #imm,<EA>` para instruções de teste de bit, essas instruções eram tratadas incorretamente como branches ao montar os blocos básicos.
+
+A condição foi restringida à lista explícita de desvios condicionais 68000 reconhecidos (`BHI`, `BLS`, `BCC`, `BCS`, `BNE`, `BEQ`, `BVC`, `BVS`, `BPL`, `BMI`, `BGE`, `BLT`, `BGT`, `BLE`). A correção foi registrada no commit `317d512cf2024b762c006683894ba197c915e945`, e um teste de regressão para `BTST` seguido de `RTS` foi adicionado em `469ab117cfb62957695c88652b78be6286ff98f8`.
+
+**Limite da conclusão:** esse erro pode fragmentar incorretamente blocos, mas ainda não está demonstrado que seja a causa da discrepância histórica entre 44 e aproximadamente 2.100 blocos. É necessário executar o mesmo comando com a ROM validada e registrar a contagem antes/depois da correção. A hipótese de parser permanece não confirmada.
+
+### Validação local após atualizar o checkout
+
+```powershell
+git pull
+python -m pytest tests/test_m68k_code.py -q
+python -m dragonslayer_ptbr inspect-m68k-targets --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" --targets 0x01E9C0 0x01E9E4 0x01EA5E 0x02930A --max-blocks-per-target 120 --output reports/m68k-text-processing-region.md
+```
+
+Compare a contagem impressa de blocos alcançados com os relatórios anteriores. Não considere a suíte aprovada nem a discrepância resolvida até obter a saída real desses comandos.
