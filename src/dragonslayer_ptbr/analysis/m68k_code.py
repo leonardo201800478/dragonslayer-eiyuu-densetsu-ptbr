@@ -545,9 +545,9 @@ def build_control_flow_graph(
                 offset = next_offset
                 continue
 
-            if instruction.mnemonic.startswith("B") and instruction.mnemonic not in {
-                "BRA",
-                "BSR",
+            if instruction.mnemonic in {
+                "BHI", "BLS", "BCC", "BCS", "BNE", "BEQ",
+                "BVC", "BVS", "BPL", "BMI", "BGE", "BLT", "BGT", "BLE",
             }:
                 if instruction.target is not None:
                     leaders.add(instruction.target)
@@ -602,7 +602,10 @@ def build_control_flow_graph(
                 offset = next_offset
                 continue
 
-            if current.mnemonic.startswith("B"):
+            if current.mnemonic in {
+                "BHI", "BLS", "BCC", "BCS", "BNE", "BEQ",
+                "BVC", "BVS", "BPL", "BMI", "BGE", "BLT", "BGT", "BLE",
+            }:
                 reason = "conditional_branch"
                 offset = next_offset
                 break
