@@ -494,3 +494,29 @@ Suporte adicionado nesta etapa: BTST #imm,<EA>, MOVE.W SR,<EA> e NEGX.B/W/L <EA>
 Não foi comprovado parser de texto, ponteiro de script, consulta efetiva à tabela 0x1A551A, conversão código→glifo ou renderer. Permanecem bloqueados encoder de produção, escrita da ROM, realocação e patch de ponteiros.
 
 Na retomada: rodar a suíte, regenerar o relatório M68K, verificar o avanço além de 0x010B3A após NEGX e rastrear as origens de A0–A3 dentro dos blocos alcançáveis.
+
+
+---
+
+## 11. Validação independente e ferramentas de terceiros
+
+O plano detalhado está em [docs/third-party-tooling-and-validation-plan.md](third-party-tooling-and-validation-plan.md). Esta seção integra essas atividades ao roadmap e estabelece a ordem de execução.
+
+### Ordem obrigatória
+
+1. **Estabilizar a suíte:** corrigir `test_scan_address_references_accepts_custom_targets`, definir o contrato para referências de 3 e 4 bytes sobrepostas e consultar o CI real antes de marcar a etapa como concluída.
+2. **Reproduzir o CFG:** executar os mesmos comandos com a mesma ROM, commit e parâmetros para explicar as contagens divergentes registradas em relatórios anteriores.
+3. **Comparar desassemblagem:** avaliar primeiro [sega2asm](https://github.com/hansbonini/sega2asm) e [Oxore m68k-disasm](https://github.com/Oxore/m68k-disasm) nos intervalos candidatos documentados. Registrar divergências de instrução, tamanho e destino de branch.
+4. **Observar execução real:** usar [BlastEm](https://github.com/libretro/blastem) ou, alternativamente, o [debugger do MAME](https://docs.mamedev.org/debugger/index.html) para buscar evidência dinâmica da cadeia script → leitura → controle → fonte/renderização.
+5. **Validar a tabela de caracteres:** demonstrar a relação código → índice → glifo, incluindo os caracteres portugueses necessários. Um teste Python do inventário não comprova presença nem renderização de um glifo na ROM.
+6. **Executar M1:** somente após os gates anteriores, construir uma ROM de teste separada, validar alterações e testar a exibição de um texto PT-BR mínimo.
+
+### Política de dependências
+
+Ferramentas de terceiros serão auxiliares e opcionais. Não devem se tornar dependências obrigatórias do pacote Python nem bloquear a execução de `pytest`. Registrar versão, comandos, configuração e hash da ROM para cada experimento. ROM original, executáveis externos e temporários permanecem fora do Git.
+
+### Critério de avanço
+
+Não considerar o engine de texto localizado apenas por encontrar `MOVE.B (An)+,Dn`, comparações com `0x01/0x06/0x0E/0x00` ou uma sequência plausível de instruções. A promoção de um candidato exige evidência estática coerente e, quando viável, confirmação durante a execução do jogo.
+
+**Estado deste checkpoint:** ferramentas selecionadas para avaliação; ainda não há evidência de que tenham sido executadas contra esta ROM. CI e divergência do CFG permanecem pendentes até nova execução documentada.
