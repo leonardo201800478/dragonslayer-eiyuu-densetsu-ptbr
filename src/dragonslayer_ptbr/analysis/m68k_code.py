@@ -351,10 +351,31 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
             return None
         return M68KInstruction(offset, 4, "BTST #imm,<EA>")
 
+    # CMPI.B/W/L #imm,<EA>. O operando imediato ocupa uma palavra
+    # para BYTE/WORD e duas palavras para LONG; o EA também pode carregar
+    # extensões (por exemplo, abs.l). Consumir tudo é essencial para não
+    # deslocar a decodificação de instruções seguintes.
     if (op & 0xFF00) == 0x0C00:
-        if offset + 4 > len(data):
+        size_bits = (op >> 6) & 0x3
+        operand_size = {0: 1, 1: 2, 2: 4}.get(size_bits)
+        mode = (op >> 3) & 0x7
+        register = op & 0x7
+        if operand_size is None or mode == 1:
             return None
-        return M68KInstruction(offset, 4, "CMPI.B #imm,Dn")
+        if mode == 7 and register not in (0, 1):
+            return None
+        immediate_size = 4 if operand_size == 4 else 2
+        ea_extension = _ea_extension_size(
+            mode, register, operand_size, source=False
+        )
+        if ea_extension is None:
+            return None
+        size = 2 + immediate_size + ea_extension
+        if offset + size > len(data):
+            return None
+        suffix = {1: "B", 2: "W", 4: "L"}[operand_size]
+        ea_name = "Dn" if mode == 0 else "<EA>"
+        return M68KInstruction(offset, size, f"CMPI.{suffix} #imm,{ea_name}")
 
     # ANDI/ORI/SUBI/ADDI byte.
     if (op & 0xFF00) in (0x0000, 0x0200, 0x0400, 0x0600, 0x0A00):
