@@ -464,3 +464,50 @@ A origem só é associada a uma leitura quando está no mesmo bloco básico e n�
 
 **Limite:** mesmo uma associação A3 → MOVE.B (A3)+ não prova que os dados sejam texto. A promoção para engine de texto continua dependendo da correlação com controles 0x01/0x06/0x0E/0x00 e com a renderização/fonte.
 
+
+
+## 31. Resultado do rastreamento conservador de A0-A3
+
+O relatório gerado pela execução de `scan-m68k-register-flow` registrou:
+
+- **1.763 blocos** no grafo de fluxo de controle analisado;
+- **391 definições** de A0-A3;
+- **38 leituras de byte** por `MOVE.B (An)` ou `MOVE.B (An)+`;
+- **332 chamadas JSR** identificadas.
+
+Entre as 38 leituras, **12** receberam uma origem constante local dentro do mesmo bloco básico. Exemplos:
+
+| Leitura | Registrador | Definição local | Valor atribuído |
+|---:|---|---:|---:|
+| `0x0026E0` | A1 | `0x0026CC` | `0x000A286E` |
+| `0x002D92` | A0 | `0x002D7E` | `0x00002E1E` |
+| `0x006112` | A0 | `0x0060FE` | `0x000063FC` |
+| `0x006140` | A0 | `0x00612C` | `0x0002165A` |
+| `0x011118` | A3 | `0x011110` | `0x000111A8` |
+| `0x0111E8` | A0 | `0x0111D4` | `0x00011254` |
+| `0x02DE1A` | A0 | `0x02DE06` | `0x0002DE7A` |
+
+Essas associações confirmam somente a origem estática local do registrador. **Não demonstram que os destinos contenham texto.** As outras 26 leituras não receberam uma origem constante local; isso pode ocorrer porque o endereço vem de contexto anterior, de uma instrução não modelada, de outra região ou de uma chamada.
+
+### Chamadas para priorizar
+
+O relatório mostra chamadas repetidas para alguns alvos:
+
+- `0x001D1E` — chamado por diversos pontos, inclusive em regiões `0x011xxx` e `0x02Cxxx`;
+- `0x001EC0` — também chamado repetidamente nas mesmas famílias de regiões;
+- `0x00D8F0` — chamado de vários pontos próximos entre `0x00D1D4` e `0x00D256`.
+
+Esses endereços são **CANDIDATOS para inspeção do fluxo e das instruções**, não parsers confirmados. O próximo passo é descrever os blocos de entrada e saída desses alvos e identificar quais registradores e argumentos são preparados pelos chamadores.
+
+### Limites e diferença em relação à análise anterior
+
+Este relatório tem uma cobertura de CFG muito maior que o checkpoint anterior documentado (43 blocos e 155 instruções reconhecidas). Os números não devem ser comparados como se fossem a mesma execução: o relatório anterior era um recorte de análise e este resultado cobre 1.763 blocos.
+
+O rastreador é intencionalmente conservador e limpa as associações locais em chamadas `JSR`. Assim, uma leitura sem origem local não é evidência de ausência de ponteiro de texto; significa apenas que o rastreador ainda não consegue provar a origem com as regras atuais.
+
+### Próxima ação
+
+1. Desassemblar os blocos em torno de `0x001D1E`, `0x001EC0` e `0x00D8F0`.
+2. Mapear os registradores preparados imediatamente antes das chamadas e observados após o retorno.
+3. Cruzar esses caminhos com a leitura dos bytes da abertura em `0x01626B)–`0x01668A` e com os controles `0x01`, `0x06 xx yy`, `0x0E` e `0x00`.
+4. Comparar os resultados com o candidato previamente documentado em `0x026ADA`–`0x026AE0`, sem promovê-lo a parser enquanto a conexão com o script não for demonstrada.
