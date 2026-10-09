@@ -16,6 +16,7 @@ def test_detects_entry_inside_an_instruction_from_another_root():
         item.entry_point == 0x12
         and item.instruction_offset == 0x10
         and item.instruction_end == 0x16
+        and item.instruction_bytes == bytes.fromhex("DB FC 00 00 00 03")
         for item in overlaps
     )
 
@@ -25,6 +26,18 @@ def test_entry_overlap_report_warns_that_runtime_is_unconfirmed():
 
     assert "não prova qual fluxo é executado em runtime" in report
     assert "Nenhuma sobreposição" in report
+
+
+def test_overlap_report_includes_raw_bytes_and_half_open_range():
+    rom = bytearray(0x40)
+    rom[0x10:0x16] = bytes.fromhex("DB FC 00 00 00 03")
+    overlaps = find_entry_overlaps(bytes(rom), (0x10, 0x12))
+
+    report = render_entry_overlap_report((0x10, 0x12), overlaps)
+
+    assert "`[início, fim)`" in report
+    assert "`DB FC 00 00 00 03`" in report
+    assert "`0x000010–0x000016`" in report
 
 
 def test_rejects_unaligned_entry_points():
