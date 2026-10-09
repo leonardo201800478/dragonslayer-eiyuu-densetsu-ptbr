@@ -6,12 +6,28 @@ from pathlib import Path
 from .m68k_code import CodeBlock, M68KInstruction, build_control_flow_graph
 
 DEFAULT_TARGETS = (0x001D1E, 0x001EC0, 0x00D8F0)
+RAW_CONTEXT_BEFORE = 8
+RAW_CONTEXT_AFTER = 16
 
 
 def _format_instruction(data: bytes, instruction: M68KInstruction) -> str:
     raw = data[instruction.offset : instruction.offset + instruction.size].hex(" ").upper()
     target = "" if instruction.target is None else f" -> 0x{instruction.target:06X}"
     return f"`0x{instruction.offset:06X}`  `{raw:<23}`  {instruction.mnemonic}{target}"
+
+
+def _format_raw_context(data: bytes, target: int) -> list[str]:
+    """Formata bytes ao redor de um alvo que o decoder não conseguiu reconhecer."""
+    start = max(0, target - RAW_CONTEXT_BEFORE)
+    end = min(len(data), target + RAW_CONTEXT_AFTER)
+    lines = [
+        f"- Janela bruta: `0x{start:06X}`–`0x{end:06X}` "
+        f"({end - start} bytes; sem interpretação de instruções)."
+    ]
+    for offset in range(start, end, 8):
+        chunk = data[offset : min(offset + 8, end)]
+        lines.append(f"  - `0x{offset:06X}`: `{chunk.hex(' ').upper()}`")
+    return lines
 
 
 def inspect_targets(
@@ -73,6 +89,8 @@ def inspect_targets(
         )
         if not target_blocks:
             lines.append("O decoder conservador não reconheceu uma instrução válida neste offset.")
+            lines.extend(["", "### Bytes brutos ao redor do alvo", ""])
+            lines.extend(_format_raw_context(data, target))
             lines.append("")
             continue
 
@@ -96,6 +114,7 @@ def inspect_targets(
         "",
         "- Chamadores listados são apenas chamadas diretas reconhecidas no CFG do reset.",
         "- Chamadas indiretas `JSR (An)` não têm destino estático resolvido por esta ferramenta.",
+        "- Se o decoder não reconhecer um alvo, a janela bruta mostra os bytes próximos sem tentar atribuir-lhes instruções.",
         "- O fluxo iniciado artificialmente em cada alvo é útil para inspeção, mas pode entrar em dados.",
         "- A classificação como parser exige evidência adicional de ponteiro de script, controles e renderização.",
         "",
