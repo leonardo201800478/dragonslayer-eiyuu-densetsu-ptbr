@@ -157,6 +157,22 @@ def decode_instruction(data: bytes, offset: int) -> M68KInstruction | None:
 
     op = _word(data, offset)
 
+    # CLR.B/W/L <EA>. As extensões do effective address devem ser
+    # consumidas para manter o alinhamento de instruções subsequentes.
+    if (op & 0xFF00) == 0x4200:
+        size_bits = op & 0x00C0
+        size = {0x0000: 1, 0x0040: 2, 0x0080: 4}.get(size_bits)
+        mode = (op >> 3) & 0x7
+        register = op & 0x7
+        # CLR não permite endereço-register direto nem imediato/PC-relative.
+        if size is None or mode == 1 or (mode == 7 and register not in (0, 1)):
+            return None
+        extension = _ea_extension_size(mode, register, size, source=False)
+        if extension is None:
+            return None
+        suffix = {1: "B", 2: "W", 4: "L"}[size]
+        return M68KInstruction(offset, 2 + extension, f"CLR.{suffix} <EA>")
+
     # Instruções de controle/sistema que aparecem no bootstrap.
     # Elas não introduzem novos destinos no CFG, mas precisam consumir
     # exatamente o tamanho correto para manter o alinhamento.
