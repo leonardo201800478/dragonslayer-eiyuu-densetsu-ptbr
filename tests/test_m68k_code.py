@@ -239,7 +239,7 @@ def test_decode_negx_effective_address_forms():
 def test_decode_adda_long_immediate_consumes_long_extension():
     instruction = decode_instruction(bytes.fromhex("DB FC 00 00 00 03"), 0)
     assert instruction is not None
-    assert instruction.mnemonic == "ADDA.L"
+    assert instruction.mnemonic == "ADDA.L #$00000003,A5"
     assert instruction.size == 6
 
 
