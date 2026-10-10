@@ -1,97 +1,74 @@
-# Roadmap revisado do projeto
+# Roadmap e estado do projeto
 
 ## Objetivo
 
-Concluir uma tradução PT-BR com uma experiência de trabalho clara e segura, aproveitando as ferramentas de terceiros que já extraem os textos. O código Python não deve duplicar recursos externos sem necessidade: sua função é conectar o fluxo, facilitar a tradução/adaptação e validar as lacunas que restarem.
+Entregar uma tradução PT-BR funcional de *Dragon Slayer: Eiyuu Densetsu* (Mega Drive), reutilizando Atlas e as ferramentas específicas do jogo. O projeto Python não deve recriar um dumper ou inserter já existente sem uma lacuna comprovada.
 
-## Fase 1 — Fixar o fluxo externo real
+## Estado resumido
 
-- registrar nome, versão e comandos das ferramentas efetivamente usadas;
-- guardar exemplos pequenos de entrada e saída, sem adicionar ROM ou conteúdo protegido ao Git;
-- documentar como controles, diretivas, offsets e IDs são representados;
-- identificar qual ferramenta, se alguma, importa/reinsere os textos;
-- separar as etapas que já funcionam das etapas manuais.
+| Área | Estado | Evidência / próximo passo |
+|---|---|---|
+| Bancada Tkinter | Implementada | Reexecutar testes no checkout atual |
+| Catálogo JSON e importação JSON/CSV genérica | Implementados | Validar com dump real do jogo e preservar metadados |
+| Classificação e auditoria lexical de marcadores Atlas | Auxiliar implementado | Não equivale a interpretar a semântica das diretivas |
+| Extração por ferramenta externa | Ferramentas presentes | Registrar versão, comando e saída reproduzível |
+| Adaptador catálogo ↔ script Atlas nativo | Pendente de validação | Primeiro marco técnico prioritário |
+| Fonte e caracteres PT-BR | Pendente | Fazer matriz de glifos e teste visual |
+| Inserção em ROM de teste | Não comprovada ponta a ponta | Executar apenas em cópia isolada |
+| Validação no emulador | Pendente para tradução PT-BR | Confirmar texto, controles e diálogos subsequentes |
+| Expansão de caixa/página | Investigação pendente | Não assumir que seja necessária ou possível antes dos testes de comprimento |
 
-**Gate 1:** existe uma amostra real e reproduzível do dump e a equipe sabe qual ferramenta é responsável por cada operação.
+Os documentos registram anteriormente 11.037 entradas, 111 testes aprovados e Ruff sem erros. Esses dados são um checkpoint histórico, não uma afirmação de que os testes atuais foram executados.
 
-## Fase 2 — Bancada de tradução PT-BR
+## Prioridades
 
-Implementado nesta etapa:
-- interface desktop Tkinter;
-- importação de JSON/CSV com campos comuns;
-- normalização em catálogo JSON;
-- lista de entradas, busca e filtro de pendências;
-- edição de tradução com a origem em modo somente leitura;
-- salvamento, exportação CSV e QA de marcadores.
+### P0 — Provar o fluxo real antes de ampliar o código
 
-Próximas melhorias:
-- glossário editável para nomes, lugares, itens, magias e termos recorrentes;
-- notas de contexto e decisões de tradução;
-- comparação de versões e identificação de entradas alteradas;
-- autosave e proteção contra perda de alterações;
-- apoio à revisão por lotes e exportação de pendências.
+1. Identificar as versões exatas de Atlas e `slayer1_dumper` usadas localmente.
+2. Selecionar um script nativo pequeno que contenha texto e ao menos um marcador.
+3. Guardar uma fixture mínima e licenciável, sem ROM nem conteúdo desnecessário.
+4. Definir quais campos do script podem ser traduzidos e quais devem permanecer idênticos.
+5. Criar testes de ida e volta: script → catálogo → script, sem tradução, deve preservar a entrada byte a byte sempre que o formato permitir.
 
-**Gate 2:** a equipe consegue traduzir e revisar um lote real sem alterar o dump original e sem perder marcadores ou metadados.
+**Critério de conclusão:** round-trip reproduzível, com diff vazio ou diferenças justificadas exclusivamente pela serialização documentada.
 
-## Fase 3 — Adaptadores de ida e volta
+### P1 — Tradução e QA
 
-- implementar adaptadores específicos, não heurísticas genéricas, para o formato real de cada ferramenta;
-- preservar comentários, comandos, offsets, alinhamento e campos desconhecidos;
-- verificar integridade do texto de origem antes de aplicar traduções;
-- testar round-trip em fixtures pequenas;
-- impedir que um catálogo de revisão seja confundido com um arquivo pronto para inserção.
+- Revisar os campos normalizados contra um dump real.
+- Preservar IDs, metadados, diretivas, comentários, controles e campos desconhecidos.
+- Validar caracteres PT-BR contra a tabela e a fonte reais; rejeitar substituições silenciosas.
+- Acrescentar glossário e notas de contexto apenas se ajudarem a revisão do texto.
+- Produzir relatório de pendências e comparação antes/depois.
 
-**Gate 3:** um pequeno conjunto traduzido volta ao formato nativo e é aceito pela ferramenta externa em uma cópia de teste.
+**Critério de conclusão:** lote real revisado sem perda de registros ou alterações estruturais não autorizadas.
 
-## Fase 4 — Adaptação linguística e visual PT-BR
+### P2 — Build de teste segura
 
-- estabelecer glossário de nomes próprios, locais, itens, personagens, magias e sistemas;
-- definir convenções de pontuação, tratamento, pronomes e tom;
-- testar acentos e caracteres disponíveis na fonte real;
-- avaliar comprimento em bytes e largura visual por contexto, sem impor limites não comprovados;
-- registrar alternativas quando a frase em português não couber.
+- Criar diretório de build separado e registrar hash da ROM de entrada.
+- Confirmar a presença dos scripts e arquivos exigidos antes de iniciar.
+- Executar as ferramentas externas por etapas, com logs e interrupção em caso de erro.
+- Gerar hash e diff da ROM de saída.
+- Não permitir que comandos automatizados apontem para a ROM original.
 
-**Gate 4:** tradução aprovada linguisticamente e representável pela fonte/codec real, com restrições visuais documentadas.
+**Critério de conclusão:** build reproduzível e auditável em uma cópia, sem modificar a entrada.
 
-## Fase 5 — Inserção e validação do jogo
+### P3 — Validação no emulador
 
-Só avançar quando a ferramenta de inserção e seu formato estiverem confirmados:
-- operar em cópia de ROM com hash conhecido;
-- gerar saída separada;
-- revisar diff binário e referências;
-- iniciar no emulador e testar os diálogos modificados, controles e mensagens seguintes;
-- manter procedimento reproduzível para regenerar a ROM de teste.
+- Confirmar que o jogo inicia.
+- Conferir o diálogo traduzido, os marcadores, a página seguinte e o fluxo adjacente.
+- Testar acentos, pontuação e textos maiores.
+- Só investigar alteração de fonte, buffer ou caixa quando um caso real demonstrar a necessidade.
 
-**Gate 5:** o texto PT-BR aparece corretamente no jogo e as rotinas próximas continuam funcionais.
+**Critério de conclusão:** evidência reproduzível do texto traduzido no jogo, acompanhada de hashes, logs e capturas.
 
-## Ferramentas próprias de engenharia reversa
+## O que não fazer agora
 
-Os módulos de análise de ROM, tabela de caracteres e código 68000 permanecem no repositório para diagnosticar problemas que os terceiros não resolvam. Eles são ferramentas auxiliares, não a etapa obrigatória anterior a cada tradução.
+- Não criar um substituto para Atlas ou `slayer1_dumper` sem provar uma limitação concreta.
+- Não interpretar marcadores apenas pelo nome ou pela aparência.
+- Não expandir caixas nem alterar ponteiros com base em hipóteses.
+- Não executar `insert TEXT.bat` nem outros scripts de inserção sobre a ROM original.
+- Não apagar ferramentas de análise só por parecerem experimentais: primeiro verificar referências, testes e utilidade para uma pendência definida.
 
-## Regras permanentes
+## Definição de pronto
 
-- ROM original sempre somente leitura e fora do Git.
-- Não distribuir ROM, executáveis ou assets de terceiros sem permissão.
-- Não afirmar compatibilidade sem teste na versão exata da ferramenta.
-- Não perder silenciosamente marcadores, metadados ou dados desconhecidos.
-- QA textual não equivale a validação de inserção.
-- Preferir logs, fixtures pequenas e testes automatizados.
-
-
-## Atualização de progresso — 10/10/2026
-
-### Verificado
-- A bancada Tkinter abriu um catálogo de **11.037 entradas**.
-- Uma tradução de teste foi salva e persistiu após fechar e reabrir a interface.
-- O QA da entrada testada não detectou divergências nos marcadores.
-- Os testes locais concluíram com **111 aprovados**.
-- `ruff check .` retornou `All checks passed!`.
-
-### Ainda não concluído
-- Confirmar a pasta, versão e formato nativo da ferramenta que gerou os TXT/dumps.
-- Executar aplicação das traduções em cópia separada dos scripts reais.
-- Demonstrar round-trip para o formato esperado pela ferramenta externa.
-- Verificar suporte a caracteres PT-BR, limites de tamanho e largura visual.
-- Gerar uma ROM de teste apenas quando o método de inserção estiver comprovado, e testar no emulador.
-
-A entrada usada na interface foi um teste de persistência, não uma tradução confirmada dentro do jogo. O QA textual não deve ser interpretado como aprovação para inserção na ROM.
+O projeto não está concluído quando o catálogo salva ou o QA textual passa. Está concluído quando uma tradução passa pelo formato nativo, é inserida numa cópia segura e aparece corretamente no emulador sem quebrar os controles ou diálogos seguintes.
