@@ -1,0 +1,742 @@
+{
+  "root": "C:\\Users\\leost\\dragonslayer-eiyuu-densetsu-ptbr\\reports\\legacy-tooling-test\\tools\\text",
+  "encoding": "cp932",
+  "read_only": true,
+  "scripts_found": 225,
+  "scripts_decoded": 225,
+  "lines_processed": 65349,
+  "line_counts": {
+    "DIRECTIVE": 13455,
+    "OTHER": 26361,
+    "COMMENT": 14291,
+    "FILE_REFERENCE": 225,
+    "MIXED": 9250,
+    "TEXT": 1767
+  },
+  "segment_counts": {
+    "DICTIONARY_MARKER": 162,
+    "TEXT": 11043,
+    "LINE_MARKER": 7058,
+    "CONTROL_FLOW_MARKER": 2634,
+    "HEX_BYTE": 9701,
+    "UNKNOWN_MARKER": 5325
+  },
+  "unknown_marker_occurrences": 5325,
+  "unknown_marker_types": 15,
+  "unknown_marker_examples_per_type": 3,
+  "unknown_markers": [
+    {
+      "marker": "<WAIT CLEAR>",
+      "count": 2324,
+      "examples": [
+        {
+          "file": "script_0F.txt",
+          "line": 62,
+          "line_kind": "MIXED",
+          "raw": "人間の若者たちよ。<WAIT CLEAR>"
+        },
+        {
+          "file": "script_0F.txt",
+          "line": 66,
+          "line_kind": "MIXED",
+          "raw": "しなかったことだ。<WAIT CLEAR>"
+        },
+        {
+          "file": "script_0F.txt",
+          "line": 70,
+          "line_kind": "MIXED",
+          "raw": "長い間　この世界を　見守ってきた。<WAIT CLEAR>"
+        }
+      ]
+    },
+    {
+      "marker": "<COLOR OFF>",
+      "count": 1623,
+      "examples": [
+        {
+          "file": "script_0F.txt",
+          "line": 60,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1E>アグニージャ<COLOR OFF><LINE>"
+        },
+        {
+          "file": "script_0F.txt",
+          "line": 91,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1E>アグニージャ<COLOR OFF><LINE>"
+        },
+        {
+          "file": "script_0F.txt",
+          "line": 101,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1E>アグニージャ<COLOR OFF><LINE>"
+        }
+      ]
+    },
+    {
+      "marker": "<COLOR 1E>",
+      "count": 506,
+      "examples": [
+        {
+          "file": "script_0F.txt",
+          "line": 60,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1E>アグニージャ<COLOR OFF><LINE>"
+        },
+        {
+          "file": "script_0F.txt",
+          "line": 91,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1E>アグニージャ<COLOR OFF><LINE>"
+        },
+        {
+          "file": "script_0F.txt",
+          "line": 101,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1E>アグニージャ<COLOR OFF><LINE>"
+        }
+      ]
+    },
+    {
+      "marker": "<HERO 4>",
+      "count": 155,
+      "examples": [
+        {
+          "file": "script_14.txt",
+          "line": 109,
+          "line_kind": "OTHER",
+          "raw": "<HERO 4><LINE>"
+        },
+        {
+          "file": "script_30.txt",
+          "line": 108,
+          "line_kind": "OTHER",
+          "raw": "<HERO 4><LINE>"
+        },
+        {
+          "file": "script_30.txt",
+          "line": 159,
+          "line_kind": "OTHER",
+          "raw": "<HERO 4><LINE>"
+        }
+      ]
+    },
+    {
+      "marker": "<HERO 1>",
+      "count": 138,
+      "examples": [
+        {
+          "file": "script_0F.txt",
+          "line": 85,
+          "line_kind": "OTHER",
+          "raw": "<HERO 1><LINE>"
+        },
+        {
+          "file": "script_0F.txt",
+          "line": 95,
+          "line_kind": "OTHER",
+          "raw": "<HERO 1><LINE>"
+        },
+        {
+          "file": "script_13.txt",
+          "line": 65,
+          "line_kind": "OTHER",
+          "raw": "<HERO 1><LINE>"
+        }
+      ]
+    },
+    {
+      "marker": "<HERO 2>",
+      "count": 128,
+      "examples": [
+        {
+          "file": "script_13.txt",
+          "line": 62,
+          "line_kind": "MIXED",
+          "raw": "私の名は、<HERO 2>。<LINE>"
+        },
+        {
+          "file": "script_13.txt",
+          "line": 69,
+          "line_kind": "OTHER",
+          "raw": "<HERO 2><LINE>"
+        },
+        {
+          "file": "script_13.txt",
+          "line": 86,
+          "line_kind": "OTHER",
+          "raw": "<HERO 2><LINE>"
+        }
+      ]
+    },
+    {
+      "marker": "<WAIT>",
+      "count": 110,
+      "examples": [
+        {
+          "file": "script_0F.txt",
+          "line": 72,
+          "line_kind": "MIXED",
+          "raw": "遠い昔　この世界に　栄えていた文明を滅ぼしたのは　私だ。<WAIT>"
+        },
+        {
+          "file": "script_0F.txt",
+          "line": 103,
+          "line_kind": "MIXED",
+          "raw": "情けというもの。<WAIT>"
+        },
+        {
+          "file": "script_12.txt",
+          "line": 123,
+          "line_kind": "MIXED",
+          "raw": "うわっはっはっはっはっ　・　・　・<WAIT>"
+        }
+      ]
+    },
+    {
+      "marker": "<CODE 0C>",
+      "count": 80,
+      "examples": [
+        {
+          "file": "script_0F.txt",
+          "line": 182,
+          "line_kind": "MIXED",
+          "raw": "みるみる　扉が溶けていきました。<CODE 0C><$7F><$01>"
+        },
+        {
+          "file": "script_13.txt",
+          "line": 88,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1E>ナイフ<COLOR OFF><COLOR 1C>を　装備しました。<CODE 0C><$03><$01><COLOR OFF><WAIT CLEAR>"
+        },
+        {
+          "file": "script_13.txt",
+          "line": 97,
+          "line_kind": "MIXED",
+          "raw": "<HERO 2><COLOR 1C>が　仲間になりました。<CODE 0C><$03><$01><COLOR OFF>"
+        }
+      ]
+    },
+    {
+      "marker": "<HERO 3>",
+      "count": 66,
+      "examples": [
+        {
+          "file": "script_14.txt",
+          "line": 104,
+          "line_kind": "OTHER",
+          "raw": "<HERO 3><LINE>"
+        },
+        {
+          "file": "script_30.txt",
+          "line": 199,
+          "line_kind": "OTHER",
+          "raw": "<HERO 3><LINE>"
+        },
+        {
+          "file": "script_30.txt",
+          "line": 252,
+          "line_kind": "OTHER",
+          "raw": "<HERO 3><LINE>"
+        }
+      ]
+    },
+    {
+      "marker": "<COLOR 1C>",
+      "count": 63,
+      "examples": [
+        {
+          "file": "script_13.txt",
+          "line": 88,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1E>ナイフ<COLOR OFF><COLOR 1C>を　装備しました。<CODE 0C><$03><$01><COLOR OFF><WAIT CLEAR>"
+        },
+        {
+          "file": "script_13.txt",
+          "line": 97,
+          "line_kind": "MIXED",
+          "raw": "<HERO 2><COLOR 1C>が　仲間になりました。<CODE 0C><$03><$01><COLOR OFF>"
+        },
+        {
+          "file": "script_15.txt",
+          "line": 217,
+          "line_kind": "MIXED",
+          "raw": "<DICT 0E><COLOR 1C>を　もらいました。<CODE 0C><$03><$01><COLOR OFF><WAIT CLEAR>"
+        }
+      ]
+    },
+    {
+      "marker": "<FLAG 14>",
+      "count": 62,
+      "examples": [
+        {
+          "file": "script_13.txt",
+          "line": 36,
+          "line_kind": "MIXED",
+          "raw": "<FLAG 14><$00><$1A>セリオス王子。<LINE>"
+        },
+        {
+          "file": "script_21.txt",
+          "line": 117,
+          "line_kind": "MIXED",
+          "raw": "<FLAG 14><$00><$A4>むっ、お前は　何者だ？<WAIT CLEAR>"
+        },
+        {
+          "file": "script_3C.txt",
+          "line": 142,
+          "line_kind": "OTHER",
+          "raw": "<FLAG 14><$00><$C3>"
+        }
+      ]
+    },
+    {
+      "marker": "<JMP 0F>",
+      "count": 57,
+      "examples": [
+        {
+          "file": "script_15.txt",
+          "line": 41,
+          "line_kind": "OTHER",
+          "raw": "<JMP 0F>"
+        },
+        {
+          "file": "script_22.txt",
+          "line": 129,
+          "line_kind": "OTHER",
+          "raw": "<JMP 0F>"
+        },
+        {
+          "file": "script_29.txt",
+          "line": 140,
+          "line_kind": "OTHER",
+          "raw": "<JMP 0F>"
+        }
+      ]
+    },
+    {
+      "marker": "<FLAG 13>",
+      "count": 9,
+      "examples": [
+        {
+          "file": "script_3D.txt",
+          "line": 674,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1E>ゲイル<COLOR OFF><COLOR 1C>が仲間に加わりました。<CODE 0C><$03><$01><COLOR OFF><FLAG 14><$00><$9C><FLAG 13><$04><$00>"
+        },
+        {
+          "file": "script_89.txt",
+          "line": 188,
+          "line_kind": "OTHER",
+          "raw": "<FLAG 13><$04><$00>"
+        },
+        {
+          "file": "script_8A.txt",
+          "line": 164,
+          "line_kind": "MIXED",
+          "raw": "ここの　警備も　しなければならないし困ったものだ　・　・　・<FLAG 13><$04><$00>"
+        }
+      ]
+    },
+    {
+      "marker": "<NAME>",
+      "count": 3,
+      "examples": [
+        {
+          "file": "script_3D.txt",
+          "line": 76,
+          "line_kind": "MIXED",
+          "raw": "<NAME>の呪文の書に<LINE>"
+        },
+        {
+          "file": "script_3E.txt",
+          "line": 76,
+          "line_kind": "MIXED",
+          "raw": "<NAME>の呪文の書に<LINE>"
+        },
+        {
+          "file": "script_67.txt",
+          "line": 409,
+          "line_kind": "OTHER",
+          "raw": "Ｇ<$2C>ｘ<NAME>"
+        }
+      ]
+    },
+    {
+      "marker": "<COLOR 1F>",
+      "count": 1,
+      "examples": [
+        {
+          "file": "script_62.txt",
+          "line": 406,
+          "line_kind": "MIXED",
+          "raw": "<COLOR 1C><COLOR 1F><HERO 4>は　"
+        }
+      ]
+    }
+  ],
+  "examples_limit": 20,
+  "examples": [
+    {
+      "file": "script_01.txt",
+      "line": 35,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0B>は　宝箱を開けました。<LINE>",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0B>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "は　宝箱を開けました。"
+          },
+          {
+            "kind": "LINE_MARKER",
+            "value": "<LINE>"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_01.txt",
+      "line": 36,
+      "classification": {
+        "kind": "TEXT",
+        "raw": "宝箱の中には",
+        "segments": [
+          {
+            "kind": "TEXT",
+            "value": "宝箱の中には"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_01.txt",
+      "line": 56,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0E>が入っていました。",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0E>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "が入っていました。"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_03.txt",
+      "line": 35,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0B>は　宝箱を開けました。<LINE>",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0B>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "は　宝箱を開けました。"
+          },
+          {
+            "kind": "LINE_MARKER",
+            "value": "<LINE>"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_03.txt",
+      "line": 36,
+      "classification": {
+        "kind": "TEXT",
+        "raw": "宝箱の中には",
+        "segments": [
+          {
+            "kind": "TEXT",
+            "value": "宝箱の中には"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_03.txt",
+      "line": 56,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0E>が入っていました。",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0E>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "が入っていました。"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_04.txt",
+      "line": 35,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0B>は　宝箱を開けました。<LINE>",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0B>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "は　宝箱を開けました。"
+          },
+          {
+            "kind": "LINE_MARKER",
+            "value": "<LINE>"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_04.txt",
+      "line": 36,
+      "classification": {
+        "kind": "TEXT",
+        "raw": "宝箱の中には",
+        "segments": [
+          {
+            "kind": "TEXT",
+            "value": "宝箱の中には"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_04.txt",
+      "line": 56,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0E>が入っていました。",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0E>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "が入っていました。"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_07.txt",
+      "line": 35,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0B>は　宝箱を開けました。<LINE>",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0B>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "は　宝箱を開けました。"
+          },
+          {
+            "kind": "LINE_MARKER",
+            "value": "<LINE>"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_07.txt",
+      "line": 36,
+      "classification": {
+        "kind": "TEXT",
+        "raw": "宝箱の中には",
+        "segments": [
+          {
+            "kind": "TEXT",
+            "value": "宝箱の中には"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_07.txt",
+      "line": 56,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0E>が入っていました。",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0E>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "が入っていました。"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_08.txt",
+      "line": 35,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0B>は　宝箱を開けました。<LINE>",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0B>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "は　宝箱を開けました。"
+          },
+          {
+            "kind": "LINE_MARKER",
+            "value": "<LINE>"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_08.txt",
+      "line": 36,
+      "classification": {
+        "kind": "TEXT",
+        "raw": "宝箱の中には",
+        "segments": [
+          {
+            "kind": "TEXT",
+            "value": "宝箱の中には"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_08.txt",
+      "line": 56,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0E>が入っていました。",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0E>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "が入っていました。"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_09.txt",
+      "line": 35,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0B>は　宝箱を開けました。<LINE>",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0B>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "は　宝箱を開けました。"
+          },
+          {
+            "kind": "LINE_MARKER",
+            "value": "<LINE>"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_09.txt",
+      "line": 36,
+      "classification": {
+        "kind": "TEXT",
+        "raw": "宝箱の中には",
+        "segments": [
+          {
+            "kind": "TEXT",
+            "value": "宝箱の中には"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_09.txt",
+      "line": 56,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0E>が入っていました。",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0E>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "が入っていました。"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_0A.txt",
+      "line": 35,
+      "classification": {
+        "kind": "MIXED",
+        "raw": "<DICT 0B>は　宝箱を開けました。<LINE>",
+        "segments": [
+          {
+            "kind": "DICTIONARY_MARKER",
+            "value": "<DICT 0B>"
+          },
+          {
+            "kind": "TEXT",
+            "value": "は　宝箱を開けました。"
+          },
+          {
+            "kind": "LINE_MARKER",
+            "value": "<LINE>"
+          }
+        ]
+      }
+    },
+    {
+      "file": "script_0A.txt",
+      "line": 36,
+      "classification": {
+        "kind": "TEXT",
+        "raw": "宝箱の中には",
+        "segments": [
+          {
+            "kind": "TEXT",
+            "value": "宝箱の中には"
+          }
+        ]
+      }
+    }
+  ],
+  "decoding_errors": [],
+  "warning": "Classificação lexical experimental. UNKNOWN_MARKER é uma categoria sintática, não um erro confirmado; valide os exemplos contra os scripts e a documentação Atlas. Comentários não são segmentados."
+}
