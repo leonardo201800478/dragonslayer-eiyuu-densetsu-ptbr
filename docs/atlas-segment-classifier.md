@@ -21,27 +21,42 @@ Para limitar exemplos de linhas textuais exibidos:
 python tools/inspect_atlas_segments.py reports/legacy-tooling-test/tools/text --limit 20
 ```
 
-A saída é JSON no terminal e inclui contagens por tipo de linha e segmento,
-exemplos de linhas japonesas, erros de decodificação e uma lista de marcadores
-`UNKNOWN_MARKER` ordenados por frequência. Cada marcador inclui até três
-exemplos com arquivo, número da linha, classificação da linha e conteúdo bruto.
-A contagem considera apenas marcadores em linhas que o classificador segmentou;
-comentários e diretivas não são segmentados e, portanto, não entram nessa lista.
+A saída JSON inclui contagens por tipo de linha e segmento, exemplos de linhas
+japonesas, erros de decodificação e marcadores `UNKNOWN_MARKER` ordenados por
+frequência. Cada marcador desconhecido inclui até três exemplos com arquivo,
+número da linha, classificação da linha e conteúdo bruto. Comentários e
+diretivas não são segmentados e não entram nessa contagem.
 
-## Categorias
+## Categorias de linha
 
 - `DIRECTIVE`: linha iniciada por uma diretiva `#...`; não é segmentada.
 - `FILE_REFERENCE`: linha que contém `[FILE]`; preservada como referência.
 - `COMMENT`: comentários iniciados por `//` ou `;`, além de linhas `[TEXT]`.
-- `TEXT`: linha com texto japonês e sem marcadores reconhecidos.
+- `TEXT`: linha com texto japonês e sem marcadores inline.
 - `MIXED`: texto japonês misturado com marcadores inline.
 - `OTHER`: linha sem texto japonês detectado, incluindo sequências de controle.
 
-Os segmentos inline são classificados como `TEXT`, `DICTIONARY_MARKER`,
-`LINE_MARKER`, `CONTROL_FLOW_MARKER`, `HEX_BYTE` ou `UNKNOWN_MARKER`.
-Marcadores desconhecidos são preservados; a ferramenta não tenta adivinhar
-sua semântica. `UNKNOWN_MARKER` é uma categoria de classificação, não prova
-de erro no script.
+## Categorias de segmento
+
+- `TEXT`: trecho textual entre marcadores.
+- `DICTIONARY_MARKER`: marcador `<DICT XX>`.
+- `LINE_MARKER`: marcador `<LINE>`.
+- `CONTROL_FLOW_MARKER`: marcadores de fluxo listados no código e forma
+  parametrizada `<JMP XX>`.
+- `WAIT_MARKER`: formas `<WAIT>` e `<WAIT CLEAR>`.
+- `COLOR_MARKER`: formas `<COLOR OFF>` e `<COLOR XX>`.
+- `HERO_MARKER`: forma parametrizada `<HERO N>`.
+- `FLAG_MARKER`: forma parametrizada `<FLAG XX>`.
+- `CODE_MARKER`: forma parametrizada `<CODE XX>`.
+- `NAME_MARKER`: marcador `<NAME>`.
+- `HEX_BYTE`: byte hexadecimal no formato `<$XX>`.
+- `UNKNOWN_MARKER`: marcador que não corresponde às formas reconhecidas.
+
+As categorias são sintáticas, não uma confirmação da semântica do jogo. Por
+exemplo, reconhecer `<FLAG 14>` não significa conhecer o efeito dessa flag.
+Marcadores desconhecidos permanecem preservados e não são corrigidos
+automaticamente. A concatenação dos valores dos segmentos deve reproduzir a
+linha original exatamente.
 
 ## Testes
 
@@ -53,11 +68,10 @@ ruff check src/dragonslayer_ptbr/text/atlas_segmenter.py tools/inspect_atlas_seg
 ## Limitações e segurança
 
 A classificação não prova que um segmento é seguro para tradução. O conteúdo
-entre `<...>` pode representar códigos de texto, controles, marcadores específicos
-do jogo ou outra sintaxe. A classificação de `<JMP.L>`, bytes hexadecimais e
-marcadores especiais precisa ser confrontada com os scripts Atlas e a documentação
-do projeto. Não use a saída como entrada para inserção na ROM.
+entre `<...>` pode representar códigos de texto, controles, marcadores
+específicos do jogo ou outra sintaxe. O projeto documenta texto comprimido,
+dados e código embutidos, ponteiros relativos e fluxo de execução não trivial.
+Não use a saída como entrada para inserção na ROM.
 
-O relatório de marcadores serve para priorizar revisão manual dos casos mais
-frequentes e inspecionar exemplos reais. A inserção continua bloqueada até que a
-codificação, a tabela de caracteres e as regras do Atlas sejam validadas.
+O relatório serve para priorizar revisão manual. A inserção continua bloqueada
+até que codificação, tabela de caracteres e regras Atlas sejam validadas.
