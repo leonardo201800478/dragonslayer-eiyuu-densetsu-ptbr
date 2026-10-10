@@ -1,94 +1,95 @@
-# Dragon Slayer: Eiyuu Densetsu — PT-BR
+# Dragon Slayer: Eiyuu Densetsu — tradução PT-BR
 
-Projeto para traduzir e adaptar ao português brasileiro a versão japonesa de **Dragon Slayer: Eiyuu Densetsu (Mega Drive)**, usando ferramentas de terceiros para as tarefas que elas já executam e código Python próprio para integrar o fluxo, facilitar a tradução e validar os resultados.
+Projeto para traduzir e adaptar ao português brasileiro a versão japonesa de **Dragon Slayer: Eiyuu Densetsu (Mega Drive)**.
 
-A ROM original permanece local e **não é distribuída pelo repositório**.
+**Princípio de arquitetura:** reutilizar as ferramentas específicas do jogo para extração, fonte e inserção. O Python deve cuidar da bancada de tradução, da integração entre formatos, do QA e da automação segura que ainda não exista nas ferramentas externas.
 
-## Nova divisão de responsabilidades
+A ROM original não é distribuída pelo repositório. Nenhuma etapa de inserção deve apontar para ela.
 
-### Ferramentas de terceiros
-Use as ferramentas externas já empregadas no projeto para extrair os scripts e, quando comprovadamente suportado, executar operações específicas do formato do jogo. O projeto não deve duplicar um dumper, assembler, empacotador ou inserter que já funcione para esse fluxo.
+## Estado real do projeto
 
-As ferramentas locais conhecidas incluem Atlas, slayer1_dumper, font_packer, asm68 e xkas_gbc. A presença desses arquivos não prova que todos sejam necessários ou compatíveis com cada etapa. Registre ferramenta, versão, parâmetros e formato gerado. Não execute operações de escrita contra a ROM original.
+- A bancada Tkinter e o catálogo de tradução estão implementados.
+- A documentação registra um catálogo de trabalho com 11.037 entradas e uma execução anterior com 111 testes aprovados e Ruff sem erros. Esses números são históricos e não substituem uma execução no checkout atual.
+- O projeto contém scripts Atlas, `slayer1_dumper` e `font_packer`.
+- **Ainda não está comprovado** o ciclo completo catálogo → script Atlas → ROM de teste → texto visível no emulador.
+- O suporte a todos os caracteres PT-BR e a expansão de caixas/limites de texto continua em investigação.
 
-### Código Python do projeto
-- importar e normalizar dumps de terceiros para um catálogo de tradução;
-- oferecer uma interface desktop simples para tradução e adaptação PT-BR;
-- preservar e validar marcadores inline, comandos e metadados disponíveis;
-- apoiar glossário, revisão, busca, filtros e relatórios de QA;
-- exportar materiais para revisão e devolver os arquivos ao fluxo externo somente conforme o formato suportado pela ferramenta usada;
-- manter os analisadores 68000 próprios como ferramentas auxiliares para investigar lacunas, não como requisito para traduzir textos já extraídos.
+Veja [o estado e as próximas etapas](docs/project-roadmap.md) e [o fluxo técnico e os critérios de validação](docs/third-party-tooling-and-validation-plan.md).
 
-**Importante:** o catálogo normalizado e o CSV exportado são formatos de trabalho. Eles não são automaticamente arquivos prontos para reinserção na ROM.
+## Responsabilidades
 
-## Começar
+### Ferramentas externas
 
-Requisitos: Python 3.10 ou superior; no Windows, a instalação padrão do Python normalmente inclui Tkinter.
+- Extrair scripts e metadados no formato específico do jogo.
+- Executar a inserção de texto e recursos quando o fluxo tiver sido validado.
+- Processar fontes/tiles com o empacotador existente, se ele suportar os glifos necessários.
 
-    python -m pip install -e ".[dev]"
-    python -m pytest -q
-    ruff check .
+A presença de um executável não prova que ele seja necessário, compatível ou seguro para todas as etapas. Não executar scripts de inserção contra a ROM original.
 
-### Abrir a interface de tradução
+### Código Python
 
-    dslayer-ptbr-gui --catalog translation/catalog.json
+- Oferecer a interface de tradução e manter o catálogo.
+- Preservar IDs, metadados e conteúdo não traduzível.
+- Validar marcadores, campos obrigatórios, alterações de origem e caracteres não representáveis.
+- Integrar o catálogo aos scripts nativos Atlas por um adaptador testado.
+- Orquestrar builds isoladas, logs, hashes e relatórios de diferenças.
+- Investigar internamente o formato do jogo somente quando as ferramentas externas não responderem a uma questão necessária.
 
-Ou, sem instalar o comando:
+O catálogo JSON e o CSV são formatos de trabalho; não são, por si só, formatos de inserção.
 
-    python -m dragonslayer_ptbr.translation_gui --catalog translation/catalog.json
+## Requisitos
 
-Na interface, use **Importar dump JSON/CSV** para normalizar um dump estruturado de terceiros. Os nomes de campos mais comuns são reconhecidos, como source, original, japanese, text, translation, translated, pt_br e id. O importador não consegue inferir todos os formatos proprietários; adapte o mapeamento quando o formato da ferramenta for diferente.
+- Python 3.10 ou superior.
+- Windows recomendado para o conjunto legado de ferramentas.
+- Tkinter disponível na instalação do Python.
 
-### Dumps de texto em arquivos TXT
+## Instalação e verificações
 
-Para as ferramentas que exportam diretivas e texto em arquivos TXT, use o catalogador existente:
+No PowerShell, na raiz do repositório:
 
-    python -m dragonslayer_ptbr.text.translation_workbench export --source-dir ".\ferramentas\text" --catalog ".\translation\catalog.json"
+```powershell
+python -m pip install -e ".[dev]"
+python -m pytest -q
+ruff check .
+```
 
-Ajuste --source-dir para a pasta real produzida pela ferramenta. O catalogador legado procura linhas com texto japonês e preserva a linha completa para revisão.
+## Abrir a bancada
 
-### Revisar e validar
+```powershell
+dslayer-ptbr-gui --catalog translation/catalog.json
+```
 
-- Edite a tradução no campo PT-BR, mantendo marcadores como <LINE>, <WAIT>, <COLOR 1E> e demais diretivas na mesma ordem.
-- Use busca e o filtro de pendências para organizar o trabalho.
-- Clique em **Validar catálogo** para gerar translation-qa-report.json.
-- Exporte CSV quando precisar revisar em planilha ou fazer a ponte com outro processo.
-- Salve cópias de trabalho; não sobrescreva dumps originais de terceiros.
+Alternativa:
 
-O QA atual verifica presença de tradução e sequência de marcadores. Ele **não** confirma largura da caixa, suporte aos acentos na fonte, codificação final, limites de bytes, ponteiros ou funcionamento no emulador.
+```powershell
+python -m dragonslayer_ptbr.translation_gui --catalog translation/catalog.json
+```
 
-## Estado técnico do jogo
+Use o caminho do catálogo de trabalho que existe no seu checkout. Não sobrescreva dumps originais; mantenha cópias de trabalho e backups.
 
-A análise prévia registrou uma ROM japonesa de 2 MiB, CRC32 01BC1604 e SHA-1 F67C9139BBC93F171E274A5CD3FBA66480CD8244. Shift-JIS foi identificado em regiões textuais e controles binários aparecem misturados aos scripts. Esses achados continuam úteis para diagnóstico, mas não são pré-requisitos para trabalhar nos textos que as ferramentas externas já extraíram.
+## Fluxo de trabalho
 
-O mapeamento de caracteres PT-BR, os limites de texto e a compatibilidade de reinserção precisam ser verificados com a ferramenta real e o jogo. Não assumir que CP932, UTF-8 ou uma tradução com os marcadores preservados será aceita pelo inserter.
+1. Extrair os textos usando a ferramenta externa documentada.
+2. Importar uma amostra real para a bancada.
+3. Traduzir e revisar sem modificar o dump de origem.
+4. Exportar para o formato nativo Atlas usando o adaptador específico.
+5. Comparar o script antes/depois e bloquear alterações inesperadas.
+6. Executar as ferramentas de inserção somente sobre uma cópia da ROM.
+7. Validar checksum, diff binário, início do jogo, diálogo alterado e diálogos seguintes.
+8. Registrar ferramentas, versões, comandos e resultados.
+
+Não declarar a tradução pronta até que o último passo seja demonstrado no emulador.
 
 ## Documentação
 
+- [Roadmap e estado atual](docs/project-roadmap.md)
+- [Arquitetura e validação com ferramentas externas](docs/third-party-tooling-and-validation-plan.md)
 - [Bancada de tradução](docs/translation-workbench.md)
-- [Plano de ferramentas de terceiros e validação](docs/third-party-tooling-and-validation-plan.md)
-- [Auditoria segura das ferramentas locais](docs/tooling-audit.md)
-- [Revisão técnica de todas as ferramentas](docs/tooling-review-2026-10.md)
-- [Resultados técnicos anteriores](docs/analysis-results.md)
-- [Engenharia reversa auxiliar](docs/reverse-engineering.md)
-- [Roadmap revisado](docs/project-roadmap.md)
+- [Auditoria segura das ferramentas](docs/tooling-audit.md)
+- [Classificador lexical Atlas](docs/atlas-segment-classifier.md)
+- [Engenharia reversa do texto](docs/reverse-engineering.md)
+- [Investigação das caixas de diálogo](docs/dialog-box-expansion-investigation.md)
 
-## Princípios do projeto
+## Segurança e distribuição
 
-1. Reutilizar ferramentas externas comprovadas em vez de reimplementar o que elas já fazem.
-2. Não executar ferramentas de terceiros sem conhecer seus efeitos e arquivos de entrada/saída.
-3. Nunca modificar a ROM original; operar em cópias verificadas.
-4. Preservar diretivas, controles e metadados durante a tradução.
-5. Não marcar uma tradução como pronta para ROM apenas porque o QA textual passou.
-6. Documentar claramente quais formatos são suportados e quais ainda precisam de um adaptador específico.
-
-
-## Estado verificado da bancada (10/10/2026)
-
-- A interface Tkinter foi aberta com um catálogo de **11.037 entradas**.
-- Uma tradução de teste foi salva e permaneceu preenchida após fechar e reabrir a bancada.
-- O QA da entrada de teste informou que não havia divergências de marcadores.
-- Na cópia de trabalho validada localmente, `python -m pytest -q` concluiu com **111 testes aprovados** e `ruff check .` retornou **All checks passed!**.
-- A correção dos três avisos TRY004 em `translation_catalog.py` foi publicada na branch de trabalho.
-
-Essas verificações confirmam o funcionamento básico da bancada e a qualidade estática do código nesse checkout. **Ainda não confirmam** o round-trip com uma ferramenta externa, a aceitação do texto pelo inserter, a renderização de caracteres PT-BR ou a execução da ROM traduzida. A tradução usada na interface foi apenas um teste de persistência, não uma validação dentro do jogo.
+Não versionar ROMs, dumps protegidos ou executáveis de terceiros sem confirmar permissões e licenças. Os relatórios devem distinguir claramente fatos confirmados, hipóteses e tarefas pendentes.
