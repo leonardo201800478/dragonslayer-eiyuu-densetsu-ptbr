@@ -68,6 +68,7 @@ O mapeamento de caracteres PT-BR, os limites de texto e a compatibilidade de rei
 - [Bancada de tradução](docs/translation-workbench.md)
 - [Plano de ferramentas de terceiros e validação](docs/third-party-tooling-and-validation-plan.md)
 - [Auditoria segura das ferramentas locais](docs/tooling-audit.md)
+- [Revisão técnica de todas as ferramentas](docs/tooling-review-2026-10.md)
 - [Resultados técnicos anteriores](docs/analysis-results.md)
 - [Engenharia reversa auxiliar](docs/reverse-engineering.md)
 - [Roadmap revisado](docs/project-roadmap.md)
