@@ -1,10 +1,10 @@
 # Estratégia de engenharia reversa do texto
 
-## Objetivo
+## Objetivo e prioridade atual
 
-Identificar o sistema real de texto de **Dragon Slayer: Eiyuu Densetsu (Mega Drive)** sem assumir charset, ponteiros ou códigos de controle antes de obter evidência da ROM.
+Este documento registra a engenharia reversa auxiliar de **Dragon Slayer: Eiyuu Densetsu (Mega Drive)**. Como os textos já foram extraídos por ferramentas de terceiros, a prioridade do projeto é agora a bancada de tradução/adaptação PT-BR e a integração com os formatos reais dessas ferramentas.
 
-A ROM original permanece local e não é modificada durante a análise.
+A análise própria de ROM, ponteiros e código 68000 deve ser usada apenas quando houver uma lacuna concreta que as ferramentas externas não resolvam. A ROM original permanece local e não é modificada durante a análise.
 
 ## Evidência externa usada como referência
 
@@ -35,18 +35,15 @@ continuam sendo ferramentas exploratórias.
 
 Nenhum offset retornado por eles deve entrar no profile do jogo como conhecimento confirmado sem validação adicional.
 
-## Próxima etapa
+## Quando retomar a análise 68000
 
-A investigação deve migrar de heurística de dados para análise do código 68000:
+Retomar a investigação somente se o fluxo externo não conseguir explicar ou executar uma etapa necessária, por exemplo a codificação dos acentos, o limite de uma entrada ou a reinserção. Nesse caso:
 
-1. identificar regiões de código executável plausíveis;
-2. localizar instruções que referenciem dados da ROM;
-3. acompanhar referências que possam chegar a rotinas de impressão;
-4. identificar a rotina que consome os bytes do texto;
-5. determinar o formato dos caracteres;
-6. determinar terminadores e códigos de controle;
-7. determinar como os scripts são referenciados;
-8. somente depois implementar o decoder específico.
+1. registrar a lacuna observada e um caso reproduzível;
+2. comparar o dump externo com os bytes da ROM local;
+3. consultar desassembladores/debuggers de terceiros;
+4. usar os scanners Python próprios para reduzir a área de investigação;
+5. confirmar o resultado antes de alterar um adaptador ou gerar arquivos para inserção.
 
 ## Por que não ampliar o scanner textual
 
@@ -56,11 +53,9 @@ Da mesma forma, um valor de 16, 24 ou 32 bits que aponta para dentro da ROM não
 
 O scanner deve permanecer conservador para não transformar ruído em conhecimento específico do jogo.
 
-## Objetivo do primeiro decoder
+## Papel do decoder próprio
 
-O primeiro decoder não deve traduzir nem modificar a ROM.
-
-Ele deverá somente produzir uma representação auditável, por exemplo:
+O decoder próprio não é o caminho principal para a extração já realizada por ferramentas externas. Ele permanece disponível para inspeção comparativa de casos não explicados. Qualquer saída dele é uma representação de análise, não um formato de inserção. Um exemplo de representação auditável:
 
 ```text
 script @ 0xXXXXXX
