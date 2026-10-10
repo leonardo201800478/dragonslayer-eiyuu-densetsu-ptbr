@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import pytest
+
 from dragonslayer_ptbr.text.atlas_segmenter import (
     LineKind,
     SegmentKind,
     classify_line,
+    classify_segment,
 )
 
 
@@ -74,6 +77,45 @@ def test_unknown_inline_markers_are_preserved_without_guessing_semantics() -> No
     assert result.segments[0].kind is SegmentKind.UNKNOWN_MARKER
     assert result.segments[0].value == "<UNKNOWN 12>"
     assert "".join(segment.value for segment in result.segments) == source
+
+
+@pytest.mark.parametrize(
+    ("token", "expected"),
+    [
+        ("<WAIT>", SegmentKind.WAIT_MARKER),
+        ("<WAIT CLEAR>", SegmentKind.WAIT_MARKER),
+        ("<COLOR OFF>", SegmentKind.COLOR_MARKER),
+        ("<COLOR 1E>", SegmentKind.COLOR_MARKER),
+        ("<COLOR 1C>", SegmentKind.COLOR_MARKER),
+        ("<COLOR 1F>", SegmentKind.COLOR_MARKER),
+        ("<HERO 1>", SegmentKind.HERO_MARKER),
+        ("<HERO 4>", SegmentKind.HERO_MARKER),
+        ("<FLAG 13>", SegmentKind.FLAG_MARKER),
+        ("<FLAG 14>", SegmentKind.FLAG_MARKER),
+        ("<CODE 0C>", SegmentKind.CODE_MARKER),
+        ("<NAME>", SegmentKind.NAME_MARKER),
+        ("<JMP 0F>", SegmentKind.CONTROL_FLOW_MARKER),
+    ],
+)
+def test_reported_atlas_markers_have_syntactic_categories(
+    token: str, expected: SegmentKind
+) -> None:
+    assert classify_segment(token) is expected
+
+
+def test_parameterized_markers_and_bytes_round_trip_without_changes() -> None:
+    source = (
+        "<COLOR 1E>ナイフ<COLOR OFF><COLOR 1C>を　装備しました。"
+        "<CODE 0C><$03><$01><COLOR OFF><WAIT CLEAR>"
+    )
+
+    result = classify_line(source)
+
+    assert "".join(segment.value for segment in result.segments) == source
+    assert [segment.kind for segment in result.segments if segment.value.startswith("<$")] == [
+        SegmentKind.HEX_BYTE,
+        SegmentKind.HEX_BYTE,
+    ]
 
 
 def test_plain_japanese_text_is_classified_as_text() -> None:
