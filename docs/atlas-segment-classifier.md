@@ -27,6 +27,33 @@ frequência. Cada marcador desconhecido inclui até três exemplos com arquivo,
 número da linha, classificação da linha e conteúdo bruto. Comentários e
 diretivas não são segmentados e não entram nessa contagem.
 
+## Inventário de marcadores e contexto
+
+Para gerar um inventário por token, com frequência e exemplos do texto ao redor,
+execute:
+
+```powershell
+python -m dragonslayer_ptbr.text.atlas_marker_audit reports/legacy-tooling-test/tools/text
+```
+
+O módulo também pode ser chamado pelo Python:
+
+```python
+from pathlib import Path
+from dragonslayer_ptbr.text.atlas_marker_audit import audit_directory
+
+report = audit_directory(
+    Path("reports/legacy-tooling-test/tools/text"),
+    examples_per_marker=5,
+)
+```
+
+O inventário é somente leitura e serve para orientar a revisão manual de cada
+marcador em contexto. O campo `text_context` reúne os segmentos classificados
+como texto na mesma linha; não garante que a frase esteja completa nem que o
+marcador tenha a semântica presumida. Erros de decodificação são listados e
+fazem a ferramenta terminar com código de saída diferente de zero.
+
 ## Categorias de linha
 
 - `DIRECTIVE`: linha iniciada por uma diretiva `#...`; não é segmentada.
@@ -61,8 +88,8 @@ linha original exatamente.
 ## Testes
 
 ```powershell
-pytest tests/test_atlas_segmenter.py
-ruff check src/dragonslayer_ptbr/text/atlas_segmenter.py tools/inspect_atlas_segments.py tests/test_atlas_segmenter.py
+pytest tests/test_atlas_segmenter.py tests/test_atlas_marker_audit.py
+ruff check src/dragonslayer_ptbr/text/atlas_segmenter.py src/dragonslayer_ptbr/text/atlas_marker_audit.py tools/inspect_atlas_segments.py tests/test_atlas_segmenter.py tests/test_atlas_marker_audit.py
 ```
 
 ## Limitações e segurança
