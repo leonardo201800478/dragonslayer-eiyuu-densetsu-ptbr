@@ -1,107 +1,88 @@
-# Plano de ferramentas de terceiros e validação
+# Arquitetura de integração e validação
 
-**Decisão de arquitetura:** reutilizar as ferramentas de terceiros para extração e operações específicas do formato quando já funcionarem; desenvolver em Python apenas a camada de integração, a experiência de tradução/adaptação PT-BR e as validações que não forem cobertas por elas.
+## Decisão central
 
-## 1. Responsabilidades
+Reutilizar as ferramentas específicas do jogo e escrever Python somente para o trabalho que falta: bancada de tradução, normalização, QA, adaptadores e automação segura. Não construir um inserter alternativo enquanto Atlas puder cumprir essa função.
 
-### Ferramentas externas
+A documentação do repositório identifica Atlas 1.06 modificado, `slayer1_dumper`, `font_packer`, `asm68`, `xkas_gbc` e scripts BAT. A presença desses arquivos não comprova que todos sejam necessários nem que todos funcionem no ambiente atual.
 
-As ferramentas externas são responsáveis pelas tarefas para as quais foram criadas, desde que a versão usada tenha sido validada no projeto:
-- extrair os textos e metadados;
-- representar controles/diretivas segundo seu próprio formato;
-- empacotar fonte/recursos quando isso já fizer parte do fluxo suportado;
-- reinserir scripts somente se a ferramenta documentar e comprovar essa capacidade para os arquivos do jogo.
+## Divisão de responsabilidades
 
-As ferramentas locais já inventariadas incluem Atlas, slayer1_dumper, font_packer, asm68 e xkas_gbc. Não assumir que todas participam do fluxo de tradução ou que qualquer uma possa reinserir os dumps sem transformação. Registrar versões, comandos, entradas, saídas e hashes. Não executar binários desconhecidos nem operar sobre a ROM original.
+| Componente | Responsabilidade | Limite atual |
+|---|---|---|
+| `slayer1_dumper` | Dump e operações específicas do jogo | Validar versão, parâmetros, codificação e comportamento real |
+| Atlas 1.06 modificado | Inserção por scripts, diretivas, índices e ponteiros | Formato nativo deve ser preservado; ainda falta validar o round-trip com a bancada |
+| `font_packer` | Processamento de recursos de fonte | Não há prova de que os glifos PT-BR necessários estejam disponíveis |
+| `asm68` / `xkas_gbc` | Montagem de código quando exigida pelo fluxo | Não executar nem incluir na build sem identificar a dependência concreta |
+| Bancada Python | Edição, busca, persistência e revisão | Não é inserter de ROM |
+| Catálogo Python | Formato de trabalho normalizado | Não é formato nativo Atlas |
+| Classificador/auditor Atlas | Inventário lexical de marcadores | Não executa diretivas, não calcula ponteiros e não prova semântica |
+| Analisadores 68000 | Investigar lacunas técnicas | Resultados exploratórios não são prova de rotina de texto |
 
-### Python do projeto
+## Pipeline pretendido
 
-O Python deve fornecer:
-- importação/normalização de dumps JSON e CSV comuns;
-- catalogação de TXT de ferramentas já suportadas;
-- interface desktop para busca, tradução, adaptação e revisão;
-- validação de marcadores e consistência dos registros;
-- glossário e regras linguísticas do projeto;
-- relatórios de QA e comparação antes/depois;
-- adaptadores de ida e volta para formatos externos quando existir amostra real e teste de round-trip.
+```text
+ROM original (somente leitura)
+  → ferramenta externa de dump
+  → script/dump nativo + metadados
+  → adaptador Python
+  → catálogo de tradução
+  → QA e revisão humana
+  → exportador para o formato nativo
+  → preflight de scripts e diretivas
+  → ferramenta externa de inserção em ROM de teste
+  → hashes, diff binário e logs
+  → validação no emulador
+```
 
-A análise própria de ROM/68000 continua disponível como ferramenta auxiliar para resolver lacunas não cobertas pelo dumper. Ela deixa de ser bloqueio para a tradução dos textos que já foram extraídos.
+Não se deve passar JSON/CSV genérico diretamente ao Atlas. O adaptador precisa operar sobre amostras reais dos scripts nativos e preservar todo o conteúdo que não seja explicitamente traduzível.
 
-## 2. Fluxo-alvo
+## Gates de validação
 
-    ROM original (somente leitura)
-        -> ferramenta externa validada
-        -> dump nativo da ferramenta
-        -> adaptador Python / catálogo de trabalho
-        -> tradução e adaptação PT-BR
-        -> QA textual e revisão humana
-        -> exportação no formato nativo, se suportada
-        -> ferramenta externa de reinserção, se comprovada
-        -> ROM de teste separada
-        -> validação binária e em emulador
+### Gate A — Dump reproduzível
 
-O catálogo normalizado não é, por si só, um formato de inserção. Não assumir compatibilidade de Atlas, CP932, UTF-8, comandos, limites ou ponteiros sem teste explícito.
+Registrar ferramenta e versão, sistema operacional, comando, hash da entrada, codificação, formato e arquivos de saída. A extração deve ser reproduzível numa cópia de trabalho.
 
-## 3. Registro obrigatório por ferramenta
+### Gate B — Round-trip do script
 
-Para cada ferramenta efetivamente usada, manter:
-- nome e versão/commit;
-- sistema operacional e dependências;
-- comando executado e parâmetros;
-- hash da ROM de entrada;
-- caminho e formato da saída;
-- tratamento de diretivas, controles e metadados;
-- possibilidade comprovada de importação/reinserção;
-- limitações, erros conhecidos e licença.
+- Preservar diretivas, índices, ponteiros, comentários, preenchimentos e metadados.
+- Bloquear aplicação quando o texto de origem tiver mudado desde a importação.
+- Testar script → catálogo → script sem tradução.
+- Comparar bytes antes/depois e explicar cada diferença.
 
-Os executáveis e a ROM original não devem ser adicionados ao Git sem autorização/licença apropriada. Os testes Python devem funcionar sem instalar ferramentas externas e sem precisar da ROM.
+### Gate C — Texto PT-BR representável
 
-## 4. Gates de validação
+- Criar matriz dos caracteres usados pela tradução.
+- Verificar tabela de caracteres, fonte e tiles reais.
+- Rejeitar caracteres não representáveis em vez de substituí-los silenciosamente.
+- Testar quebra de linha e textos longos em exemplos pequenos.
 
-### Gate A — Dump utilizável
-- dump real da ferramenta armazenado localmente;
-- formato, codificação e marcadores identificados;
-- amostra pequena reproduzível;
-- origem mantida intacta.
+### Gate D — Inserção isolada
 
-### Gate B — Tradução sem perda estrutural
-- catálogo normalizado preserva ID, arquivo/linha, texto e metadados disponíveis;
-- marcadores e comandos permanecem na mesma ordem;
-- dados desconhecidos não são descartados silenciosamente;
-- o QA reporta pendências e divergências.
+- Verificar o hash da ROM-base e criar cópia separada.
+- Validar todos os arquivos e caminhos antes de executar ferramentas.
+- Interromper em erro e guardar logs.
+- Calcular tamanho, CRC32, SHA-1 e diff binário.
+- Confirmar que a ROM original permanece inalterada.
 
-### Gate C — Round-trip para ferramenta externa
-- existe um formato de entrada documentado;
-- o adaptador devolve os textos ao formato esperado;
-- campos não traduzíveis e comandos são preservados;
-- a extração/serialização repetida não altera dados não relacionados;
-- a ferramenta externa aceita o resultado em uma cópia de teste.
+### Gate E — Funcionamento no jogo
 
-### Gate D — Inserção e execução
-- ROM de entrada validada por hash;
-- saída em caminho separado;
-- diff binário explicado;
-- checksum e tamanho verificados;
-- jogo inicia e o texto traduzido aparece;
-- controles, mensagens seguintes e fluxos relacionados continuam funcionais.
+Confirmar início do jogo, texto traduzido visível, controles preservados, página seguinte e diálogos adjacentes. A aprovação de testes Python não substitui esta validação.
 
-## 5. Situação técnica preexistente
+## Segurança operacional
 
-A ROM de referência registrada no projeto tem 2 MiB, CRC32 01BC1604 e SHA-1 F67C9139BBC93F171E274A5CD3FBA66480CD8244. Shift-JIS foi identificado em regiões textuais e há controles binários misturados ao texto. Essas evidências continuam úteis para validar o comportamento das ferramentas, mas não justificam reimplementar a extração já realizada.
+- Nunca executar `ferramentas/tools/insert TEXT.bat` contra a ROM original.
+- Não automatizar os BATs antes de confirmar todos os caminhos, efeitos de escrita e códigos de saída.
+- Não versionar ROMs, executáveis ou dumps protegidos sem verificar licença e permissões.
+- Manter artefatos de build fora do catálogo de tradução e da árvore de fontes.
+- Registrar resultados como **confirmado**, **hipótese** ou **pendente**.
 
-## 6. Limites atuais
+## Evidências técnicas atuais
 
-A interface implementada normaliza dumps JSON/CSV comuns e oferece catalogação de TXT pelo fluxo anterior. Ainda não existe adaptador universal para formatos proprietários. O nome e a versão exata da ferramenta externa, com um exemplo de dump real, são necessários antes de declarar suporte específico ou automatizar a reinserção.
+O baseline documentado da ROM é 2 MiB, CRC32 `01BC1604` e SHA-1 `F67C9139BBC93F171E274A5CD3FBA66480CD8244`. Há texto Shift-JIS em regiões conhecidas e controles misturados ao texto. Esses dados ajudam a validar o fluxo, mas não provam que o catálogo atual seja compatível com o Atlas.
 
-Não marcar qualquer saída como pronta para ROM apenas porque os marcadores passaram no QA textual.
+O estado histórico documentado da bancada registra 11.037 entradas, 111 testes aprovados e Ruff sem erros. Isso não demonstra que a tradução tenha sido inserida ou exibida no jogo.
 
+## Próxima ação técnica
 
-## Estado de execução registrado em 10/10/2026
-
-A bancada foi executada localmente com um catálogo de **11.037 entradas**. Uma tradução de teste permaneceu salva após fechar e reabrir a interface, e o QA dessa entrada não indicou divergências de marcadores. A suíte Python local apresentou **111 testes aprovados**, e o Ruff retornou `All checks passed!`.
-
-Esse resultado cobre a interface, a persistência observada e as verificações automatizadas no checkout testado. Não é evidência de compatibilidade com uma ferramenta de inserção nem de que o texto foi renderizado no jogo.
-
-**Gate B — parcialmente verificado:** o salvamento de uma entrada e a validação dos marcadores passaram no teste manual; a revisão de um lote real e a preservação integral dos metadados em um dump externo ainda precisam ser comprovadas.
-
-**Gate C — pendente:** ainda é necessário identificar o formato nativo e a versão exata da ferramenta externa, criar um adaptador específico e demonstrar um round-trip em amostra pequena.
+Implementar somente o adaptador mínimo entre uma fixture de script Atlas real e o catálogo. A primeira meta é um round-trip sem tradução. Não expandir a investigação de 68000, fonte ou caixas até que esse teste mostre uma limitação concreta que exija pesquisa adicional.
