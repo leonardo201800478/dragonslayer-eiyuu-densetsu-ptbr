@@ -63,7 +63,12 @@ def find_address_references(
     A função não tenta desassemblar a ROM. Ela procura o endereço como
     literal de 24 e/ou 32 bits e, quando os quatro bytes anteriores formam
     um opcode 68000 conhecido, registra uma classificação instrucional.
-    Os resultados são evidência para análise posterior, não prova de execução.
+
+    Ocorrências de larguras diferentes são preservadas mesmo quando seus
+    intervalos se sobrepõem. Por exemplo, os bytes 00 00 20 podem formar um
+    candidato de 24 bits em um offset e, junto a um zero anterior, um candidato
+    de 32 bits no offset anterior. Isso é uma ambiguidade literal, não prova
+    de duas referências reais nem motivo para descartar um dos candidatos.
     """
     if target < 0:
         raise ValueError("target deve ser maior ou igual a zero")
