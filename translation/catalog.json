@@ -7,13 +7,13 @@
       "file": "script_01.txt",
       "line": 35,
       "source": "<DICT 0B>は　宝箱を開けました。<LINE>",
-      "translation": "",
+      "translation": "<DICT 0B>abriu o baú do tesouro。<LINE>",
       "source_sha256": "731b8ad1d0a7a7862adc9482c3ce82366ece694609a76c7209e821a02423ed53",
       "tags": [
         "<DICT 0B>",
         "<LINE>"
       ],
-      "status": "PENDENTE"
+      "status": "TRADUZIDO"
     },
     {
       "id": "script_01.txt:36",
