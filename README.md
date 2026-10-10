@@ -80,3 +80,14 @@ O mapeamento de caracteres PT-BR, os limites de texto e a compatibilidade de rei
 4. Preservar diretivas, controles e metadados durante a tradução.
 5. Não marcar uma tradução como pronta para ROM apenas porque o QA textual passou.
 6. Documentar claramente quais formatos são suportados e quais ainda precisam de um adaptador específico.
+
+
+## Estado verificado da bancada (10/10/2026)
+
+- A interface Tkinter foi aberta com um catálogo de **11.037 entradas**.
+- Uma tradução de teste foi salva e permaneceu preenchida após fechar e reabrir a bancada.
+- O QA da entrada de teste informou que não havia divergências de marcadores.
+- Na cópia de trabalho validada localmente, `python -m pytest -q` concluiu com **111 testes aprovados** e `ruff check .` retornou **All checks passed!**.
+- A correção dos três avisos TRY004 em `translation_catalog.py` foi publicada na branch de trabalho.
+
+Essas verificações confirmam o funcionamento básico da bancada e a qualidade estática do código nesse checkout. **Ainda não confirmam** o round-trip com uma ferramenta externa, a aceitação do texto pelo inserter, a renderização de caracteres PT-BR ou a execução da ROM traduzida. A tradução usada na interface foi apenas um teste de persistência, não uma validação dentro do jogo.
