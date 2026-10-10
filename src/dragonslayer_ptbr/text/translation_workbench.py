@@ -4,7 +4,7 @@ import argparse
 import hashlib
 import json
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 DEFAULT_SOURCE_ENCODING = "cp932"
@@ -125,6 +125,9 @@ def apply_catalog(
         line_number = entry.get("line")
         if not isinstance(relative, str) or not isinstance(line_number, int) or line_number < 1:
             raise ValueError(f"Entrada inválida no catálogo: {entry.get('id', '<sem id>')}")
+        relative_path = PurePosixPath(relative)
+        if relative_path.is_absolute() or ".." in relative_path.parts or not relative_path.parts:
+            raise ValueError(f"Caminho inseguro no catálogo: {relative!r}")
         translation = entry.get("translation", "")
         if not isinstance(translation, str):
             raise ValueError(f"Tradução inválida em {entry.get('id', relative)}")
@@ -137,7 +140,10 @@ def apply_catalog(
                 f"Tags/controles inline foram alterados em {entry.get('id', relative)}. "
                 "Preserve todos os marcadores <...> e sua ordem."
             )
-        replacements.setdefault(relative, {})[line_number] = entry
+        file_replacements = replacements.setdefault(relative, {})
+        if line_number in file_replacements:
+            raise ValueError(f"Entrada duplicada no catálogo: {relative}:{line_number}")
+        file_replacements[line_number] = entry
 
     written = 0
     pending = 0
@@ -146,7 +152,8 @@ def apply_catalog(
         for path in root.rglob("*.txt")
         if path.is_file()
     }
-    missing = sorted(set(replacements) - current_files)
+    catalog_files = {entry.get("file") for entry in entries if isinstance(entry.get("file"), str)}
+    missing = sorted(catalog_files - current_files)
     if missing:
         raise FileNotFoundError("Arquivos do catálogo ausentes: " + ", ".join(missing))
 
