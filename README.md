@@ -1,144 +1,95 @@
-# Dragon Slayer: Eiyuu Densetsu — PT-BR
+# Dragon Slayer: Eiyuu Densetsu — tradução PT-BR
 
-Projeto de engenharia reversa e tradução para português brasileiro da versão japonesa de **Dragon Slayer: Eiyuu Densetsu (Mega Drive)**.
+Projeto para traduzir e adaptar ao português brasileiro a versão japonesa de **Dragon Slayer: Eiyuu Densetsu (Mega Drive)**.
 
-## Objetivo
+**Princípio de arquitetura:** reutilizar as ferramentas específicas do jogo para extração, fonte e inserção. O Python deve cuidar da bancada de tradução, da integração entre formatos, do QA e da automação segura que ainda não exista nas ferramentas externas.
 
-Analisar a ROM, identificar fonte/charset, localizar e extrair textos, preservar códigos de controle, traduzir, realocar textos quando necessário, corrigir ponteiros, inserir a tradução e validar a ROM final.
+A ROM original não é distribuída pelo repositório. Nenhuma etapa de inserção deve apontar para ela.
 
-A ROM japonesa original permanece local e **não é distribuída pelo repositório**.
+## Estado real do projeto
 
-## Estado atual
+- A bancada Tkinter e o catálogo de tradução estão implementados.
+- A documentação registra um catálogo de trabalho com 11.037 entradas e uma execução anterior com 111 testes aprovados e Ruff sem erros. Esses números são históricos e não substituem uma execução no checkout atual.
+- O projeto contém scripts Atlas, `slayer1_dumper` e `font_packer`.
+- **Ainda não está comprovado** o ciclo completo catálogo → script Atlas → ROM de teste → texto visível no emulador.
+- O suporte a todos os caracteres PT-BR e a expansão de caixas/limites de texto continua em investigação.
 
-A investigação já estabeleceu uma base técnica sólida, mas o projeto **ainda não está na fase de inserção de tradução**.
+Veja [o estado e as próximas etapas](docs/project-roadmap.md) e [o fluxo técnico e os critérios de validação](docs/third-party-tooling-and-validation-plan.md).
 
-### Confirmado
+## Responsabilidades
 
-- ROM japonesa de 2 MiB.
-- CRC32 `01BC1604`.
-- SHA-1 `F67C9139BBC93F171E274A5CD3FBA66480CD8244`.
-- Header Mega Drive válido.
-- **Shift-JIS** nos trechos japoneses identificados.
-- 47 regiões fortemente sustentadas como texto japonês.
-- Controles binários misturados ao texto.
-- `0x01` confirmado como separador/quebra na abertura.
-- `0x06 xx yy` confirmado como comando de três bytes, ainda sem semântica completa.
-- `0x0E` observado como controle.
-- `0x00` observado como terminador em estruturas textuais.
-- Tabela explícita de códigos em `0x1A551A`, observada até `0x1A62D2`.
-- A tabela contém códigos latinos maiúsculos acentuados; os minúsculos acentuados portugueses observados não estão presentes.
-- O decoder estrutural consegue atravessar a abertura preservando os controles.
+### Ferramentas externas
 
-### Ainda não confirmado
+- Extrair scripts e metadados no formato específico do jogo.
+- Executar a inserção de texto e recursos quando o fluxo tiver sido validado.
+- Processar fontes/tiles com o empacotador existente, se ele suportar os glifos necessários.
 
-- rotina 68000 definitiva do engine de texto;
-- gramática completa dos controles;
-- limites exatos das entradas;
-- mecanismo de seleção dos scripts;
-- tabela/formato definitivo de ponteiros;
-- relação completa entre códigos e glifos;
-- formato da fonte;
-- compressão, caso exista para algum recurso;
-- allocator/realocação;
-- encoder/importador definitivo;
-- patch PT-BR.
+A presença de um executável não prova que ele seja necessário, compatível ou seguro para todas as etapas. Não executar scripts de inserção contra a ROM original.
 
-A regra do projeto é não transformar uma hipótese em conhecimento específico do jogo sem evidência direta da ROM/código.
+### Código Python
 
-## Documentação
+- Oferecer a interface de tradução e manter o catálogo.
+- Preservar IDs, metadados e conteúdo não traduzível.
+- Validar marcadores, campos obrigatórios, alterações de origem e caracteres não representáveis.
+- Integrar o catálogo aos scripts nativos Atlas por um adaptador testado.
+- Orquestrar builds isoladas, logs, hashes e relatórios de diferenças.
+- Investigar internamente o formato do jogo somente quando as ferramentas externas não responderem a uma questão necessária.
 
-- **[docs/analysis-results.md](docs/analysis-results.md)** — evidências e resultados técnicos consolidados.
-- **[docs/reverse-engineering.md](docs/reverse-engineering.md)** — estratégia e critérios da engenharia reversa.
-- **[docs/project-roadmap.md](docs/project-roadmap.md)** — roadmap completo, gates e critérios para chegar ao primeiro teste PT-BR seguro.
-- **[docs/third-party-tooling-and-validation-plan.md](docs/third-party-tooling-and-validation-plan.md)** — plano de validação, comparação de ferramentas externas, gates e evidências necessárias antes de escrever a ROM.
-- **[docs/tooling-audit.md](docs/tooling-audit.md)** — auditoria local segura do pacote `ferramentas/`, com verificação de hash da ROM e inspeção estática do dumper legado.
-- **[docs/translation-workbench.md](docs/translation-workbench.md)** — catálogo editável para traduzir scripts, preservar marcadores e aplicar alterações somente em cópias de revisão.
-- `reports/` — resultados reproduzíveis das análises.
-- `tests/` — testes automatizados.
+O catálogo JSON e o CSV são formatos de trabalho; não são, por si só, formatos de inserção.
 
-## Próximo marco
+## Requisitos
 
-A próxima etapa é a **localização do engine 68000**, não a escrita da ROM.
+- Python 3.10 ou superior.
+- Windows recomendado para o conjunto legado de ferramentas.
+- Tkinter disponível na instalação do Python.
 
-O objetivo é comprovar uma cadeia:
+## Instalação e verificações
 
-`seleção do script → referência → leitura do byte → teste de controle → processamento → acesso à fonte/renderização`.
+No PowerShell, na raiz do repositório:
 
-O plano atual prioriza estabilizar o CI, reproduzir as contagens do CFG e comparar o decoder próprio com desassembladores externos antes de tentar rastrear a execução em emulador. Consulte o [plano de ferramentas e validação](docs/third-party-tooling-and-validation-plan.md).
-
-Somente depois serão implementados encoder, ponteiros de escrita, realocação e patch.
-
-## Primeiro teste de tradução
-
-O primeiro teste PT-BR será um **vertical slice mínimo e reversível**, não uma tradução completa.
-
-Antes dele, o projeto deverá provar:
-
-1. formato do script;
-2. terminador;
-3. controles;
-4. limites das entradas;
-5. rotina de leitura;
-6. seleção/referência do script;
-7. encoder reversível;
-8. realocação segura, se necessária;
-9. validação de referências e sobreposição;
-10. execução da ROM modificada no emulador sem quebrar o fluxo.
-
-O marco será chamado **M1 — Primeiro Texto PT-BR Executável**.
-
-## Instalação e análise
-
-```bash
+```powershell
 python -m pip install -e ".[dev]"
 python -m pytest -q
 ruff check .
 ```
 
-Exemplo de análise:
+## Abrir a bancada
 
 ```powershell
-python -m dragonslayer_ptbr analyze `
-  --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" `
-  --report reports/rom-analysis.json
+dslayer-ptbr-gui --catalog translation/catalog.json
 ```
 
-Os candidatos encontrados pelos analisadores são heurísticos. Nenhum offset deve ser tratado como confirmado sem validação e documentação.
-
-Auditoria estática das ferramentas locais (não executa binários nem modifica a ROM):
+Alternativa:
 
 ```powershell
-python -m dragonslayer_ptbr.tooling_audit `
-  --tools-dir ferramentas `
-  --rom "caminho/para/ROM.bin" `
-  --output reports/tooling-audit.json
+python -m dragonslayer_ptbr.translation_gui --catalog translation/catalog.json
 ```
 
-Consulte [docs/tooling-audit.md](docs/tooling-audit.md) para os limites e critérios de segurança.
+Use o caminho do catálogo de trabalho que existe no seu checkout. Não sobrescreva dumps originais; mantenha cópias de trabalho e backups.
 
-## Estrutura
+## Fluxo de trabalho
 
-```text
-src/dragonslayer_ptbr/
-├── analysis/       # análise da imagem e engenharia reversa
-├── text/           # decoder, encoder, tabelas e extrator
-├── pointers/       # leitura, escrita e realocação
-├── profiles/       # conhecimento específico do jogo
-└── cli.py
-```
+1. Extrair os textos usando a ferramenta externa documentada.
+2. Importar uma amostra real para a bancada.
+3. Traduzir e revisar sem modificar o dump de origem.
+4. Exportar para o formato nativo Atlas usando o adaptador específico.
+5. Comparar o script antes/depois e bloquear alterações inesperadas.
+6. Executar as ferramentas de inserção somente sobre uma cópia da ROM.
+7. Validar checksum, diff binário, início do jogo, diálogo alterado e diálogos seguintes.
+8. Registrar ferramentas, versões, comandos e resultados.
 
-## Ponto de parada atual
+Não declarar a tradução pronta até que o último passo seja demonstrado no emulador.
 
-A análise M68K avançou para um CFG conservador baseado no vetor de reset real da ROM.
+## Documentação
 
-- vetor de reset: 0x010620;
-- os relatórios históricos contêm contagens divergentes de blocos e devem ser reproduzidos com a mesma configuração antes de comparação;
-- chamadas JSR abs.l e destinos foram acompanhados em análises anteriores;
-- várias rotinas com RTS foram identificadas;
-- decoder ampliado incrementalmente conforme os opcodes reais foram confirmados.
+- [Roadmap e estado atual](docs/project-roadmap.md)
+- [Arquitetura e validação com ferramentas externas](docs/third-party-tooling-and-validation-plan.md)
+- [Bancada de tradução](docs/translation-workbench.md)
+- [Auditoria segura das ferramentas](docs/tooling-audit.md)
+- [Classificador lexical Atlas](docs/atlas-segment-classifier.md)
+- [Engenharia reversa do texto](docs/reverse-engineering.md)
+- [Investigação das caixas de diálogo](docs/dialog-box-expansion-investigation.md)
 
-Suporte/testes adicionados nesta etapa incluem BTST #imm,<EA>, MOVE.W SR,<EA>, NEGX.B/W/L <EA> e LEA abs.l para A0–A7.
+## Segurança e distribuição
 
-Isso ainda não significa que o engine de texto foi localizado. A próxima investigação continua sendo corrigir/verificar o CI, estabilizar o CFG, comparar desassemblagem, e rastrear registradores, leituras de bytes, controles e chamadas até chegar à fonte/renderização.
-
-O projeto permanece em análise somente leitura; a ROM japonesa original não é modificada nem distribuída.
+Não versionar ROMs, dumps protegidos ou executáveis de terceiros sem confirmar permissões e licenças. Os relatórios devem distinguir claramente fatos confirmados, hipóteses e tarefas pendentes.

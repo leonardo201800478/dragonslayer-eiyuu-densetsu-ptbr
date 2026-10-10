@@ -1,545 +1,74 @@
-# Roadmap do projeto
+# Roadmap e estado do projeto
 
-## 1. Objetivo do roadmap
+## Objetivo
 
-Levar o projeto do estado atual de engenharia reversa até o primeiro **teste controlado de tradução PT-BR**, com uma ROM de teste que:
+Entregar uma tradução PT-BR funcional de *Dragon Slayer: Eiyuu Densetsu* (Mega Drive), reutilizando Atlas e as ferramentas específicas do jogo. O projeto Python não deve recriar um dumper ou inserter já existente sem uma lacuna comprovada.
 
-- mantenha a ROM japonesa original intacta;
-- preserve todos os controles necessários;
-- não corrompa scripts adjacentes;
-- mantenha referências/ponteiros válidos;
-- permita iniciar o jogo e atravessar a área traduzida;
-- possa ser comparada byte a byte com a ROM original;
-- tenha validações automáticas antes de qualquer teste no emulador.
+## Estado resumido
 
-O primeiro teste não será uma tradução completa. Será um **vertical slice mínimo e reversível**, preferencialmente uma pequena sequência de diálogo já totalmente compreendida.
+| Área | Estado | Evidência / próximo passo |
+|---|---|---|
+| Bancada Tkinter | Implementada | Reexecutar testes no checkout atual |
+| Catálogo JSON e importação JSON/CSV genérica | Implementados | Validar com dump real do jogo e preservar metadados |
+| Classificação e auditoria lexical de marcadores Atlas | Auxiliar implementado | Não equivale a interpretar a semântica das diretivas |
+| Extração por ferramenta externa | Ferramentas presentes | Registrar versão, comando e saída reproduzível |
+| Adaptador catálogo ↔ script Atlas nativo | Pendente de validação | Primeiro marco técnico prioritário |
+| Fonte e caracteres PT-BR | Pendente | Fazer matriz de glifos e teste visual |
+| Inserção em ROM de teste | Não comprovada ponta a ponta | Executar apenas em cópia isolada |
+| Validação no emulador | Pendente para tradução PT-BR | Confirmar texto, controles e diálogos subsequentes |
+| Expansão de caixa/página | Investigação pendente | Não assumir que seja necessária ou possível antes dos testes de comprimento |
 
----
+Os documentos registram anteriormente 11.037 entradas, 111 testes aprovados e Ruff sem erros. Esses dados são um checkpoint histórico, não uma afirmação de que os testes atuais foram executados.
 
-## 2. Estado atual
+## Prioridades
 
-### CONFIRMADO
+### P0 — Provar o fluxo real antes de ampliar o código
 
-- ROM japonesa Mega Drive/Genesis com 2 MiB.
-- CRC32: `01BC1604`.
-- SHA-1: `F67C9139BBC93F171E274A5CD3FBA66480CD8244`.
-- Header Mega Drive válido.
-- Texto japonês identificado em múltiplas regiões.
-- **Shift-JIS confirmado** para os trechos japoneses encontrados.
-- Controles binários aparecem misturados ao texto.
-- `0x01` está confirmado como separador/quebra na abertura.
-- `0x06 xx yy` está confirmado como comando de três bytes, mas sua semântica ainda não foi resolvida.
-- `0x0E` aparece como controle.
-- `0x00` aparece como terminador em estruturas observadas.
-- Tabela explícita de códigos de caracteres em `0x1A551A`, observada até `0x1A62D2`.
-- A tabela contém códigos latinos maiúsculos acentuados, mas os minúsculos acentuados portugueses observados não estão presentes.
-- Existem 47 regiões fortemente sustentadas como texto japonês.
-- O decoder estrutural já consegue atravessar a abertura preservando os controles.
+1. Identificar as versões exatas de Atlas e `slayer1_dumper` usadas localmente.
+2. Selecionar um script nativo pequeno que contenha texto e ao menos um marcador.
+3. Guardar uma fixture mínima e licenciável, sem ROM nem conteúdo desnecessário.
+4. Definir quais campos do script podem ser traduzidos e quais devem permanecer idênticos.
+5. Criar testes de ida e volta: script → catálogo → script, sem tradução, deve preservar a entrada byte a byte sempre que o formato permitir.
 
-### NÃO RESOLVIDO
+**Critério de conclusão:** round-trip reproduzível, com diff vazio ou diferenças justificadas exclusivamente pela serialização documentada.
 
-- Rotina 68000 definitiva do engine de texto.
-- Gramática completa dos controles.
-- Limite exato de cada entrada de script.
-- Forma como o jogo seleciona cada script.
-- Tabela/formato definitivo de ponteiros.
-- Relação exata entre código de caractere, índice e glifo.
-- Formato completo da fonte.
-- Compressão/descompressão, caso exista para algum recurso.
-- Estratégia segura de realocação.
-- Encoder/importador definitivo.
-- Patch PT-BR.
+### P1 — Tradução e QA
 
-**Regra:** nenhum item não resolvido deve ser convertido em comportamento de escrita da ROM apenas por inferência estatística.
+- Revisar os campos normalizados contra um dump real.
+- Preservar IDs, metadados, diretivas, comentários, controles e campos desconhecidos.
+- Validar caracteres PT-BR contra a tabela e a fonte reais; rejeitar substituições silenciosas.
+- Acrescentar glossário e notas de contexto apenas se ajudarem a revisão do texto.
+- Produzir relatório de pendências e comparação antes/depois.
 
----
+**Critério de conclusão:** lote real revisado sem perda de registros ou alterações estruturais não autorizadas.
 
-## 3. Fases e gates
+### P2 — Build de teste segura
 
-O projeto será executado em fases. Cada fase possui um **gate de saída**. Só avançamos quando o gate estiver satisfeito.
+- Criar diretório de build separado e registrar hash da ROM de entrada.
+- Confirmar a presença dos scripts e arquivos exigidos antes de iniciar.
+- Executar as ferramentas externas por etapas, com logs e interrupção em caso de erro.
+- Gerar hash e diff da ROM de saída.
+- Não permitir que comandos automatizados apontem para a ROM original.
 
-### Fase 0 — Integridade e baseline
+**Critério de conclusão:** build reproduzível e auditável em uma cópia, sem modificar a entrada.
 
-**Objetivo:** garantir que todas as análises futuras partam sempre do mesmo dump.
+### P3 — Validação no emulador
 
-Tarefas:
+- Confirmar que o jogo inicia.
+- Conferir o diálogo traduzido, os marcadores, a página seguinte e o fluxo adjacente.
+- Testar acentos, pontuação e textos maiores.
+- Só investigar alteração de fonte, buffer ou caixa quando um caso real demonstrar a necessidade.
 
-- registrar tamanho, CRC32 e SHA-1;
-- manter a ROM original fora do Git;
-- gerar um baseline imutável;
-- garantir que ferramentas de análise são somente leitura;
-- executar a suíte de testes Python.
+**Critério de conclusão:** evidência reproduzível do texto traduzido no jogo, acompanhada de hashes, logs e capturas.
 
-**Gate 0:**
+## O que não fazer agora
 
-- hashes da ROM conferidos;
-- testes passando;
-- nenhuma ferramenta de análise modifica a ROM.
+- Não criar um substituto para Atlas ou `slayer1_dumper` sem provar uma limitação concreta.
+- Não interpretar marcadores apenas pelo nome ou pela aparência.
+- Não expandir caixas nem alterar ponteiros com base em hipóteses.
+- Não executar `insert TEXT.bat` nem outros scripts de inserção sobre a ROM original.
+- Não apagar ferramentas de análise só por parecerem experimentais: primeiro verificar referências, testes e utilidade para uma pendência definida.
 
----
+## Definição de pronto
 
-### Fase 1 — Inventário completo de texto
-
-**Objetivo:** transformar as 47 regiões encontradas em um inventário lógico.
-
-Tarefas:
-
-1. identificar início/fim de cada região;
-2. separar entradas individuais;
-3. registrar terminadores;
-4. registrar todos os controles e suas posições;
-5. classificar cada região por contexto:
-   - abertura;
-   - diálogo;
-   - itens;
-   - magias;
-   - sistema;
-   - minijogos;
-   - final;
-6. detectar padrões de tamanho;
-7. produzir um inventário determinístico.
-
-Formato mínimo:
-
-| Região | Entrada | Offset | Tamanho | Contexto | Controles | Terminador |
-|---|---|---:|---:|---|---|---|
-
-**Gate 1:**
-
-Uma entrada conhecida pode ser extraída do offset correto e reproduzida exatamente em bytes, incluindo controles e terminador.
-
----
-
-### Fase 2 — Reconstrução do protocolo de script
-
-**Objetivo:** descobrir como o jogo interpreta os bytes.
-
-Tarefas:
-
-- continuar o inventário de `0x01`, `0x06 xx yy`, `0x0E`, `0x00` e demais bytes de controle;
-- comparar os controles entre abertura, diálogos, itens/magias, sistema e minijogos;
-- identificar quais comandos têm comprimento fixo ou variável;
-- determinar quais comandos alteram posição, fluxo, estado, janela ou apresentação;
-- nunca atribuir nomes sem evidência de execução.
-
-A investigação deve chegar a uma gramática semelhante a:
-
-`TEXTO | CONTROLE_1 | CONTROLE_2 | ... | END`
-
-mas os tokens concretos só serão definidos após rastreamento.
-
-**Gate 2:**
-
-Uma entrada completa pode ser tokenizada e reconstruída byte a byte sem perda.
-
----
-
-### Fase 3 — Localização do engine 68000
-
-**Objetivo:** obter a cadeia de execução que liga script, controles e fonte.
-
-Esta é a principal fase atual.
-
-Tarefas:
-
-1. identificar blocos de código 68000;
-2. reconhecer limites básicos por `BSR`, `JSR`, `JMP`, `RTS`;
-3. reduzir falsos positivos de regiões de dados;
-4. rastrear leituras `MOVE.B`;
-5. rastrear origem dos registradores de endereço;
-6. seguir transformações de índices:
-   - `MOVEQ`;
-   - `EXT`;
-   - `LSL/ASL`;
-   - `MULU`;
-   - `ANDI`;
-   - `ADDI`;
-   - somas com bases;
-7. investigar especialmente acessos próximos de `0x1A551A`;
-8. rastrear comparações com `0x01`, `0x06), `0x0E) e `0x00);
-9. localizar chamadas de subrotinas envolvidas;
-10. reconstruir pelo menos uma cadeia completa.
-
-A análise de `MOVE.B (An,Dn.W/L),Dm` deve ser feita apenas dentro de blocos de código identificados, pois o scanner global produz milhares de falsos positivos.
-
-**Gate 3:**
-
-Existe pelo menos uma cadeia comprovada:
-
-`seleção do script → endereço/dado do script → leitura do byte → teste de controle → processamento → acesso à fonte/renderização`.
-
----
-
-### Fase 4 — Fonte, códigos e encoder
-
-**Objetivo:** transformar a descoberta do engine em um codec seguro.
-
-Tarefas:
-
-- confirmar como o código de caractere é convertido em índice/glifo;
-- determinar se a tabela `0x1A551A` é tabela de lookup, repertório, índice ou outra estrutura;
-- localizar os glifos;
-- determinar como caracteres latinos são renderizados;
-- decidir como representar:
-  - `á à â ã`;
-  - `é ê`;
-  - `í`;
-  - `ó ô õ`;
-  - `ú`;
-  - `ç`;
-  - maiúsculas correspondentes;
-- preferir reaproveitamento de entradas existentes quando isso não quebrar o mapeamento;
-- só estender/substituir a tabela se a rotina de lookup e o espaço de armazenamento permitirem.
-
-Depois disso:
-
-- implementar encoder reversível;
-- validar `decode(encode(texto)));
-- preservar controles;
-- rejeitar caracteres sem mapeamento;
-- produzir erro explícito em vez de gerar bytes inválidos.
-
-**Gate 4:**
-
-Um conjunto de strings japonesas conhecidas é decodificado e reencodado produzindo exatamente os mesmos bytes originais.
-
----
-
-### Fase 5 — Ponteiros e seleção de scripts
-
-**Objetivo:** descobrir como cada entrada é localizada pelo jogo.
-
-Tarefas:
-
-- rastrear quem fornece o endereço do script;
-- identificar ponteiros absolutos, relativos ou índices, sem assumir formato;
-- validar candidatos contra chamadas reais do engine;
-- identificar tabelas, bases e offsets;
-- mapear cada entrada para sua referência;
-- descobrir se scripts estão fragmentados;
-- documentar regras de alinhamento e limites.
-
-A análise estatística de ponteiros atual continua sendo somente auxiliar. Os candidatos 16-bit, 24-bit e 32-bit não devem ser promovidos sem confirmação no código.
-
-**Gate 5:**
-
-Para pelo menos um script, deve ser possível:
-
-`ID/contexto → referência real → offset do script → leitura correta → terminador`.
-
-Idealmente, o mecanismo deve funcionar para uma pequena família de scripts antes de qualquer escrita.
-
----
-
-### Fase 6 — Realocação segura
-
-**Objetivo:** permitir texto maior sem corromper dados adjacentes.
-
-Somente iniciar depois dos Gates 3, 4 e 5.
-
-Tarefas:
-
-1. mapear regiões livres ou recursos que possam ser realocados;
-2. definir alinhamento;
-3. calcular tamanho físico de cada script;
-4. criar allocator determinístico;
-5. copiar scripts para novas posições;
-6. atualizar somente as referências comprovadamente associadas;
-7. gerar mapa:
-   - origem;
-   - destino;
-   - tamanho;
-   - referências alteradas;
-8. impedir sobreposição;
-9. validar todos os destinos dentro da ROM;
-10. gerar ROM de teste separada.
-
-Importante: **não assumir ainda que as caixas precisam permanecer do tamanho original**. Primeiro será necessário saber como o renderer determina largura, altura, quebra e posicionamento.
-
-**Gate 6:**
-
-Uma cópia de um script, ainda em japonês, pode ser realocada e executada exatamente como antes.
-
-Esse é um teste crítico: prova que a infraestrutura de inserção funciona antes de introduzir tradução.
-
----
-
-### Fase 7 — Primeiro vertical slice PT-BR
-
-**Objetivo:** realizar o primeiro teste de tradução real com risco mínimo.
-
-Escolha:
-
-- uma pequena entrada;
-- controles totalmente conhecidos;
-- ponteiro conhecido;
-- encoder validado;
-- espaço de destino controlado.
-
-Procedimento:
-
-1. extrair a entrada original;
-2. criar tradução PT-BR;
-3. preservar controles;
-4. codificar;
-5. verificar tamanho;
-6. realocar somente se necessário;
-7. corrigir a referência;
-8. gerar ROM de teste;
-9. comparar estrutura original × modificada;
-10. validar automaticamente;
-11. abrir no emulador;
-12. executar exatamente o fluxo que usa a entrada.
-
-O primeiro teste deve ser pequeno o suficiente para que qualquer diferença possa ser auditada manualmente.
-
-**Gate 7 — primeiro teste seguro:**
-
-- ROM inicializa;
-- jogo entra normalmente;
-- entrada traduzida é exibida;
-- controles continuam funcionando;
-- texto seguinte continua correto;
-- não há travamento;
-- nenhuma região não relacionada foi alterada;
-- checksum/hash da ROM de teste é registrado;
-- patch/diff da alteração é reproduzível.
-
----
-
-### Fase 8 — Expansão para diálogos e dados de jogo
-
-Depois do primeiro vertical slice:
-
-- ampliar para outras entradas;
-- validar nomes;
-- validar itens;
-- validar magias;
-- validar mensagens de sistema;
-- validar minijogos;
-- validar final;
-- construir testes específicos por contexto;
-- identificar limites de caixa e largura;
-- avaliar necessidade de VWF somente se o renderer demonstrar essa limitação.
-
----
-
-### Fase 9 — Pipeline completo de tradução
-
-Quando a infraestrutura estiver comprovada:
-
-`ROM original`
-→ `extract`
-→ `translation/`
-→ `encode`
-→ `allocate`
-→ `patch references`
-→ `validate`
-→ `ROM de teste`
-
-Cada etapa deverá ser determinística e reproduzível.
-
----
-
-## 4. Critérios de segurança antes da primeira tradução
-
-Não será permitido gerar a primeira ROM traduzida enquanto qualquer um destes itens estiver sem solução:
-
-- [ ] formato real do script conhecido;
-- [ ] terminador conhecido;
-- [ ] controles preservados;
-- [ ] limites das entradas conhecidos;
-- [ ] rotina de leitura identificada;
-- [ ] método de seleção do script identificado;
-- [ ] referência/ponteiro de pelo menos uma entrada comprovado;
-- [ ] encoder reversível;
-- [ ] mecanismo de escrita isolado da ROM original;
-- [ ] realocação testada em japonês, se necessária;
-- [ ] validação de sobreposição;
-- [ ] validação de referências;
-- [ ] ROM original preservada;
-- [ ] teste automatizado cobrindo a transformação.
-
----
-
-## 5. Estratégia de testes
-
-### Testes unitários
-
-Cobrir:
-
-- Shift-JIS de 1 byte;
-- Shift-JIS de 2 bytes;
-- controles;
-- terminador;
-- caracteres inválidos;
-- tabela de caracteres;
-- encoder/decoder;
-- limites de região;
-- ponteiros;
-- allocator.
-
-### Testes de round-trip
-
-Para cada entrada conhecida:
-
-`bytes originais → decode → encode → bytes originais`
-
-Resultado esperado: **igualdade byte a byte**.
-
-### Testes de patch
-
-Para uma ROM de teste:
-
-- verificar tamanho;
-- verificar regiões modificadas;
-- verificar que somente os offsets esperados foram alterados;
-- verificar que nenhum destino aponta para fora da ROM;
-- verificar que nenhum bloco foi sobreposto.
-
-### Teste no emulador
-
-O teste manual só começa depois de os testes binários passarem.
-
-A sequência deve ser registrada por contexto, por exemplo:
-
-1. inicialização;
-2. entrada no fluxo;
-3. exibição da mensagem;
-4. avanço;
-5. mensagem seguinte;
-6. saída da janela;
-7. continuação do jogo.
-
----
-
-## 6. Regra para expansão de texto
-
-O projeto não adotará ainda um limite artificial de tamanho igual ao japonês.
-
-Existem três níveis:
-
-### Nível A — mesma área
-
-Usar quando a tradução cabe no espaço original.
-
-### Nível B — realocação
-
-Usar quando o texto cresce, mas o renderer continua compatível.
-
-### Nível C — alteração do renderer
-
-Somente se a largura/altura da janela, quebra automática, fonte ou VWF forem realmente limitantes.
-
-A ordem é deliberada: **primeiro resolver armazenamento e referências; depois alterar apresentação**.
-
----
-
-## 7. Marco de entrada na tradução
-
-O projeto estará oficialmente pronto para iniciar a tradução de testes quando o seguinte fluxo estiver funcional:
-
-`extract`
-→ `decode`
-→ `edit PT-BR`
-→ `encode`
-→ `allocate`
-→ `patch`
-→ `validate`
-→ `build test ROM`
-
-E, para pelo menos uma entrada:
-
-`ROM japonesa`
-→ `extrator`
-→ `texto`
-→ `tradução`
-→ `ROM modificada`
-→ `execução no emulador`
-→ `continuação normal do jogo`.
-
-Esse será o **Marco M1 — Primeiro Texto PT-BR Executável**.
-
----
-
-## 8. Próxima tarefa imediata
-
-A próxima tarefa técnica deve ser a **Fase 3 — localização do engine 68000**, começando por:
-
-1. identificar blocos de código;
-2. filtrar os `MOVE.B (An,Dn.W/L),Dm` para esses blocos;
-3. rastrear origem de `An) e `Dn);
-4. cruzar com testes de `0x01`, `0x06`, `0x0E) e `0x00);
-5. rastrear chamadas `JSR/BSR);
-6. procurar a primeira cadeia que conecte script e tabela `0x1A551A);
-7. documentar candidatos com classificação **CONFIRMADO / REFERÊNCIA / HIPÓTESE / DESCARTADO**.
-
-Não iniciar ainda encoder de escrita, realocação ou patch da ROM.
-
-
-## 10. Checkpoint de pausa — análise M68K
-
-A Fase 3 avançou para um CFG conservador baseado no vetor de reset 0x010620.
-
-Estado no momento da pausa:
-- 43 blocos básicos no relatório analisado;
-- 155 instruções reconhecidas;
-- blocos não sobrepostos;
-- chamadas JSR abs.l com destinos identificados;
-- rotinas com RTS alcançadas;
-- decoder ampliado incrementalmente conforme os opcodes reais foram encontrados.
-
-Suporte adicionado nesta etapa: BTST #imm,<EA>, MOVE.W SR,<EA> e NEGX.B/W/L <EA>, além das formas anteriores.
-
-Não foi comprovado parser de texto, ponteiro de script, consulta efetiva à tabela 0x1A551A, conversão código→glifo ou renderer. Permanecem bloqueados encoder de produção, escrita da ROM, realocação e patch de ponteiros.
-
-Na retomada: rodar a suíte, regenerar o relatório M68K, verificar o avanço além de 0x010B3A após NEGX e rastrear as origens de A0–A3 dentro dos blocos alcançáveis.
-
-
----
-
-## 11. Validação independente e ferramentas de terceiros
-
-O plano detalhado está em [docs/third-party-tooling-and-validation-plan.md](third-party-tooling-and-validation-plan.md). Esta seção integra essas atividades ao roadmap e estabelece a ordem de execução.
-
-### Ordem obrigatória
-
-1. **Estabilizar a suíte:** corrigir `test_scan_address_references_accepts_custom_targets`, definir o contrato para referências de 3 e 4 bytes sobrepostas e consultar o CI real antes de marcar a etapa como concluída.
-2. **Reproduzir o CFG:** executar os mesmos comandos com a mesma ROM, commit e parâmetros para explicar as contagens divergentes registradas em relatórios anteriores.
-3. **Comparar desassemblagem:** avaliar primeiro [sega2asm](https://github.com/hansbonini/sega2asm) e [Oxore m68k-disasm](https://github.com/Oxore/m68k-disasm) nos intervalos candidatos documentados. Registrar divergências de instrução, tamanho e destino de branch.
-4. **Observar execução real:** usar [BlastEm](https://github.com/libretro/blastem) ou, alternativamente, o [debugger do MAME](https://docs.mamedev.org/debugger/index.html) para buscar evidência dinâmica da cadeia script → leitura → controle → fonte/renderização.
-5. **Validar a tabela de caracteres:** demonstrar a relação código → índice → glifo, incluindo os caracteres portugueses necessários. Um teste Python do inventário não comprova presença nem renderização de um glifo na ROM.
-6. **Executar M1:** somente após os gates anteriores, construir uma ROM de teste separada, validar alterações e testar a exibição de um texto PT-BR mínimo.
-
-### Política de dependências
-
-Ferramentas de terceiros serão auxiliares e opcionais. Não devem se tornar dependências obrigatórias do pacote Python nem bloquear a execução de `pytest`. Registrar versão, comandos, configuração e hash da ROM para cada experimento. ROM original, executáveis externos e temporários permanecem fora do Git.
-
-### Critério de avanço
-
-Não considerar o engine de texto localizado apenas por encontrar `MOVE.B (An)+,Dn`, comparações com `0x01/0x06/0x0E/0x00` ou uma sequência plausível de instruções. A promoção de um candidato exige evidência estática coerente e, quando viável, confirmação durante a execução do jogo.
-
-**Estado deste checkpoint:** ferramentas selecionadas para avaliação; ainda não há evidência de que tenham sido executadas contra esta ROM. CI e divergência do CFG permanecem pendentes até nova execução documentada.
-
-## 12. Hipótese de compressão da fonte
-
-**Estado: HIPÓTESE aberta; não confirmada na ROM atual.**
-
-Uma referência comunitária secundária menciona ferramentas/notas históricas de compressão de texto e fonte relacionadas à série, mas os arquivos originais ainda não foram recuperados nem verificados. O projeto passa a considerar explicitamente a possibilidade de compressão sem tratá-la como fato.
-
-Investigar separadamente:
-
-- fonte armazenada como tiles sem compressão;
-- fonte comprimida e expandida em tempo de execução;
-- fonte sem compressão com mapeamento/tabelas próprias;
-- combinação de formatos diferentes para tiles e tabelas.
-
-### Tarefas
-
-1. Procurar os utilitários e as notas originais, registrando procedência e integridade.
-2. Identificar glifos visíveis no jogo e procurar correspondência nos dados gráficos da ROM.
-3. Usar debugger para observar origem, destino, tamanho dos dados e transferência para VRAM.
-4. Comparar resultados estáticos com os dados gráficos reais em runtime.
-5. Registrar testes que descartem ou sustentem cada hipótese em reports/, sem adicionar binários de terceiros ou ROM ao Git.
-
-**Gate:** só marcar compressão como confirmada quando uma transformação reproduzível ligar dados de origem identificados aos glifos observados no jogo. Não implementar um descompressor presumido e não alterar a ROM original. O plano de validação está detalhado na seção 9 de docs/third-party-tooling-and-validation-plan.md.
+O projeto não está concluído quando o catálogo salva ou o QA textual passa. Está concluído quando uma tradução passa pelo formato nativo, é inserida numa cópia segura e aparece corretamente no emulador sem quebrar os controles ou diálogos seguintes.
