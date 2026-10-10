@@ -1,69 +1,70 @@
-# Bancada de tradução dos scripts
+# Bancada de tradução e adaptação PT-BR
 
-Este módulo cria um catálogo editável em UTF-8 a partir dos arquivos .txt gerados pelas
-ferramentas legadas. Ele preserva os comandos Atlas e os marcadores inline na cópia de
-trabalho, valida que a fonte não mudou desde a exportação e nunca modifica a pasta original.
+## Objetivo
 
-## Estado e limites
+As ferramentas externas continuam sendo a fonte dos dumps e, quando compatível, da reinserção. Esta bancada não substitui Atlas, dumper ou inserter: normaliza formatos comuns para facilitar a tradução, mantém metadados disponíveis e executa QA textual.
 
-- **Confirmado:** os dumps legados contêm diretivas Atlas, texto japonês e marcadores como
-  <LINE>, <COLOR 1E>, <WAIT CLEAR> e comandos de fluxo.
-- **Implementado:** exportação para JSON UTF-8, aplicação por arquivo/linha, verificação
-  SHA-256 da linha original e validação da sequência de marcadores <...>.
-- **Ainda não confirmado:** compatibilidade de arquivos traduzidos com Atlas, codificação
-  final esperada pelo Atlas, mapeamento dos caracteres PT-BR para os glifos da ROM,
-  limites de tamanho e reinserção funcional.
-- A saída padrão de apply é UTF-8 para revisão humana; **não deve ser tratada como pronta
-  para inserção na ROM**. A opção CP932 só funciona quando todos os caracteres podem ser
-  representados nessa codificação, e isso não comprova compatibilidade com a fonte ou a
-  tabela de caracteres do jogo.
+## Interface desktop
 
-## 1. Exportar o catálogo
+Instale o projeto e abra um catálogo:
 
-Aponte --source-dir para a pasta text extraída pelo dumper legado:
+    python -m pip install -e ".[dev]"
+    dslayer-ptbr-gui --catalog translation/catalog.json
 
-    python -m dragonslayer_ptbr.text.translation_workbench export --source-dir ".\reports\legacy-tooling-test\tools\text" --catalog ".\translation\catalog.json"
+Ou execute:
 
-Abra translation/catalog.json no VS Code. Cada entrada tem um ID por caminho e linha,
-texto original, tradução, hash da fonte, marcadores inline e status. Preencha apenas
-translation; preserve todos os marcadores <...> exatamente na mesma ordem.
+    python -m dragonslayer_ptbr.translation_gui --catalog translation/catalog.json
 
-Exemplo de entrada:
+A interface inclui:
+- lista de entradas com indicação de pendência;
+- busca por ID, arquivo, origem, tradução ou contexto;
+- filtro de entradas pendentes;
+- painel de origem somente leitura e campo de tradução;
+- salvamento de catálogo JSON;
+- importação de dumps estruturados JSON/CSV;
+- exportação CSV UTF-8;
+- relatório de QA textual.
 
-    {
-      "id": "script_0F.txt:42",
-      "file": "script_0F.txt",
-      "line": 42,
-      "source": "こんにちは<LINE>",
-      "translation": "Olá<LINE>",
-      "source_sha256": "...",
-      "tags": ["<LINE>"],
-      "status": "PENDENTE"
-    }
+## Importar dados de ferramentas externas
 
-## 2. Gerar uma cópia de revisão
+Na interface, escolha **Importar dump JSON/CSV**. A importação reconhece listas JSON ou objetos contendo entries, texts ou strings, além de CSV com cabeçalhos. Campos de origem reconhecidos: source, original, japanese, text, original_text e jp. Campos de tradução reconhecidos: translation, translated, portuguese, pt_br e target. Para IDs, reconhece id, key, label e name.
 
-Use uma pasta de saída nova ou vazia:
+O importador preserva os campos originais de cada registro e acrescenta os campos normalizados source, translation, tags, source_sha256 e status. Isso permite manter metadados do dumper quando estão presentes. Formatos proprietários ou estruturas diferentes exigirão um adaptador específico; não presumir que todos os dumps são reconhecidos.
 
-    python -m dragonslayer_ptbr.text.translation_workbench apply --source-dir ".\reports\legacy-tooling-test\tools\text" --catalog ".\translation\catalog.json" --output-dir ".\reports\translation-preview"
+Para diretórios de TXT com diretivas Atlas, o catalogador anterior continua disponível:
 
-O comando informa quantas traduções foram aplicadas e quantas entradas continuam pendentes.
-Ele aborta se o texto original mudou, se os marcadores foram alterados ou se a pasta de saída
-já contém arquivos. A pasta de origem permanece intacta.
+    python -m dragonslayer_ptbr.text.translation_workbench export --source-dir ".\ferramentas\text" --catalog ".\translation\catalog.json"
 
-## Regras para tradução
+Ajuste o caminho à saída real do dumper. O catalogador TXT atual seleciona linhas com caracteres japoneses; linhas compostas apenas por diretivas ou outros alfabetos podem precisar de um adaptador adicional.
 
-1. Traduza somente o texto natural; não traduza diretivas #WRITE, #FILL, #W08BYTE,
-   #WRITEINDEX, comentários de offsets nem comandos de fluxo.
-2. Preserve marcadores como <LINE>, <WAIT>, <WAIT CLEAR>, <COLOR 1E>, <CLEAR>, <JMP.L>
-   e <$XX> exatamente como aparecem.
-3. Não remova nem acrescente linhas. A ferramenta aplica uma tradução por linha de origem.
-4. Nomes próprios, locais, itens e magias devem seguir o glossário do projeto.
-5. Não execute comandos de inserção contra a ROM original. A saída desta bancada é material
-   de tradução/revisão, não uma ROM corrigida.
+## Regras de tradução
 
-## Próximo marco técnico
+1. Traduza somente o texto natural. Não traduza diretivas Atlas, comentários, offsets ou comandos de fluxo.
+2. Preserve os marcadores inline exatamente e na mesma ordem, por exemplo <LINE>, <WAIT>, <WAIT CLEAR>, <COLOR 1E>, <CLEAR>, <JMP.L> e <$XX>.
+3. Preserve os nomes próprios, locais, itens, personagens e magias conforme o glossário do projeto.
+4. Adapte a frase ao português brasileiro natural, em vez de fazer tradução literal quando isso comprometer clareza ou espaço.
+5. Não invente limite de caracteres ou bytes: a largura da caixa e o formato físico precisam ser medidos no fluxo real.
+6. Mantenha os dumps originais intactos e trabalhe em catálogos/cópias.
 
-Antes de gerar arquivos para Atlas, precisamos confirmar a codificação de entrada do Atlas,
-a tabela de caracteres ativa e a representação dos caracteres PT-BR. Depois, adicionaremos
-um validador de tamanho por bloco e um importador compatível com o formato de inserção real.
+## QA e limites
+
+O QA verifica se a tradução está preenchida, se a sequência de marcadores é idêntica e se há sinais básicos de texto inválido. O relatório inclui rom_insertion_ready=false deliberadamente.
+
+Passar no QA não comprova:
+- suporte a acentos pela fonte ou tabela de caracteres;
+- comprimento em bytes no formato final;
+- largura visual ou quebra de linha;
+- validade de ponteiros e limites;
+- aceitação pelo inserter;
+- funcionamento no emulador.
+
+A saída normalizada JSON/CSV é material de trabalho humano. Para devolver os textos à ferramenta externa, é necessário usar o formato de entrada que essa ferramenta documenta ou criar um adaptador testado para ela. Não alimentar o Atlas ou outro inserter com o catálogo normalizado sem conversão explícita.
+
+## Próximas melhorias
+
+- adaptadores específicos para os formatos reais usados pelo projeto, depois de fixar versões e exemplos de entrada/saída;
+- glossário editável integrado à interface;
+- validação de tamanho e largura quando as regras da ferramenta e da caixa forem conhecidas;
+- diff de alterações e verificação de hash da origem;
+- exportação de volta ao formato de origem com teste de round-trip;
+- testes automatizados contra fixtures pequenas, sem ROM proprietária no repositório.
