@@ -76,3 +76,22 @@ Os módulos de análise de ROM, tabela de caracteres e código 68000 permanecem 
 - Não perder silenciosamente marcadores, metadados ou dados desconhecidos.
 - QA textual não equivale a validação de inserção.
 - Preferir logs, fixtures pequenas e testes automatizados.
+
+
+## Atualização de progresso — 10/10/2026
+
+### Verificado
+- A bancada Tkinter abriu um catálogo de **11.037 entradas**.
+- Uma tradução de teste foi salva e persistiu após fechar e reabrir a interface.
+- O QA da entrada testada não detectou divergências nos marcadores.
+- Os testes locais concluíram com **111 aprovados**.
+- `ruff check .` retornou `All checks passed!`.
+
+### Ainda não concluído
+- Confirmar a pasta, versão e formato nativo da ferramenta que gerou os TXT/dumps.
+- Executar aplicação das traduções em cópia separada dos scripts reais.
+- Demonstrar round-trip para o formato esperado pela ferramenta externa.
+- Verificar suporte a caracteres PT-BR, limites de tamanho e largura visual.
+- Gerar uma ROM de teste apenas quando o método de inserção estiver comprovado, e testar no emulador.
+
+A entrada usada na interface foi um teste de persistência, não uma tradução confirmada dentro do jogo. O QA textual não deve ser interpretado como aprovação para inserção na ROM.
