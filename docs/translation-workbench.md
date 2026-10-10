@@ -68,3 +68,24 @@ A saída normalizada JSON/CSV é material de trabalho humano. Para devolver os t
 - diff de alterações e verificação de hash da origem;
 - exportação de volta ao formato de origem com teste de round-trip;
 - testes automatizados contra fixtures pequenas, sem ROM proprietária no repositório.
+
+
+## Estado de verificação atual
+
+Verificação manual registrada em 10/10/2026:
+
+- a interface abriu o catálogo com **11.037 entradas**;
+- uma tradução de teste foi salva, a aplicação foi fechada e a tradução continuou presente após reabertura;
+- o QA da entrada selecionada informou que não havia divergências de marcadores;
+- a suíte local concluiu com **111 testes aprovados**;
+- `ruff check .` concluiu com `All checks passed!`.
+
+Isso valida o salvamento básico e os testes automatizados no checkout usado. Não significa que todas as 11.037 entradas foram revisadas, nem que o catálogo possa ser inserido diretamente na ROM. A aplicação em cópia dos TXT, a exportação para o formato nativo da ferramenta externa e o teste no emulador continuam pendentes.
+
+### Próximo teste reproduzível
+
+1. Identificar a pasta e a versão exatas da ferramenta que produziu os TXT e registrar um pequeno exemplo real.
+2. Manter os TXT originais intactos e exportar um catálogo de teste.
+3. Aplicar uma tradução somente em uma cópia de saída, verificando identidade das entradas e preservação dos marcadores.
+4. Comparar a saída com o formato esperado pela ferramenta externa; não presumir que JSON/CSV normalizado seja aceito diretamente.
+5. Só depois de confirmar o adaptador, testar a ferramenta externa em uma cópia separada e, por fim, validar visualmente no emulador.
