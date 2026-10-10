@@ -17,7 +17,6 @@ from pathlib import Path
 
 from dragonslayer_ptbr.text.atlas_segmenter import (
     LineKind,
-    SegmentKind,
     classify_line,
 )
 
