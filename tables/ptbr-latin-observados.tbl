@@ -1,0 +1,18 @@
+# Caracteres latinos observados na tabela da ROM
+# Fonte: reports/latin-character-analysis.md
+# Formato documental: CODIGO=CARACTERE
+# Isso registra códigos presentes na tabela proprietária; não comprova sozinho
+# que cada código possa ser emitido com segurança em qualquer texto.
+
+00C0=À
+00C1=Á
+00C2=Â
+00C3=Ã
+00C7=Ç
+00C9=É
+00CA=Ê
+00CD=Í
+00D3=Ó
+00D4=Ô
+00D5=Õ
+00DA=Ú
