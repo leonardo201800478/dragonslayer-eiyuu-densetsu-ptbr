@@ -44,7 +44,7 @@ def test_apply_catalog_writes_translated_copy_without_touching_source(tmp_path: 
 
     assert (written, pending) == (1, 0)
     assert script.read_bytes() == original
-    assert (output / "script_01.txt").read_text(encoding="utf-8") == (
+    assert (output / "script_01.txt").read_bytes().decode("utf-8") == (
         "#WRITE(PtrTable)\r\nOlá<LINE>\r\n"
     )
 
