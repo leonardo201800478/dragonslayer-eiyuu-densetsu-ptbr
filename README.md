@@ -51,6 +51,7 @@ A regra do projeto é não transformar uma hipótese em conhecimento específico
 - **[docs/reverse-engineering.md](docs/reverse-engineering.md)** — estratégia e critérios da engenharia reversa.
 - **[docs/project-roadmap.md](docs/project-roadmap.md)** — roadmap completo, gates e critérios para chegar ao primeiro teste PT-BR seguro.
 - **[docs/third-party-tooling-and-validation-plan.md](docs/third-party-tooling-and-validation-plan.md)** — plano de validação, comparação de ferramentas externas, gates e evidências necessárias antes de escrever a ROM.
+- **[docs/tooling-audit.md](docs/tooling-audit.md)** — auditoria local segura do pacote `ferramentas/`, com verificação de hash da ROM e inspeção estática do dumper legado.
 - `reports/` — resultados reproduzíveis das análises.
 - `tests/` — testes automatizados.
 
@@ -89,7 +90,8 @@ O marco será chamado **M1 — Primeiro Texto PT-BR Executável**.
 
 ```bash
 python -m pip install -e ".[dev]"
-pytest
+python -m pytest -q
+ruff check .
 ```
 
 Exemplo de análise:
@@ -101,6 +103,17 @@ python -m dragonslayer_ptbr analyze `
 ```
 
 Os candidatos encontrados pelos analisadores são heurísticos. Nenhum offset deve ser tratado como confirmado sem validação e documentação.
+
+Auditoria estática das ferramentas locais (não executa binários nem modifica a ROM):
+
+```powershell
+python -m dragonslayer_ptbr.tooling_audit `
+  --tools-dir ferramentas `
+  --rom "caminho/para/ROM.bin" `
+  --output reports/tooling-audit.json
+```
+
+Consulte [docs/tooling-audit.md](docs/tooling-audit.md) para os limites e critérios de segurança.
 
 ## Estrutura
 
