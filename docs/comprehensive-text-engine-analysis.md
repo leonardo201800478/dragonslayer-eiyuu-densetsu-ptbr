@@ -201,3 +201,39 @@ O próximo resultado útil deve ser uma ficha do **primeiro candidato que aprese
 Esta análise será considerada produtiva quando reduzir o conjunto de candidatos e entregar pelo menos uma cadeia verificável entre dados de texto conhecidos e código 68000 plausivelmente responsável por processá-los. Gerar mais ocorrências sem aumentar a qualidade das ligações não conta como progresso.
 
 Nenhuma tradução, realocação, gravação de ponteiros ou alteração da ROM deve começar com base apenas neste relatório.
+
+
+## Integração do plano de ferramentas externas — 2026-10-09
+
+A execução desta análise deve seguir o plano versionado em [third-party-tooling-and-validation-plan.md](third-party-tooling-and-validation-plan.md). A prioridade é comparar o decoder próprio com sega2asm e Oxore m68k-disasm, depois buscar evidência dinâmica em BlastEm ou MAME.
+
+Antes de comparar novas contagens de CFG, reproduzir o baseline com a mesma ROM, commit e parâmetros. Os relatórios históricos apresentam contagens divergentes, e a causa ainda não deve ser presumida. O teste `test_scan_address_references_accepts_custom_targets` também precisa ser corrigido e validado por uma execução real de CI.
+
+Os intervalos `0x01E9A4–0x01E9C8`, `0x0262C0–0x0262E8` e `0x02AF20–0x02AFA6` são alvos de comparação, não funções confirmadas. Para cada um, registrar bytes brutos, alinhamento, comprimento das instruções, destinos de branch e eventuais diferenças entre ferramentas.
+
+Não iniciar encoder de produção, realocação ou patch até demonstrar a relação entre uma entrada conhecida, sua leitura em runtime e o processamento/renderização. O fato de um teste reconhecer os códigos dos caracteres portugueses não comprova que a ROM possua os glifos correspondentes.
+
+## Hipótese adicional: fonte possivelmente comprimida
+
+**Classificação atual: HIPÓTESE — sem confirmação específica para esta ROM.**
+
+Uma referência comunitária secundária menciona ferramentas/notas históricas sobre compressão de texto e fonte relacionadas à série. Os arquivos originais ainda não foram recuperados e avaliados. Isso é motivo suficiente para investigar a possibilidade, mas não para afirmar que a fonte deste dump esteja comprimida.
+
+Separar as hipóteses:
+
+- **Fonte sem compressão:** tiles reconhecíveis estão armazenados diretamente na ROM.
+- **Fonte comprimida:** uma rotina transforma dados compactados em tiles antes do uso.
+- **Fonte/tabela em formato próprio:** a organização ou o mapeamento de códigos pode ser customizado sem haver compressão.
+- **Formato híbrido:** diferentes tabelas e recursos podem seguir mecanismos distintos.
+
+### Experimentos discriminantes
+
+1. Buscar ferramentas e notas históricas e registrar a procedência; não executar binários desconhecidos sem inspeção.
+2. Identificar um ou mais glifos que apareçam na tela e procurar sua representação em dados gráficos candidatos, considerando a organização dos planos/tilemap do Mega Drive.
+3. Com um debugger, observar o carregamento dos gráficos: endereço de origem na ROM, buffer de destino, tamanho antes/depois e transferência para VRAM.
+4. Comparar os bytes extraídos da ROM com os dados gráficos observados em runtime. Uma transformação reproduzível é evidência; ausência de uma correspondência visual direta não é prova de compressão.
+5. Testar qualquer ferramenta histórica sobre dados extraídos para uma cópia temporária e validar a saída contra os tiles reais. Não experimentar algoritmos de escrita na ROM original.
+
+**Critério de confirmação:** uma rotina ou ferramenta transforma dados de origem identificados em glifos compatíveis com os observados em execução, com parâmetros e resultados reproduzíveis. Até esse ponto, não implementar nem nomear um algoritmo de descompressão como fato.
+
+A investigação da fonte deve ser coordenada com a cadeia já planejada “código de texto → índice/tabela → glifo → desenho”, pois a tabela em 0x1A551A ainda não teve sua função no acesso aos glifos comprovada.

@@ -33,6 +33,20 @@ def test_portuguese_accent_inventory():
     assert "á" in missing
     assert missing["á"] == 0xE1
 
+    expected_missing = {
+        "õ": 0xF5,
+        "Õ": 0xD5,
+        "À": 0xC0,
+        "à": 0xE0,
+        "ã": 0xE3,
+        "é": 0xE9,
+        "í": 0xED,
+        "ó": 0xF3,
+        "Ó": 0xD3,
+    }
+    for char, code in expected_missing.items():
+        assert missing[char] == code
+
 
 def test_profile_offsets_are_ordered():
     assert CHARACTER_TABLE_OFFSET < CHARACTER_TABLE_END
