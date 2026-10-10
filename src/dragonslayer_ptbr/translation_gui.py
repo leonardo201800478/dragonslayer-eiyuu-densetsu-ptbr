@@ -16,6 +16,7 @@ from .translation_catalog import (
     write_qa_report,
 )
 
+
 class TranslationWorkbench(tk.Tk):
     """Interface desktop simples para revisar dumps extraídos por ferramentas externas."""
 
