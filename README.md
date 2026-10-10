@@ -52,6 +52,7 @@ A regra do projeto é não transformar uma hipótese em conhecimento específico
 - **[docs/project-roadmap.md](docs/project-roadmap.md)** — roadmap completo, gates e critérios para chegar ao primeiro teste PT-BR seguro.
 - **[docs/third-party-tooling-and-validation-plan.md](docs/third-party-tooling-and-validation-plan.md)** — plano de validação, comparação de ferramentas externas, gates e evidências necessárias antes de escrever a ROM.
 - **[docs/tooling-audit.md](docs/tooling-audit.md)** — auditoria local segura do pacote `ferramentas/`, com verificação de hash da ROM e inspeção estática do dumper legado.
+- **[docs/translation-workbench.md](docs/translation-workbench.md)** — catálogo editável para traduzir scripts, preservar marcadores e aplicar alterações somente em cópias de revisão.
 - `reports/` — resultados reproduzíveis das análises.
 - `tests/` — testes automatizados.
 

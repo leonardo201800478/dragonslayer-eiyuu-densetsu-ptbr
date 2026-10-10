@@ -3,6 +3,11 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from .analysis.character_table import (
+    missing_portuguese_accents,
+    read_character_table,
+    write_character_table_report,
+)
 from .analysis.japanese_text import scan_japanese_text, write_japanese_text_report
 from .analysis.m68k_a3_flow import (
     scan_a3_byte_reads,
@@ -190,6 +195,17 @@ def build_parser() -> argparse.ArgumentParser:
     indexed.add_argument("--output", type=Path, default=Path("reports/m68k-indexed-reads.md"))
     indexed.add_argument("--context", type=lambda value: int(value, 0), default=16)
 
+    character_table = sub.add_parser(
+        "inspect-character-table",
+        help="gera inventário da tabela de códigos e dos acentos portugueses",
+    )
+    character_table.add_argument("--rom", required=True, type=Path)
+    character_table.add_argument(
+        "--output",
+        type=Path,
+        default=Path("reports/character-table-analysis.md"),
+    )
+
     japanese = sub.add_parser(
         "scan-japanese-text",
         help="localiza regiões reais de texto japonês Shift-JIS",
@@ -211,6 +227,15 @@ def main() -> int:
 
     if not args.rom.is_file():
         raise SystemExit(f"ROM não encontrada: {args.rom}")
+
+    if args.command == "inspect-character-table":
+        entries = read_character_table(args.rom.read_bytes())
+        write_character_table_report(entries, args.output)
+        missing = len(missing_portuguese_accents(entries))
+        print(f"Entradas de 16 bits analisadas: {len(entries)}")
+        print(f"Códigos acentuados PT-BR ausentes: {missing}")
+        print(f"Relatório: {args.output}")
+        return 0
 
     if args.command == "scan-japanese-text":
         if args.minimum_characters < 1:
