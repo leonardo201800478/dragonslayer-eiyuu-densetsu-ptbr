@@ -80,7 +80,7 @@ def import_external_dump(source_path: Path, catalog_path: Path) -> int:
     entries: list[dict[str, Any]] = []
     for index, record in enumerate(raw_records, start=1):
         if not isinstance(record, dict):
-            raise ValueError(f"Registro {index} não é um objeto/cabeçalho de CSV.")
+            raise TypeError(f"Registro {index} não é um objeto/cabeçalho de CSV.")
         entries.append(_make_entry(record, index, source_path))
 
     catalog_path.parent.mkdir(parents=True, exist_ok=True)
@@ -100,12 +100,12 @@ def load_catalog(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     if isinstance(payload, list):
         payload = {"catalog_version": CATALOG_VERSION, "entries": payload}
     if not isinstance(payload, dict) or not isinstance(payload.get("entries"), list):
-        raise ValueError("Catálogo inválido: esperado objeto com uma lista 'entries'.")
+        raise TypeError("Catálogo inválido: esperado objeto com uma lista 'entries'.")
     entries = payload["entries"]
     seen: set[str] = set()
     for index, entry in enumerate(entries, start=1):
         if not isinstance(entry, dict) or not isinstance(entry.get("source"), str):
-            raise ValueError(f"Entrada {index} precisa ser um objeto com campo 'source' textual.")
+            raise TypeError(f"Entrada {index} precisa ser um objeto com campo 'source' textual.")
         entry.setdefault("id", f"entry:{index}")
         entry.setdefault("translation", "")
         entry.setdefault("tags", TAG_PATTERN.findall(entry["source"]))
