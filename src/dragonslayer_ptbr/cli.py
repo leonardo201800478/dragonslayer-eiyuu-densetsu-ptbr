@@ -4,7 +4,11 @@ import argparse
 from pathlib import Path
 
 from .analysis.japanese_text import scan_japanese_text, write_japanese_text_report
-from .analysis.character_table import read_character_table, write_character_table_report
+from .analysis.character_table import (
+    missing_portuguese_accents,
+    read_character_table,
+    write_character_table_report,
+)
 from .analysis.m68k_a3_flow import (
     scan_a3_byte_reads,
     scan_a3_definitions,
@@ -227,13 +231,7 @@ def main() -> int:
     if args.command == "inspect-character-table":
         entries = read_character_table(args.rom.read_bytes())
         write_character_table_report(entries, args.output)
-        missing = len({
-            char for char, code in __import__(
-                "dragonslayer_ptbr.analysis.character_table",
-                fromlist=["PORTUGUESE_ACCENTED"],
-            ).PORTUGUESE_ACCENTED.items()
-            if code not in {entry.code for entry in entries}
-        })
+        missing = len(missing_portuguese_accents(entries))
         print(f"Entradas de 16 bits analisadas: {len(entries)}")
         print(f"Códigos acentuados PT-BR ausentes: {missing}")
         print(f"Relatório: {args.output}")
