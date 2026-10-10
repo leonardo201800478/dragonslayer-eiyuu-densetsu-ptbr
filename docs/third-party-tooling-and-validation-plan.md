@@ -67,7 +67,7 @@ As ferramentas abaixo foram selecionadas para complementar — não substituir a
 
 1. Confirmar tamanho, CRC32 e SHA-1 da ROM local.
 2. Registrar o commit do projeto e as versões de Python, pytest e Ruff.
-3. Corrigir o teste de referências de endereços que falha no CI. O contrato deve esclarecer se referências de 3 e 4 bytes sobrepostas são entradas distintas ou se devem ser deduplicadas; não apenas alterar o número esperado sem justificar.
+3. Contrato do scanner literal de endereços esclarecido: ocorrências de 3 e 4 bytes são preservadas por largura e offset, mesmo quando se sobrepõem. O scanner enumera candidatos binários, não referências semânticas confirmadas; um byte zero precedente pode produzir um candidato de 32 bits adicional. Há teste de regressão para esse caso. O CI deve confirmar a correção em Python 3.13 e 3.14.
 4. Executar:
    ```powershell
    python -m pytest -q
