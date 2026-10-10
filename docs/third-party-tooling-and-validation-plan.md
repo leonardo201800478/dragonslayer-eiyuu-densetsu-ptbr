@@ -94,3 +94,14 @@ A ROM de referência registrada no projeto tem 2 MiB, CRC32 01BC1604 e SHA-1 F67
 A interface implementada normaliza dumps JSON/CSV comuns e oferece catalogação de TXT pelo fluxo anterior. Ainda não existe adaptador universal para formatos proprietários. O nome e a versão exata da ferramenta externa, com um exemplo de dump real, são necessários antes de declarar suporte específico ou automatizar a reinserção.
 
 Não marcar qualquer saída como pronta para ROM apenas porque os marcadores passaram no QA textual.
+
+
+## Estado de execução registrado em 10/10/2026
+
+A bancada foi executada localmente com um catálogo de **11.037 entradas**. Uma tradução de teste permaneceu salva após fechar e reabrir a interface, e o QA dessa entrada não indicou divergências de marcadores. A suíte Python local apresentou **111 testes aprovados**, e o Ruff retornou `All checks passed!`.
+
+Esse resultado cobre a interface, a persistência observada e as verificações automatizadas no checkout testado. Não é evidência de compatibilidade com uma ferramenta de inserção nem de que o texto foi renderizado no jogo.
+
+**Gate B — parcialmente verificado:** o salvamento de uma entrada e a validação dos marcadores passaram no teste manual; a revisão de um lote real e a preservação integral dos metadados em um dump externo ainda precisam ser comprovadas.
+
+**Gate C — pendente:** ainda é necessário identificar o formato nativo e a versão exata da ferramenta externa, criar um adaptador específico e demonstrar um round-trip em amostra pequena.
