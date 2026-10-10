@@ -3,12 +3,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .analysis.japanese_text import scan_japanese_text, write_japanese_text_report
 from .analysis.character_table import (
     missing_portuguese_accents,
     read_character_table,
     write_character_table_report,
 )
+from .analysis.japanese_text import scan_japanese_text, write_japanese_text_report
 from .analysis.m68k_a3_flow import (
     scan_a3_byte_reads,
     scan_a3_definitions,
