@@ -34,4 +34,8 @@ def test_scan_address_references_accepts_custom_targets(
     assert main() == 0
     report = report_path.read_text(encoding="utf-8")
     assert "## target_0x000020" in report
-    assert "Total: 1" in report
+    # O zero anterior também forma um candidato literal de 32 bits.
+    # O scanner preserva ambos os candidatos sobrepostos; nenhum prova uma referência real.
+    assert "Total: 2" in report
+    assert "| 0x00000F | 4 |" in report
+    assert "| 0x000010 | 3 |" in report
