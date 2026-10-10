@@ -1,144 +1,82 @@
 # Dragon Slayer: Eiyuu Densetsu — PT-BR
 
-Projeto de engenharia reversa e tradução para português brasileiro da versão japonesa de **Dragon Slayer: Eiyuu Densetsu (Mega Drive)**.
+Projeto para traduzir e adaptar ao português brasileiro a versão japonesa de **Dragon Slayer: Eiyuu Densetsu (Mega Drive)**, usando ferramentas de terceiros para as tarefas que elas já executam e código Python próprio para integrar o fluxo, facilitar a tradução e validar os resultados.
 
-## Objetivo
+A ROM original permanece local e **não é distribuída pelo repositório**.
 
-Analisar a ROM, identificar fonte/charset, localizar e extrair textos, preservar códigos de controle, traduzir, realocar textos quando necessário, corrigir ponteiros, inserir a tradução e validar a ROM final.
+## Nova divisão de responsabilidades
 
-A ROM japonesa original permanece local e **não é distribuída pelo repositório**.
+### Ferramentas de terceiros
+Use as ferramentas externas já empregadas no projeto para extrair os scripts e, quando comprovadamente suportado, executar operações específicas do formato do jogo. O projeto não deve duplicar um dumper, assembler, empacotador ou inserter que já funcione para esse fluxo.
 
-## Estado atual
+As ferramentas locais conhecidas incluem Atlas, slayer1_dumper, font_packer, asm68 e xkas_gbc. A presença desses arquivos não prova que todos sejam necessários ou compatíveis com cada etapa. Registre ferramenta, versão, parâmetros e formato gerado. Não execute operações de escrita contra a ROM original.
 
-A investigação já estabeleceu uma base técnica sólida, mas o projeto **ainda não está na fase de inserção de tradução**.
+### Código Python do projeto
+- importar e normalizar dumps de terceiros para um catálogo de tradução;
+- oferecer uma interface desktop simples para tradução e adaptação PT-BR;
+- preservar e validar marcadores inline, comandos e metadados disponíveis;
+- apoiar glossário, revisão, busca, filtros e relatórios de QA;
+- exportar materiais para revisão e devolver os arquivos ao fluxo externo somente conforme o formato suportado pela ferramenta usada;
+- manter os analisadores 68000 próprios como ferramentas auxiliares para investigar lacunas, não como requisito para traduzir textos já extraídos.
 
-### Confirmado
+**Importante:** o catálogo normalizado e o CSV exportado são formatos de trabalho. Eles não são automaticamente arquivos prontos para reinserção na ROM.
 
-- ROM japonesa de 2 MiB.
-- CRC32 `01BC1604`.
-- SHA-1 `F67C9139BBC93F171E274A5CD3FBA66480CD8244`.
-- Header Mega Drive válido.
-- **Shift-JIS** nos trechos japoneses identificados.
-- 47 regiões fortemente sustentadas como texto japonês.
-- Controles binários misturados ao texto.
-- `0x01` confirmado como separador/quebra na abertura.
-- `0x06 xx yy` confirmado como comando de três bytes, ainda sem semântica completa.
-- `0x0E` observado como controle.
-- `0x00` observado como terminador em estruturas textuais.
-- Tabela explícita de códigos em `0x1A551A`, observada até `0x1A62D2`.
-- A tabela contém códigos latinos maiúsculos acentuados; os minúsculos acentuados portugueses observados não estão presentes.
-- O decoder estrutural consegue atravessar a abertura preservando os controles.
+## Começar
 
-### Ainda não confirmado
+Requisitos: Python 3.10 ou superior; no Windows, a instalação padrão do Python normalmente inclui Tkinter.
 
-- rotina 68000 definitiva do engine de texto;
-- gramática completa dos controles;
-- limites exatos das entradas;
-- mecanismo de seleção dos scripts;
-- tabela/formato definitivo de ponteiros;
-- relação completa entre códigos e glifos;
-- formato da fonte;
-- compressão, caso exista para algum recurso;
-- allocator/realocação;
-- encoder/importador definitivo;
-- patch PT-BR.
+    python -m pip install -e ".[dev]"
+    python -m pytest -q
+    ruff check .
 
-A regra do projeto é não transformar uma hipótese em conhecimento específico do jogo sem evidência direta da ROM/código.
+### Abrir a interface de tradução
+
+    dslayer-ptbr-gui --catalog translation/catalog.json
+
+Ou, sem instalar o comando:
+
+    python -m dragonslayer_ptbr.translation_gui --catalog translation/catalog.json
+
+Na interface, use **Importar dump JSON/CSV** para normalizar um dump estruturado de terceiros. Os nomes de campos mais comuns são reconhecidos, como source, original, japanese, text, translation, translated, pt_br e id. O importador não consegue inferir todos os formatos proprietários; adapte o mapeamento quando o formato da ferramenta for diferente.
+
+### Dumps de texto em arquivos TXT
+
+Para as ferramentas que exportam diretivas e texto em arquivos TXT, use o catalogador existente:
+
+    python -m dragonslayer_ptbr.text.translation_workbench export --source-dir ".\ferramentas\text" --catalog ".\translation\catalog.json"
+
+Ajuste --source-dir para a pasta real produzida pela ferramenta. O catalogador legado procura linhas com texto japonês e preserva a linha completa para revisão.
+
+### Revisar e validar
+
+- Edite a tradução no campo PT-BR, mantendo marcadores como <LINE>, <WAIT>, <COLOR 1E> e demais diretivas na mesma ordem.
+- Use busca e o filtro de pendências para organizar o trabalho.
+- Clique em **Validar catálogo** para gerar translation-qa-report.json.
+- Exporte CSV quando precisar revisar em planilha ou fazer a ponte com outro processo.
+- Salve cópias de trabalho; não sobrescreva dumps originais de terceiros.
+
+O QA atual verifica presença de tradução e sequência de marcadores. Ele **não** confirma largura da caixa, suporte aos acentos na fonte, codificação final, limites de bytes, ponteiros ou funcionamento no emulador.
+
+## Estado técnico do jogo
+
+A análise prévia registrou uma ROM japonesa de 2 MiB, CRC32 01BC1604 e SHA-1 F67C9139BBC93F171E274A5CD3FBA66480CD8244. Shift-JIS foi identificado em regiões textuais e controles binários aparecem misturados aos scripts. Esses achados continuam úteis para diagnóstico, mas não são pré-requisitos para trabalhar nos textos que as ferramentas externas já extraíram.
+
+O mapeamento de caracteres PT-BR, os limites de texto e a compatibilidade de reinserção precisam ser verificados com a ferramenta real e o jogo. Não assumir que CP932, UTF-8 ou uma tradução com os marcadores preservados será aceita pelo inserter.
 
 ## Documentação
 
-- **[docs/analysis-results.md](docs/analysis-results.md)** — evidências e resultados técnicos consolidados.
-- **[docs/reverse-engineering.md](docs/reverse-engineering.md)** — estratégia e critérios da engenharia reversa.
-- **[docs/project-roadmap.md](docs/project-roadmap.md)** — roadmap completo, gates e critérios para chegar ao primeiro teste PT-BR seguro.
-- **[docs/third-party-tooling-and-validation-plan.md](docs/third-party-tooling-and-validation-plan.md)** — plano de validação, comparação de ferramentas externas, gates e evidências necessárias antes de escrever a ROM.
-- **[docs/tooling-audit.md](docs/tooling-audit.md)** — auditoria local segura do pacote `ferramentas/`, com verificação de hash da ROM e inspeção estática do dumper legado.
-- **[docs/translation-workbench.md](docs/translation-workbench.md)** — catálogo editável para traduzir scripts, preservar marcadores e aplicar alterações somente em cópias de revisão.
-- `reports/` — resultados reproduzíveis das análises.
-- `tests/` — testes automatizados.
+- [Bancada de tradução](docs/translation-workbench.md)
+- [Plano de ferramentas de terceiros e validação](docs/third-party-tooling-and-validation-plan.md)
+- [Auditoria segura das ferramentas locais](docs/tooling-audit.md)
+- [Resultados técnicos anteriores](docs/analysis-results.md)
+- [Engenharia reversa auxiliar](docs/reverse-engineering.md)
+- [Roadmap revisado](docs/project-roadmap.md)
 
-## Próximo marco
+## Princípios do projeto
 
-A próxima etapa é a **localização do engine 68000**, não a escrita da ROM.
-
-O objetivo é comprovar uma cadeia:
-
-`seleção do script → referência → leitura do byte → teste de controle → processamento → acesso à fonte/renderização`.
-
-O plano atual prioriza estabilizar o CI, reproduzir as contagens do CFG e comparar o decoder próprio com desassembladores externos antes de tentar rastrear a execução em emulador. Consulte o [plano de ferramentas e validação](docs/third-party-tooling-and-validation-plan.md).
-
-Somente depois serão implementados encoder, ponteiros de escrita, realocação e patch.
-
-## Primeiro teste de tradução
-
-O primeiro teste PT-BR será um **vertical slice mínimo e reversível**, não uma tradução completa.
-
-Antes dele, o projeto deverá provar:
-
-1. formato do script;
-2. terminador;
-3. controles;
-4. limites das entradas;
-5. rotina de leitura;
-6. seleção/referência do script;
-7. encoder reversível;
-8. realocação segura, se necessária;
-9. validação de referências e sobreposição;
-10. execução da ROM modificada no emulador sem quebrar o fluxo.
-
-O marco será chamado **M1 — Primeiro Texto PT-BR Executável**.
-
-## Instalação e análise
-
-```bash
-python -m pip install -e ".[dev]"
-python -m pytest -q
-ruff check .
-```
-
-Exemplo de análise:
-
-```powershell
-python -m dragonslayer_ptbr analyze `
-  --rom "roms/original/Dragon Slayer - Eiyuu Densetsu (Japan).md" `
-  --report reports/rom-analysis.json
-```
-
-Os candidatos encontrados pelos analisadores são heurísticos. Nenhum offset deve ser tratado como confirmado sem validação e documentação.
-
-Auditoria estática das ferramentas locais (não executa binários nem modifica a ROM):
-
-```powershell
-python -m dragonslayer_ptbr.tooling_audit `
-  --tools-dir ferramentas `
-  --rom "caminho/para/ROM.bin" `
-  --output reports/tooling-audit.json
-```
-
-Consulte [docs/tooling-audit.md](docs/tooling-audit.md) para os limites e critérios de segurança.
-
-## Estrutura
-
-```text
-src/dragonslayer_ptbr/
-├── analysis/       # análise da imagem e engenharia reversa
-├── text/           # decoder, encoder, tabelas e extrator
-├── pointers/       # leitura, escrita e realocação
-├── profiles/       # conhecimento específico do jogo
-└── cli.py
-```
-
-## Ponto de parada atual
-
-A análise M68K avançou para um CFG conservador baseado no vetor de reset real da ROM.
-
-- vetor de reset: 0x010620;
-- os relatórios históricos contêm contagens divergentes de blocos e devem ser reproduzidos com a mesma configuração antes de comparação;
-- chamadas JSR abs.l e destinos foram acompanhados em análises anteriores;
-- várias rotinas com RTS foram identificadas;
-- decoder ampliado incrementalmente conforme os opcodes reais foram confirmados.
-
-Suporte/testes adicionados nesta etapa incluem BTST #imm,<EA>, MOVE.W SR,<EA>, NEGX.B/W/L <EA> e LEA abs.l para A0–A7.
-
-Isso ainda não significa que o engine de texto foi localizado. A próxima investigação continua sendo corrigir/verificar o CI, estabilizar o CFG, comparar desassemblagem, e rastrear registradores, leituras de bytes, controles e chamadas até chegar à fonte/renderização.
-
-O projeto permanece em análise somente leitura; a ROM japonesa original não é modificada nem distribuída.
+1. Reutilizar ferramentas externas comprovadas em vez de reimplementar o que elas já fazem.
+2. Não executar ferramentas de terceiros sem conhecer seus efeitos e arquivos de entrada/saída.
+3. Nunca modificar a ROM original; operar em cópias verificadas.
+4. Preservar diretivas, controles e metadados durante a tradução.
+5. Não marcar uma tradução como pronta para ROM apenas porque o QA textual passou.
+6. Documentar claramente quais formatos são suportados e quais ainda precisam de um adaptador específico.
