@@ -8,11 +8,11 @@ reconhecidos permanecem preservados como segmentos UNKNOWN_MARKER.
 from __future__ import annotations
 
 import re
-from dataclasses import asdict, dataclass
-from enum import StrEnum
+from dataclasses import dataclass
+from enum import Enum
 
 
-class LineKind(StrEnum):
+class LineKind(str, Enum):
     DIRECTIVE = "DIRECTIVE"
     FILE_REFERENCE = "FILE_REFERENCE"
     COMMENT = "COMMENT"
@@ -21,13 +21,12 @@ class LineKind(StrEnum):
     OTHER = "OTHER"
 
 
-class SegmentKind(StrEnum):
+class SegmentKind(str, Enum):
     TEXT = "TEXT"
     DICTIONARY_MARKER = "DICTIONARY_MARKER"
     LINE_MARKER = "LINE_MARKER"
     CONTROL_FLOW_MARKER = "CONTROL_FLOW_MARKER"
     HEX_BYTE = "HEX_BYTE"
-    KNOWN_MARKER = "KNOWN_MARKER"
     UNKNOWN_MARKER = "UNKNOWN_MARKER"
 
 
@@ -39,12 +38,7 @@ COMMENT = re.compile(r"^\s*(?://|;)")
 HEX_BYTE = re.compile(r"<\$[0-9A-Fa-f]{2}>")
 DICTIONARY_MARKER = re.compile(r"<DICT\s+[0-9A-Fa-f]{2}>", re.IGNORECASE)
 
-CONTROL_FLOW_MARKERS = {
-    "<JMP.L>",
-    "<JMP>",
-    "<RET>",
-    "<END>",
-}
+CONTROL_FLOW_MARKERS = {"<JMP.L>", "<JMP>", "<RET>", "<END>", "<END 06>", "<RET *>"}
 LINE_MARKERS = {"<LINE>"}
 
 
@@ -83,13 +77,11 @@ def classify_segment(value: str) -> SegmentKind:
         return SegmentKind.CONTROL_FLOW_MARKER
     if HEX_BYTE.fullmatch(value):
         return SegmentKind.HEX_BYTE
-    if value.upper() in {"<END 06>", "<RET *>"}:
-        return SegmentKind.CONTROL_FLOW_MARKER
     return SegmentKind.UNKNOWN_MARKER
 
 
 def classify_line(line: str) -> ClassifiedLine:
-    """Classifica uma linha de script, preservando seu conteúdo byte-textual."""
+    """Classifica uma linha de script, preservando seu conteúdo textual."""
     if FILE_REFERENCE.search(line):
         return ClassifiedLine(LineKind.FILE_REFERENCE, line, ())
     if DIRECTIVE.match(line):
@@ -108,13 +100,16 @@ def classify_line(line: str) -> ClassifiedLine:
     if cursor < len(line):
         segments.append(Segment(SegmentKind.TEXT, line[cursor:]))
 
-    if not segments:
-        kind = LineKind.OTHER
-    elif any(segment.kind == SegmentKind.TEXT and JAPANESE_TEXT.search(segment.value) for segment in segments):
-        has_marker = any(segment.kind != SegmentKind.TEXT for segment in segments)
-        kind = LineKind.MIXED if has_marker else LineKind.TEXT
-    elif any(segment.kind != SegmentKind.TEXT for segment in segments):
-        kind = LineKind.OTHER
+    japanese_text = any(
+        segment.kind == SegmentKind.TEXT and JAPANESE_TEXT.search(segment.value)
+        for segment in segments
+    )
+    has_marker = any(segment.kind != SegmentKind.TEXT for segment in segments)
+
+    if japanese_text and has_marker:
+        kind = LineKind.MIXED
+    elif japanese_text:
+        kind = LineKind.TEXT
     else:
         kind = LineKind.OTHER
 
