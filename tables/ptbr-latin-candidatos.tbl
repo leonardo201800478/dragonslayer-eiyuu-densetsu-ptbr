@@ -1,0 +1,16 @@
+# Caracteres latinos minúsculos PT-BR ausentes da tabela observada
+# Códigos candidatos para investigação; NAO usar para escrever a ROM ainda.
+# É necessário confirmar a rotina de lookup e a disponibilidade dos glifos.
+
+00E0=à
+00E1=á
+00E2=â
+00E3=ã
+00E7=ç
+00E9=é
+00EA=ê
+00ED=í
+00F3=ó
+00F4=ô
+00F5=õ
+00FA=ú
