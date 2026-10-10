@@ -20,7 +20,7 @@ def _source_hash(text: str) -> str:
 def _split_line_ending(line: str) -> tuple[str, str]:
     if line.endswith("\r\n"):
         return line[:-2], "\r\n"
-    if line.endswith("\n") or line.endswith("\r"):
+    if line.endswith(("\n", "\r")):
         return line[:-1], line[-1:]
     return line, ""
 
@@ -90,7 +90,7 @@ def _load_catalog(path: Path) -> list[dict[str, Any]]:
         raise ValueError(f"Versão de catálogo não suportada: {payload.get('catalog_version')!r}")
     entries = payload.get("entries")
     if not isinstance(entries, list):
-        raise ValueError("Catálogo inválido: campo 'entries' deve ser uma lista")
+        raise TypeError("Catálogo inválido: campo 'entries' deve ser uma lista")
     return entries
 
 
@@ -130,7 +130,7 @@ def apply_catalog(
             raise ValueError(f"Caminho inseguro no catálogo: {relative!r}")
         translation = entry.get("translation", "")
         if not isinstance(translation, str):
-            raise ValueError(f"Tradução inválida em {entry.get('id', relative)}")
+            raise TypeError(f"Tradução inválida em {entry.get('id', relative)}")
         if "\n" in translation or "\r" in translation:
             raise ValueError(f"Tradução não pode conter quebra de linha: {entry.get('id', relative)}")
         if not translation.strip():
