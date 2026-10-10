@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from dragonslayer_ptbr.translation_gui import (
+from dragonslayer_ptbr.translation_catalog import (
     import_external_dump,
     load_catalog,
     validate_entry,
