@@ -26,6 +26,12 @@ class SegmentKind(str, Enum):
     DICTIONARY_MARKER = "DICTIONARY_MARKER"
     LINE_MARKER = "LINE_MARKER"
     CONTROL_FLOW_MARKER = "CONTROL_FLOW_MARKER"
+    WAIT_MARKER = "WAIT_MARKER"
+    COLOR_MARKER = "COLOR_MARKER"
+    HERO_MARKER = "HERO_MARKER"
+    FLAG_MARKER = "FLAG_MARKER"
+    CODE_MARKER = "CODE_MARKER"
+    NAME_MARKER = "NAME_MARKER"
     HEX_BYTE = "HEX_BYTE"
     UNKNOWN_MARKER = "UNKNOWN_MARKER"
 
@@ -38,7 +44,22 @@ COMMENT = re.compile(r"^\s*(?://|;)")
 HEX_BYTE = re.compile(r"<\$[0-9A-Fa-f]{2}>")
 DICTIONARY_MARKER = re.compile(r"<DICT\s+[0-9A-Fa-f]{2}>", re.IGNORECASE)
 
-CONTROL_FLOW_MARKERS = {"<JMP.L>", "<JMP>", "<RET>", "<END>", "<END 06>", "<RET *>"}
+WAIT_MARKER = re.compile(r"<WAIT(?:\s+CLEAR)?>", re.IGNORECASE)
+COLOR_MARKER = re.compile(r"<COLOR(?:\s+[0-9A-Fa-f]{2}|\s+OFF)>", re.IGNORECASE)
+HERO_MARKER = re.compile(r"<HERO\s+[0-9]+>", re.IGNORECASE)
+FLAG_MARKER = re.compile(r"<FLAG\s+[0-9A-Fa-f]{2}>", re.IGNORECASE)
+CODE_MARKER = re.compile(r"<CODE\s+[0-9A-Fa-f]{2}>", re.IGNORECASE)
+NAME_MARKER = re.compile(r"<NAME>", re.IGNORECASE)
+
+CONTROL_FLOW_MARKERS = {
+    "<JMP.L>",
+    "<JMP>",
+    "<RET>",
+    "<END>",
+    "<END 06>",
+    "<RET *>",
+}
+CONTROL_FLOW_PARAMETERIZED = re.compile(r"<JMP\s+[0-9A-Fa-f]{2}>", re.IGNORECASE)
 LINE_MARKERS = {"<LINE>"}
 
 
@@ -66,15 +87,27 @@ class ClassifiedLine:
 
 
 def classify_segment(value: str) -> SegmentKind:
-    """Classifica um segmento sem remover nem normalizar seu conteúdo."""
+    """Classifica sintaticamente um segmento sem alterar seu conteúdo."""
     if not INLINE_TOKEN.fullmatch(value):
         return SegmentKind.TEXT
     if DICTIONARY_MARKER.fullmatch(value):
         return SegmentKind.DICTIONARY_MARKER
     if value.upper() in LINE_MARKERS:
         return SegmentKind.LINE_MARKER
-    if value.upper() in CONTROL_FLOW_MARKERS:
+    if value.upper() in CONTROL_FLOW_MARKERS or CONTROL_FLOW_PARAMETERIZED.fullmatch(value):
         return SegmentKind.CONTROL_FLOW_MARKER
+    if WAIT_MARKER.fullmatch(value):
+        return SegmentKind.WAIT_MARKER
+    if COLOR_MARKER.fullmatch(value):
+        return SegmentKind.COLOR_MARKER
+    if HERO_MARKER.fullmatch(value):
+        return SegmentKind.HERO_MARKER
+    if FLAG_MARKER.fullmatch(value):
+        return SegmentKind.FLAG_MARKER
+    if CODE_MARKER.fullmatch(value):
+        return SegmentKind.CODE_MARKER
+    if NAME_MARKER.fullmatch(value):
+        return SegmentKind.NAME_MARKER
     if HEX_BYTE.fullmatch(value):
         return SegmentKind.HEX_BYTE
     return SegmentKind.UNKNOWN_MARKER
