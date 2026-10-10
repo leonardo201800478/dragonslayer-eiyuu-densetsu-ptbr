@@ -96,3 +96,54 @@ A melhor estratégia é **integrar e validar a cadeia existente**, sem criar um 
 ## Conclusão
 
 A principal oportunidade não é adicionar mais ferramentas aleatórias: é construir uma ponte segura, reversível e testada entre a bancada Python e os scripts Atlas já existentes. A prioridade imediata é auditar o script nativo e a tabela de caracteres, preparar um fixture pequeno e validar o round-trip sem tocar na ROM original.
+
+
+## Passo 1 — Auditoria dos scripts Atlas e cadeia de inserção
+
+**Status em 10/10/2026: inspeção estática concluída para os arquivos listados abaixo; execução controlada ainda pendente.** A auditoria consultou os arquivos versionados no GitHub. Não executou Atlas, dumper, font packer nem assemblers, e não abriu nem modificou uma ROM.
+
+### Arquivos inspecionados
+
+- `ferramentas/readme.txt`
+- `ferramentas/journal.txt`
+- `ferramentas/tools/dump TEXT.bat`
+- `ferramentas/tools/insert TEXT.bat`
+- `ferramentas/tools/insert BINARY.bat`
+- `ferramentas/tools/insert FONT.bat`
+- `ferramentas/tools/insert ASM.bat`
+
+### Fluxo observado
+
+1. **Dump de texto:** `dump TEXT.bat` cria diretórios `binary`, `insert`, `logs`, `table` e `text`; depois chama `slayer1_dumper DUMP_FILE` e `DUMP_STRINGS` sobre `copy of Dragon Slayer (J) [!].bin`, com logs separados.
+2. **Inserção de texto:** `insert TEXT.bat` chama Atlas primeiro com `text//script_init.txt`; em seguida processa individualmente os scripts `text//script_00.txt`, `script_01.txt` e uma sequência extensa de `script_XX.txt`, redirecionando cada saída para `logs//log_atlas_XX.txt`.
+3. **Inserção de binários:** `insert BINARY.bat` chama `slayer1_dumper INSERT_FILE "Dragon Slayer (J) [!].bin" 0 E0` e grava a saída em `log_encode.txt`.
+4. **Fonte:** `insert FONT.bat` chama `font_packer REPACK` cinco vezes para arquivos de fonte e intervalos fixos da ROM.
+5. **ASM:** `insert ASM.bat` chama `xkas_gbc "text//script_asm.txt" "Dragon Slayer (J) [!].bin"` e grava a saída em `log_xkas.txt`.
+
+Os nomes de arquivos, argumentos e a ordem acima vêm diretamente dos BAT versionados. Não foi possível concluir apenas por essa inspeção se todos os passos são necessários para cada build traduzida.
+
+### Diretivas Atlas registradas na documentação do pacote
+
+O `journal.txt` descreve extensões do Atlas 1.06 modificado: `#FILL`, `#WARN`, `#SAVEPC`, `#LOADPC`, `#INSERT`, `#SETINDEX`, `#WRITEINDEX`, `#SAVEINDEX`, `#LOADINDEX`, `#ALIGN`, `#W08BYTE`, `#EMBCLEAR`, `#EMBSETREL`, `#EMBWRITEREL`, `#SAVEPTRTABLE` e `#LOADPTRTABLE`, além de modos de endereçamento específicos. Essa lista é documentação do pacote; antes de escrever um parser, ainda precisamos verificar as diretivas usadas nos scripts Atlas reais e sua gramática exata.
+
+### Riscos concretos
+
+- **Escrita na ROM:** os BATs de inserção recebem diretamente o caminho do arquivo de ROM como argumento. A segurança depende de usar uma cópia de trabalho; não há proteção automática evidente nesses comandos.
+- **Falhas mascaradas:** cada chamada redireciona saída para log, mas os BATs inspecionados não demonstram checagem explícita de `ERRORLEVEL` nem interrupção imediata após falha.
+- **Estado compartilhado:** `script_init.txt` é executado antes dos demais scripts, indicando inicialização de índices/estado compartilhado segundo o journal. Não se deve inserir scripts isolados sem compreender essa dependência.
+- **Build em múltiplas etapas:** texto, binários, fonte e ASM usam ferramentas e arquivos distintos. Uma ROM final consistente pode depender da ordem correta; isso ainda deve ser validado.
+- **Assembler:** o arquivo chama `xkas_gbc`, embora o projeto seja para Mega Drive. O nome, isoladamente, não prova incompatibilidade; é preciso identificar a versão executável e confirmar a sintaxe/saída antes de alterar essa etapa.
+- **Codificação/fonte:** o journal descreve Shift-JIS, tabelas de conversão de código para tile e cinco tipos de fonte. A inserção de acentos não pode ser considerada resolvida pelo simples uso de UTF-8 no catálogo.
+
+### Decisões técnicas resultantes
+
+1. Não editar nem regenerar scripts Atlas completos a partir do catálogo sem um parser que preserve todas as diretivas e os bytes não traduzíveis.
+2. Implementar inicialmente um analisador **somente leitura** para classificar linhas como diretiva, comentário, dado binário/inserido ou texto candidato.
+3. Criar fixtures de teste a partir de pequenos trechos dos scripts versionados e garantir que análise + serialização sem tradução produz conteúdo idêntico.
+4. Criar um preflight de build que confirme os arquivos necessários, resolva os caminhos, copie a ROM para um diretório temporário e calcule SHA-256 antes/depois.
+5. Atualizar os BATs ou criar um wrapper Python apenas após mapear os códigos de saída e a ordem necessária; qualquer ferramenta que falhe deve interromper a build.
+6. Antes de mudar a fonte, inspecionar os dados de tabela/fonte e demonstrar um glifo de teste dentro do emulador.
+
+### Limitações e próxima ação
+
+A árvore consultada não forneceu nesta passagem o conteúdo dos próprios `script_init.txt` e `script_XX.txt`; por isso, a gramática Atlas real ainda não foi auditada linha a linha. O próximo artefato necessário é um pequeno conjunto de scripts nativos do diretório `text` (começando por `script_init.txt` e um `script_00.txt` que contenha texto e diretivas). Com esses arquivos, podemos especificar e testar o parser sem adivinhar a sintaxe.
