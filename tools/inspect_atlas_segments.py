@@ -12,13 +12,16 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from dragonslayer_ptbr.text.atlas_segmenter import (
     LineKind,
+    SegmentKind,
     classify_line,
 )
+
+UNKNOWN_EXAMPLES_PER_MARKER = 3
 
 
 def inspect_directory(root: Path, limit: int) -> int:
@@ -33,6 +36,8 @@ def inspect_directory(root: Path, limit: int) -> int:
 
     line_counts: Counter[str] = Counter()
     segment_counts: Counter[str] = Counter()
+    unknown_counts: Counter[str] = Counter()
+    unknown_examples: dict[str, list[dict[str, object]]] = defaultdict(list)
     examples: list[dict[str, object]] = []
     decoding_errors: list[dict[str, str]] = []
     processed_lines = 0
@@ -50,6 +55,18 @@ def inspect_directory(root: Path, limit: int) -> int:
             processed_lines += 1
             for segment in result.segments:
                 segment_counts[segment.kind.value] += 1
+                if segment.kind is SegmentKind.UNKNOWN_MARKER:
+                    unknown_counts[segment.value] += 1
+                    marker_examples = unknown_examples[segment.value]
+                    if len(marker_examples) < UNKNOWN_EXAMPLES_PER_MARKER:
+                        marker_examples.append(
+                            {
+                                "file": path.name,
+                                "line": line_number,
+                                "line_kind": result.kind.value,
+                                "raw": line,
+                            }
+                        )
 
             if (
                 len(examples) < limit
@@ -63,6 +80,17 @@ def inspect_directory(root: Path, limit: int) -> int:
                     }
                 )
 
+    unknown_markers = [
+        {
+            "marker": marker,
+            "count": count,
+            "examples": unknown_examples[marker],
+        }
+        for marker, count in sorted(
+            unknown_counts.items(), key=lambda item: (-item[1], item[0])
+        )
+    ]
+
     report = {
         "root": str(root.resolve()),
         "encoding": "cp932",
@@ -72,12 +100,17 @@ def inspect_directory(root: Path, limit: int) -> int:
         "lines_processed": processed_lines,
         "line_counts": dict(line_counts),
         "segment_counts": dict(segment_counts),
+        "unknown_marker_occurrences": sum(unknown_counts.values()),
+        "unknown_marker_types": len(unknown_counts),
+        "unknown_marker_examples_per_type": UNKNOWN_EXAMPLES_PER_MARKER,
+        "unknown_markers": unknown_markers,
         "examples_limit": limit,
         "examples": examples,
         "decoding_errors": decoding_errors,
         "warning": (
-            "Classificação lexical experimental; UNKNOWN_MARKER e controles "
-            "exigem validação contra os scripts e a documentação Atlas."
+            "Classificação lexical experimental. UNKNOWN_MARKER é uma categoria "
+            "sintática, não um erro confirmado; valide os exemplos contra os "
+            "scripts e a documentação Atlas. Comentários não são segmentados."
         ),
     }
     print(json.dumps(report, ensure_ascii=False, indent=2))
