@@ -1,91 +1,75 @@
-# Bancada de tradução e adaptação PT-BR
+# Manual da bancada de tradução
 
-## Objetivo
+## Finalidade
 
-As ferramentas externas continuam sendo a fonte dos dumps e, quando compatível, da reinserção. Esta bancada não substitui Atlas, dumper ou inserter: normaliza formatos comuns para facilitar a tradução, mantém metadados disponíveis e executa QA textual.
+A bancada Python existe para editar e revisar traduções PT-BR. Ela **não substitui** o dumper, o Atlas ou as ferramentas de fonte e não transforma automaticamente um catálogo em uma ROM pronta.
 
-## Interface desktop
+## Iniciar
 
-Instale o projeto e abra um catálogo:
+Instale as dependências de desenvolvimento e abra o catálogo:
 
-    python -m pip install -e ".[dev]"
-    dslayer-ptbr-gui --catalog translation/catalog.json
+```powershell
+python -m pip install -e ".[dev]"
+dslayer-ptbr-gui --catalog translation/catalog.json
+```
 
-Ou execute:
+Alternativa:
 
-    python -m dragonslayer_ptbr.translation_gui --catalog translation/catalog.json
+```powershell
+python -m dragonslayer_ptbr.translation_gui --catalog translation/catalog.json
+```
 
-A interface inclui:
-- lista de entradas com indicação de pendência;
-- busca por ID, arquivo, origem, tradução ou contexto;
+Use o caminho real do catálogo do seu checkout; não sobrescreva os dumps originais.
+
+## Funcionalidades documentadas
+
+- lista de entradas e indicação de pendências;
+- busca por ID, arquivo, texto de origem, tradução ou contexto;
 - filtro de entradas pendentes;
-- painel de origem somente leitura e campo de tradução;
-- salvamento de catálogo JSON;
-- importação de dumps estruturados JSON/CSV;
+- origem em modo somente leitura e campo de tradução;
+- persistência em catálogo JSON;
+- importação de formatos genéricos JSON/CSV;
 - exportação CSV UTF-8;
-- relatório de QA textual.
+- QA textual e verificação de marcadores.
 
-## Importar dados de ferramentas externas
+## Importação
 
-Na interface, escolha **Importar dump JSON/CSV**. A importação reconhece listas JSON ou objetos contendo entries, texts ou strings, além de CSV com cabeçalhos. Campos de origem reconhecidos: source, original, japanese, text, original_text e jp. Campos de tradução reconhecidos: translation, translated, portuguese, pt_br e target. Para IDs, reconhece id, key, label e name.
+O importador genérico reconhece listas JSON, objetos com chaves comuns como `entries`, `texts` ou `strings`, e CSV com cabeçalhos. Entre os nomes de campo reconhecidos estão `source`, `original`, `japanese`, `text`, `original_text`, `jp`, `translation`, `translated`, `portuguese`, `pt_br` e `target`.
 
-O importador preserva os campos originais de cada registro e acrescenta os campos normalizados source, translation, tags, source_sha256 e status. Isso permite manter metadados do dumper quando estão presentes. Formatos proprietários ou estruturas diferentes exigirão um adaptador específico; não presumir que todos os dumps são reconhecidos.
+Isso não significa suporte universal a formatos proprietários. Antes de declarar um dump compatível, valide uma amostra real e confirme que todos os campos importantes foram preservados.
 
-Para diretórios de TXT com diretivas Atlas, o catalogador anterior continua disponível:
+Para catalogar TXT Atlas, existe o módulo `dragonslayer_ptbr.text.translation_workbench`. Ele seleciona linhas com caracteres japoneses e não é um parser completo da gramática Atlas. Não use sua saída como script de inserção sem um adaptador validado.
 
-    python -m dragonslayer_ptbr.text.translation_workbench export --source-dir ".\ferramentas\text" --catalog ".\translation\catalog.json"
+## Regras de edição
 
-Ajuste o caminho à saída real do dumper. O catalogador TXT atual seleciona linhas com caracteres japoneses; linhas compostas apenas por diretivas ou outros alfabetos podem precisar de um adaptador adicional.
+1. Altere somente o texto que foi identificado como traduzível.
+2. Preserve diretivas, índices, ponteiros, comentários, preenchimentos e controles.
+3. Preserve os marcadores inline exatamente e na mesma ordem.
+4. Siga o glossário aprovado para nomes, lugares, itens, personagens e magias.
+5. Não invente limites de caracteres ou bytes; eles precisam ser verificados no formato e na tela reais.
+6. Mantenha dumps originais intactos e trabalhe em cópias.
 
-## Regras de tradução
+## O que o QA significa
 
-1. Traduza somente o texto natural. Não traduza diretivas Atlas, comentários, offsets ou comandos de fluxo.
-2. Preserve os marcadores inline exatamente e na mesma ordem, por exemplo <LINE>, <WAIT>, <WAIT CLEAR>, <COLOR 1E>, <CLEAR>, <JMP.L> e <$XX>.
-3. Preserve os nomes próprios, locais, itens, personagens e magias conforme o glossário do projeto.
-4. Adapte a frase ao português brasileiro natural, em vez de fazer tradução literal quando isso comprometer clareza ou espaço.
-5. Não invente limite de caracteres ou bytes: a largura da caixa e o formato físico precisam ser medidos no fluxo real.
-6. Mantenha os dumps originais intactos e trabalhe em catálogos/cópias.
+O QA textual pode detectar tradução ausente e divergências de marcadores. Um resultado aprovado **não** comprova que:
 
-## QA e limites
+- os caracteres acentuados existam na fonte;
+- a codificação final seja válida;
+- o texto caiba na caixa;
+- ponteiros e limites estejam corretos;
+- Atlas aceite a saída;
+- a ROM funcione no emulador.
 
-O QA verifica se a tradução está preenchida, se a sequência de marcadores é idêntica e se há sinais básicos de texto inválido. O relatório inclui rom_insertion_ready=false deliberadamente.
+JSON e CSV são formatos de trabalho. A exportação para inserção precisa devolver os textos ao formato nativo da ferramenta externa.
 
-Passar no QA não comprova:
-- suporte a acentos pela fonte ou tabela de caracteres;
-- comprimento em bytes no formato final;
-- largura visual ou quebra de linha;
-- validade de ponteiros e limites;
-- aceitação pelo inserter;
-- funcionamento no emulador.
+## Estado registrado
 
-A saída normalizada JSON/CSV é material de trabalho humano. Para devolver os textos à ferramenta externa, é necessário usar o formato de entrada que essa ferramenta documenta ou criar um adaptador testado para ela. Não alimentar o Atlas ou outro inserter com o catálogo normalizado sem conversão explícita.
+Um checkpoint anterior documentou 11.037 entradas, um teste manual de salvamento persistente, 111 testes aprovados e Ruff sem erros. Esses resultados são históricos e não foram reexecutados nesta atualização documental. Também não comprovam a inserção de texto no jogo.
 
-## Próximas melhorias
+## Próximo teste técnico
 
-- adaptadores específicos para os formatos reais usados pelo projeto, depois de fixar versões e exemplos de entrada/saída;
-- glossário editável integrado à interface;
-- validação de tamanho e largura quando as regras da ferramenta e da caixa forem conhecidas;
-- diff de alterações e verificação de hash da origem;
-- exportação de volta ao formato de origem com teste de round-trip;
-- testes automatizados contra fixtures pequenas, sem ROM proprietária no repositório.
-
-
-## Estado de verificação atual
-
-Verificação manual registrada em 10/10/2026:
-
-- a interface abriu o catálogo com **11.037 entradas**;
-- uma tradução de teste foi salva, a aplicação foi fechada e a tradução continuou presente após reabertura;
-- o QA da entrada selecionada informou que não havia divergências de marcadores;
-- a suíte local concluiu com **111 testes aprovados**;
-- `ruff check .` concluiu com `All checks passed!`.
-
-Isso valida o salvamento básico e os testes automatizados no checkout usado. Não significa que todas as 11.037 entradas foram revisadas, nem que o catálogo possa ser inserido diretamente na ROM. A aplicação em cópia dos TXT, a exportação para o formato nativo da ferramenta externa e o teste no emulador continuam pendentes.
-
-### Próximo teste reproduzível
-
-1. Identificar a pasta e a versão exatas da ferramenta que produziu os TXT e registrar um pequeno exemplo real.
-2. Manter os TXT originais intactos e exportar um catálogo de teste.
-3. Aplicar uma tradução somente em uma cópia de saída, verificando identidade das entradas e preservação dos marcadores.
-4. Comparar a saída com o formato esperado pela ferramenta externa; não presumir que JSON/CSV normalizado seja aceito diretamente.
-5. Só depois de confirmar o adaptador, testar a ferramenta externa em uma cópia separada e, por fim, validar visualmente no emulador.
+1. Fixar versão e comando da ferramenta que gerou um script Atlas real.
+2. Escolher uma amostra pequena com texto e controles.
+3. Implementar um adaptador que substitua somente os segmentos traduzíveis.
+4. Exigir round-trip sem tradução e comparar os bytes do script.
+5. Só então inserir uma tradução em uma cópia separada da ROM e validar no emulador.
