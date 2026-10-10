@@ -260,18 +260,9 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
     try:
-        catalog = args.catalog
-        if catalog is None:
-            root = tk.Tk()
-            root.withdraw()
-            selected = filedialog.askopenfilename(
-                title="Abrir catálogo de tradução",
-                filetypes=[("Catálogo JSON", "*.json"), ("Todos os arquivos", "*.*")],
-            )
-            root.destroy()
-            if not selected:
-                return 0
-            catalog = Path(selected)
+        catalog = args.catalog or Path("translation/catalog.json")
+        if not catalog.exists():
+            save_catalog(catalog, {"catalog_version": 1}, [])
         app = TranslationWorkbench(catalog)
         app.mainloop()
     except (OSError, ValueError, json.JSONDecodeError) as exc:
