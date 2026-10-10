@@ -1,0 +1,139 @@
+*. Sticky notes
+
+Summary:
+Written in brutal FALCOM FIENDISHNESS!
+But the kanji is SJIS. YAY!!
+
+; ============================================================================
+; ============================================================================
+
+There's 5 font types.
+
+Narrative uses 14x14 kanji and 8x14 tiles.
+There's 8x8 and 8x12 ascii. And 12x12 kanji. Menus maybe.
+No compression. Only bit-packing.
+
+
+The first catch.
+Each one uses a translation table to convert say SJIS codes to
+the real font tile # (see print.txt).
+
+
+The font creation routine is NOT true variable-width.
+If you look at 'script.txt', you'll see:
+
+; $0C = pixel bump (6 or 12)
+
+Even though each tile is 8 or 14 pixels wide, the game updates in
+increments of 6 or 12. This means that pixels GET CLIPPED on purpose.
+Providing that curious VWF-look.
+
+; ============================================================================
+; ============================================================================
+
+Next up is the narrative format.
+
+All the story is encoded in RLE/LZ (wicked format).
+Goes to RAM $6650 (see decode.txt)
+The re-compressor uses lookahead and $00 #FILL directives to over-fit.
+
+
+The text storage is equally unbearable.
+Kinda-scattered strings, with rewind pointers and multi-boundary JMPs.
+Lots of obscure pointer references.
+
+Worse, it stores embedded ASM and data. Accessed using 16-bit RELATIVE ptrs.
+CALLs and dictionaries are INLINED where possible for translation readability.
+
+And it uses some odd forms of script EXECUTION. When <END 06> or <RET *> is
+run, the game can OPTIONALLY continue running code past that point.
+Or RTS and blindly go elsewhere.
+
+
+Dumping text becomes harder since they become unpredictable.
+And the pointers are hard-coded OFFSETS (LEA $xxxx(a1,d0)) in RAM.
+
+Correctly dumping this to a RAM-only format is almost outrageous.
+And ROM battle text is quite similar in style.
+
+; ============================================================================
+; ============================================================================
+
+Lots of tricks and hacks are coded into the dumper for safety detection.
+
+Index #s and JMP.L codes are used to access ROM and RET back to keep the
+variety of codes intact and functioning (OFFSET ptrs).
+
+
+Atlas gets a sizable upgrade to handle multi-FILE operations -
+PtrTable, index, PC, index writes, relative embeds, and such. See below.
+
+When the IMAGE is copied, the ROM is expanded to 24Mbit + Checksum bomb removed.
+
+When TEXT is inserted, script_init is FIRST run to initialise the INDEX, PC,
+and PTRTABLE values. Then the script files are inserted to ROM and
+binaries MODIFIED (not inserted or encoded).
+
+; ============================================================================
+; ============================================================================
+
+Some small assembly work is done in the abscence of an xkas style-assembler.
+
+asm68.exe is used to:
+- #1 = JMP.L control code handler to ROM
+- #2 = additions of $EA and $EB codes for index JMP and JMP.L
+
+Works when specially tested with raw hex dumps of SJIS.
+Same with embedded writes.
+
+; ============================================================================
+; ============================================================================
+
+Lastly but incompletely covered.
+
+Location names use an offset table @ $34110.
+Appear to be fixed-length data (12 bytes).
+Copies string to RAM. See 'menu_location.txt'.
+
+
+The menu names are more confusing.
+Pascal strings are involved, after skipping a 2-byte header.
+Copies string to RAM. See 'menu_item1.txt'.
+
+; ============================================================================
+; ============================================================================
+
+Atlas 1.06 is modified (nothing new since 'Dragon Slayer I')
+
+> #FILL( int stop_address, int file_byte )		- pads up to stop address
+  #FILL( int start, stop, int file_byte )		- pads address range
+  #FILL( int start, stop, int file_byte, string file )	- pads address range IN FILE
+
+  #WARN( int warn_address )				- OKAY/BARF if PC counter >= warn_address
+
+  #SAVEPC( string file_name )				- writes PC to file
+  #LOADPC( string file_name )				- loads PC from file
+
+  #INSERT( string file_name )				- inserts binary file at current PC
+
+  MSB16,MSB24,MSB32,GB4xxx				- addressing modes
+
+  #SETINDEX( int index_number, int index_bump )		- init the index numbers
+  #WRITEINDEX( int address, int size )			- writes index numbers to address, # bytes
+							  and auto-bumps the index #
+  #WRITEINDEX( int addr, int size, string file )	- writes index number to address IN FILE
+
+  #SAVEINDEX( string file_name )			- writes INDEX # to file
+  #LOADINDEX( string file_name )			- loads INDEX # from file
+
+  #ALIGN( int byte_count )                      	- does file alignment (1,2,3,4)
+
+  #W08BYTE( int address, int byte )			- writes byte to address (no JMP)
+  #W08BYTE( int addr, int byte, string file )		- writes byte to address IN FILE (no JMP)
+
+  #EMBCLEAR()						- erases all embedded pointers
+  #EMBSETREL( int number )				- uses relative offset pointers
+  #EMBWRITEREL( int number )				- uses relative offset pointers
+
+  #SAVEPTRTABLE( PTRTABLE table, string file_name )	- writes PTRTABLE address to file
+  #LOADPTRTABLE( PTRTABLE table, string file_name )	- loads PTRTABLE address from file 

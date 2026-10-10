@@ -1,0 +1,7 @@
+linear
+
+org $9fb0
+incbin asm1.bin
+
+org $1ec400
+incbin asm2.bin

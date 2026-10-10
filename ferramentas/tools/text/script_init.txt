@@ -1,0 +1,23 @@
+#VAR(Table, TABLE)
+#ADDTBL("slayer1_table.txt", Table)
+#ACTIVETBL(Table)
+
+#SMA("LINEAR")
+#EMBTYPE("MSB16", 16, $2)
+
+#VAR(MyPtr, CUSTOMPOINTER)
+#VAR(PtrTable, POINTERTABLE)
+
+#CREATEPTR(MyPtr, "MSB32", $0, 32)
+#PTRTBL(PtrTable, $200000, 4, MyPtr)
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+#SETINDEX($0000,1)
+#JMP($210000)
+
+
+#SAVEPC( "text//atlas_pc.txt" )
+#SAVEINDEX( "text//atlas_index.txt" )
+#SAVEPTRTABLE( PtrTable, "text//atlas_ptrtable.txt" )

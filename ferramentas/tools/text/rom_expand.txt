@@ -1,0 +1,29 @@
+#VAR(Table, TABLE)
+#ADDTBL("slayer1_table.txt", Table)
+#ACTIVETBL(Table)
+
+#SMA("LINEAR")
+#EMBTYPE("MSB16", 16, $2)
+
+#VAR(MyPtr, CUSTOMPOINTER)
+#VAR(PtrTable, POINTERTABLE)
+
+#CREATEPTR(MyPtr, "MSB32", $0, 32)
+#PTRTBL(PtrTable, $200000, 4, MyPtr)
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+// ROM header
+#JMP($1A4)
+<$00><$2F><$FF><$FF>
+
+
+// ROM fill
+#JMP($2FFFFF)
+<$00>
+
+
+// Remove checksum bomb
+#JMP($132e)
+<$60><$1A>

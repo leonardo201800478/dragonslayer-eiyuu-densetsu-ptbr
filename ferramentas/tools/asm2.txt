@@ -1,0 +1,59 @@
+;--------------------------------
+; Test file for 68000 assembler.
+;
+; asm68.exe
+;--------------------------------
+
+	.code
+	org 0x1ec400
+
+start:
+	; Check for <JMP.I> index code
+	cmpi.b #0xeb-0xcb,d0
+	beq CODE_JMP_EA
+
+	; Check for <JMP.L> code
+	cmpi.b #0xec-0xcb,d0
+	beq CODE_JMP_EB
+
+	; Normal execution
+	lea.l 0x9fe2,a4
+	jmp 0x9fb6
+
+
+CODE_JMP_EA:
+	; retrieve 16-bit index code (LSB)
+	moveq #0x00,d0
+	move.b 0x0001(a1),d0
+	lsl.l #8,d0
+	move.b 0x0000(a1),d0
+
+	; convert to 32-bit range	
+	lsl.l #2,d0
+
+	; load 32-bit vector
+	lea.l 0x200000,a4
+	move.l 0x00(a4,d0),a1
+
+	; exit routine
+	jmp 0x9fdc
+
+
+CODE_JMP_EB:
+	; init value
+	moveq #0x00,d0
+
+	; load 32-bit vector (MSB)
+	move.b 0x0000(a1),d0
+	lsl.l #8,d0
+	move.b 0x0001(a1),d0
+	lsl.l #8,d0
+	move.b 0x0002(a1),d0
+	lsl.l #8,d0
+	move.b 0x0003(a1),d0
+
+	; switch code vector
+	move.l d0,a1
+
+	; exit routine
+	jmp 0x9fdc

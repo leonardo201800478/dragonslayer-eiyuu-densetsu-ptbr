@@ -1,0 +1,2090 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 9">
+<meta name=Originator content="Microsoft Word 9">
+<link rel=File-List href="./asm68_files/filelist.xml">
+<link rel=Edit-Time-Data href="./asm68_files/editdata.mso">
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]-->
+<title>asm68</title>
+<style>
+<!--
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;
+	text-underline:single;}
+p
+	{margin-right:0in;
+	mso-margin-top-alt:auto;
+	mso-margin-bottom-alt:auto;
+	margin-left:0in;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+<!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext="edit" spidmax="1027"/>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="1"/>
+ </o:shapelayout></xml><![endif]-->
+<meta name=Template content="C:\PROGRAM FILES\MICROSOFT OFFICE\OFFICE\html.dot">
+</head>
+
+<body bgcolor=white lang=EN-US link=blue vlink=purple style='tab-interval:.5in'>
+
+<div class=Section1>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><b><i><span style='font-size:18.0pt;font-family:Arial;color:blue'>Bird
+Computer - ASM68 Cross Macro Assembler<o:p></o:p></span></i></b></p>
+
+<p><span style='font-family:Arial'>&nbsp;680xx Cross Macro Assembler for the
+PC.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><u><span style='font-family:Arial'>Disclaimer</span></u><span
+style='font-family:Arial'>:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>No warrantee or guarantee of the suitability
+of this product for a particular purpose or the correctness of the output is
+given. <o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>This program is distributed WITHOUT ANY
+WARENTEE; without even the implied warentee of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>(C) 1999,2000 Bird Computer<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<p><u><span style='font-family:Arial'>Terms of Usage<o:p></o:p></span></u></p>
+
+<p><span style='font-family:Arial'>Programs written for ASM68 may be used,
+given away or sold without additional fees or license.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>If you find this software useful please send
+$30 (cheque made payable to Bird Computer) to the address listed below.<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;&nbsp;<a name=ContactInformation><span
+style='color:blue'>Contact Information</span></a><span style='color:blue'><o:p></o:p></span></span></b></p>
+
+<p><b><span style='font-family:Arial'>Telephone<o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><b><span style='font-family:Arial'>1-519-275-2514<o:p></o:p></span></b></p>
+
+<p><b><span style='font-family:Arial'>Email<o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><a href="mailto:bird@cyg.net"><span
+style='font-size:10.0pt'>bird@cyg.net</span></a></p>
+
+<p><b><span style='font-family:Arial'>Postal<o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><b><span style='font-family:Arial'>198 Church St<o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><b><span style='font-family:Arial'>Apt 3B<o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><b><span style='font-family:Arial'>Stratford,
+Ontario, Canada<o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><b><span style='font-family:Arial'>N5A 2R5<o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+
+<div class=MsoNormal align=center style='text-align:center'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+
+<p><b><span style='font-size:18.0pt;font-family:Arial'>Table of Contents<o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><a href="#ProcessingRequirements"><span
+style='font-size:13.5pt;font-family:Arial'>Processing Requirements</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#ListOfFiles"><span style='font-size:
+13.5pt;font-family:Arial'>List of Files</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#GeneralNotes"><span style='font-size:
+13.5pt;font-family:Arial'>General Notes</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#NotesOnDocumentation"><span
+style='font-family:Arial'>Notes on Documentation</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>     </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#SupportedProcessors"><span
+style='font-family:Arial'>Supported Processors</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>         </span><o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><a href="#CommandLineOptions"><span
+style='font-size:13.5pt;font-family:Arial'>Command Line Options</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#Output"><span style='font-size:13.5pt;
+font-family:Arial'>Output</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#MnemonicRepresentations"><span
+style='font-size:13.5pt;font-family:Arial'>Mnemonic Representations</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#OperandRepresentations"><span
+style='font-size:13.5pt;font-family:Arial'>Operand Representations</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#IndexRegisterAssumptions"><span
+style='font-family:Arial'>Index Register Assumptions</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#PCRelCalc"><span style='font-family:
+Arial'>Program Counter Relative Calculations</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#RegisterLists"><span style='font-family:
+Arial'>Register Lists</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#Branches"><span style='font-family:Arial'>Branches</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#Expressions"><span style='font-size:
+13.5pt;font-family:Arial'>Expressions</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#Functions"><span style='font-family:
+Arial'>Functions</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#OperatorPrecedence"><span
+style='font-family:Arial'>Operator Precedence</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#Sections"><span style='font-size:13.5pt;
+font-family:Arial'>Sections</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#Macros"><span style='font-size:13.5pt;
+font-family:Arial'>Macros</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#SymbolManagement"><span
+style='font-size:13.5pt;font-family:Arial'>Symbol Management</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#SummaryOfPseudoOps"><span
+style='font-size:13.5pt;font-family:Arial'>Summary of Pseudo-Ops</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#align"><span style='font-family:Arial'>align</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#bss"><span style='font-family:Arial'>bss</span></a></p>
+
+<p style='margin-left:2.0in'><a href="#code"><span style='font-family:Arial'>code</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>   </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#cpu"><span style='font-family:Arial'>cpu</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>      </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#data"><span style='font-family:Arial'>data</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>    </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#dc"><span style='font-family:Arial'>dc</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>        </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#end"><span style='font-family:Arial'>end</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>      </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#endm"><span style='font-family:Arial'>endm</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>  </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#equ"><span style='font-family:Arial'>equ</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>      </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#even"><span style='font-family:Arial'>even</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>    </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#ffp"><span style='font-family:Arial'>ffp</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>        </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#fill"><span style='font-family:Arial'>fill</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>         </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#include"><span style='font-family:Arial'>include</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>            </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#macro"><span style='font-family:Arial'>macro</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'> </span><o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><a href="#org"><span style='font-family:Arial'>org</span></a><span
+style='font-family:Arial'><span style='mso-tab-count:1'>      </span><o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><a href="#Errors"><span style='font-size:13.5pt;
+font-family:Arial'>Errors</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#SplitUtility"><span style='font-size:
+13.5pt;font-family:Arial'>Split Utility</span></a></p>
+
+<p style='margin-left:1.0in'><a href="#Dissassembler"><span style='font-size:
+13.5pt;font-family:Arial'>Dissassembler</span></a></p>
+
+<p style='margin-left:1.0in'>&nbsp;</p>
+
+
+<div class=MsoNormal align=center style='text-align:center'>
+
+<hr size=2 width="100%" align=center>
+
+</div>
+
+
+<p><a name=ProcessingRequirements><b><span style='font-family:Arial;color:blue'>Processing
+Requirements</span></b></a><b><span style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>A garden variety 80486 (or higher)
+compatible computer.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>This assembler was built to run in 32 bit
+Win95/98 environment only.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=ListOfFiles><b><span style='font-family:Arial;color:blue'>List of
+Files</span></b></a><b><span style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>asm68.exe<span style='mso-tab-count:2'>                 </span>-
+cross assembler<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>dasm68.exe<span style='mso-tab-count:2'>               </span>-
+cross dissassembler<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>split.exe<span style='mso-tab-count:2'>                      </span>-
+binary file splitter<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>readme.doc<span style='mso-tab-count:2'>               </span>-
+documentation update file<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&lt;filename&gt;.s<span style='mso-tab-count:
+2'>              </span>- sample source file(s)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=GeneralNotes><b><span style='font-family:Arial;color:blue'>General
+Notes</span></b></a><b><span style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Comments
+may be inserted into source code by using ';'. The ';' causes everything from
+the ';' to the end of the line to be ignored. In order to preserve comments
+within a macro definition use ';;' (two semi-colons in a row).<o:p></o:p></span></p>
+
+<p><u><span style='font-family:Arial'>Labels<o:p></o:p></span></u></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Only
+the first 31 characters of a label or other symbol are significant.<span
+style='mso-tab-count:1'>    </span><o:p></o:p></span></p>
+
+<p><u><span style='font-family:Arial'>Case Sensitivity<o:p></o:p></span></u></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+assembler is case insensitive when recognizing mnemonics, size specifiers and
+registers. For other symbols and labels the assembler is case sensitive.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Errors
+during the assembly process are output to stderr.<o:p></o:p></span></p>
+
+<p><u><span style='font-family:Arial'>Operation<o:p></o:p></span></u></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>This
+is a two pass assembler. This is necessary as values of expressions may not be
+valid until the second pass if they contain forward references.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=NotesOnDocumentation><b><span style='font-family:Arial'>Notes on
+Documentation</span></b></a><b><span style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+form '&lt;something&gt;' indicates a mandatory parameter for a command
+'[something]' indicates optional parameters.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+form &lt;size&gt; indicates a size character of 'b', 'w' or 'l'.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=SupportedProcessors><b><span style='font-family:Arial'>Supported
+Processors</span></b></a><b><span style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>The following processors are supported:<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>68008,68000,68010,68020,68030,68040,68EC030,68EC040,68LC040,CPU32,68851,68881,68882<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=CommandLineOptions><b><span style='font-family:Arial;color:blue'>Command
+Line Options</span></b></a><b><span style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>/o&lt;option list&gt;<span style='mso-tab-count:
+1'>            </span>- set output option<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>This option sets various output options.
+Output options are listed with no spaces between them. Preceding the option
+with a '-' negates the option.<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>b - generate
+binary file (default)<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>l - generate
+listing file<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>s - generate S
+record file<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>y - generate
+symbol table<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>e - generate error
+file<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>:&lt;filename&gt;
+- set base output file name<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Note binary and S
+- record output cannot be selected at the same time. You must select one or the
+other.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+assembler defaults the output file name(s) to the same as the input file name
+except for the extension which is set to one of '.bin', '.lst', '.S37', '.sym',
+'.err' depending on the output file type . To override the base output file
+name specify ':&lt;output file name&gt;' as the last option in the output
+option list.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>/Gxx<span style='mso-tab-count:1'>     </span>-
+set processor instruction set<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>xx
+= 00<span style='mso-tab-count:1'>            </span>-&gt; 68000/68008<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>xx
+= 10<span style='mso-tab-count:1'>            </span>-&gt; 68010<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>xx = 20 -&gt;
+68020<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>xx = 30 -&gt;
+68030<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>xx = 40 -&gt;
+68040<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>xx = EC030 -&gt;
+68EC030<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>xx = EC040 -&gt;
+68EC040<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>xx = LC040 -&gt;
+68LC040<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>xx = CPU32 -&gt;
+CPU32<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>This
+option causes the assembler to verify that instructions and addressing modes
+are available on the processor level selected. The default is for 68000/68008
+instructions. If an instruction for a processor higher than the selected level
+is found then an error message is given.<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=Output><b><span style='font-family:Arial;color:blue'>Output</span></b></a><b><span
+style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>The assembler is capable of generating
+several different types of output files. The default is to generate a binary
+file, with error messages displayed on the screen. Other output files may be
+generated by specifying with the output option (/o) command line option. Other
+output files include listing (mixed machine / source code), error (redirection
+of errors to a file), symbol table, and S-file format.<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=MnemonicRepresentations><b><span style='font-family:Arial;
+color:blue'>Mnemonic Representations</span></b></a><b><span style='font-family:
+Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Many
+assemblers suffix the base mnemonics with various undesirable characters such
+as 'i', 'a', or 'q' in order to aid the assembler or make the instruction set
+look more complicated. This is not necessary for asm68 as it has some built in
+intelligence. However, these alternate forms of mnemonics are still accepted to
+enhance portability.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+assembler will automatically use quick instructions where possible. For example<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>add.l
+#5,d0 will be assembled as if it were addq.l #5,d0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>the
+assembler also knows about using address registers as destinations. It will
+automatically assemble the code<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>sub.l
+#2,a0 as if it were suba.l #2,a0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Using
+'i' to indicate immediate mode is not necessary in the assembler since it
+places the type of the operand directly with the operand.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>add.l<span
+style='mso-tab-count:2'>                </span>#1234,d1<span style='mso-tab-count:
+1'>       </span>; this form should be used<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>addi.l<span
+style='mso-tab-count:1'>   </span>#1234,d1<span style='mso-tab-count:1'>       </span>;
+the 'i' is not necessary but will work<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+assembler will still accept the mnemonic if an 'i' is suffixed, but the '#'
+immediate indicator must still precede the immediate operand.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Summary:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>As
+a programmer you do not have to worry about:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:2'>                        </span>1)
+choosing quick immediate mode,<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:2'>                        </span>2)
+using address forms of mnemonics,<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:2'>                        </span>3)
+using immediate forms of mnemonics.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>asm68
+removes these burdens from you.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>The assembler has a default operation size
+of long. Long operations do not require the use of the size specifier
+character. Also if no size is specified on some operations for which there is
+no long size then a word size will be assumed. For example chk, and link
+instructions for the 68000/08/10.<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>add.l #1234,d0 ;
+specified long op size<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>add #1234,d0 ;
+will default to long operation size<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Some
+mnemonics do not require a size specifier. If one is specified it may be used,
+ignored, or cause an error or warning message.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move<span
+style='mso-tab-count:1'>   </span>#123,ccr<span style='mso-tab-count:2'>                     </span>;
+move to condition code register<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.b
+#123,ccr<span style='mso-tab-count:1'>       </span>; still accepted<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.w
+#123,ccr<span style='mso-tab-count:1'>       </span>; gives error, but
+generates code for<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:5'>                                                            </span>;
+move #123,ccr<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Byte size operations on the status register
+will translate to operations on the condition code register 'ccr'.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.b
+#123,sr<span style='mso-tab-count:1'>         </span>will translate to move
+#123,ccr<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=OperandRepresentations><b><span style='font-family:Arial;color:blue'>Operand
+Representations</span></b></a><b><span style='font-family:Arial;color:blue'> <o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+comma is used to distinguish between source and destination operands. Because
+the comma is used in this fashion, the assembler uses the '+' to separate
+registers when representing indexed addressing using square brackets.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Square
+brackets are used to represent indexing in the indexed addressing modes. This
+was done to avoid confusion with round brackets. Round brackets may appear in
+an expression adjacent to the square brackets, as in indexed with displacement
+addressing modes. Square brackets are also generally used to represent indexing
+in most languages. Even though the native format of the assembler uses square
+brackets round brackets are still accepted.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>This
+assembler uses 'C' style incrementation and decrementation operators. Note that
+the incrementation / decrementation operators are placed within the indexing
+brackets. This is done to follow the convention that the operator is closest to
+the thing that it is working on. A notation such as [a0]++ would have implied
+that the value at the location indicated by the a0 register is being
+incremented. This is not actually the case with 68000 increment/decrement
+operators. [a0++] more clearly indicates what is going on. The a0 register is
+being incremented, after being used, and not to what a0 is pointing.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Immediate
+operands are identified by being preceded with a '#'.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Absolute
+short and long address operands may be identified by appending a '.w' or '.l'
+to the address expression. If not otherwise specified the assembler uses the
+address mode based on the size of the symbol. If the size is unknown at the
+time of assembly then absolute long address mode is assumed.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Upper
+or lower case characters may be used when specifying registers.<o:p></o:p></span></p>
+
+<p><a name=IndexRegisterAssumptions><b><span style='font-family:Arial'>Index
+Register Assumptions</span></b></a><b><span style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>If no scale is
+specified for the index register then a scale of one is assumed. If no size is
+specified then a size of long is assumed.<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>For memory
+indirect and based address modes index register suppression may be indicated by
+prepending a 'z' to the index register name as in ([bd,An],zd0,od).<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Examples:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>asm68
+format:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.l<span
+style='mso-tab-count:1'> </span>[a0++],16[a7]<span style='mso-tab-count:1'> </span>;
+Note the 16 may be an expression.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.l<span
+style='mso-tab-count:1'> </span>[a0++],(16*(aa)+1)[a7]<span style='mso-tab-count:
+1'>          </span>; a little easier to see <span style='mso-tab-count:6'>                                                                       </span><span
+style='mso-tab-count:2'>                        </span>; than below<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Alternate
+formats:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.l<span
+style='mso-tab-count:1'> </span>(a0)+,(16,a7)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.l<span
+style='mso-tab-count:1'> </span>(a0)+,(16*(aa)+1,a7)<span style='mso-tab-count:
+1'>            </span>; note label aa will <span style='mso-tab-count:7'>                                                                             </span><span
+style='mso-tab-count:1'>            </span>; confuse the assembler<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Note
+that while the native format of the assembler is to use square brackets round
+brackets are still recognized.<o:p></o:p></span></p>
+
+<p><a name=PCRelCalc><b><span style='font-family:Arial'>Program Counter
+Relative Calculations</span></b></a><b><span style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>In program counter relative address modes if
+a single label is used in the displacement expression it is assumed that the
+resulting expression is to be relative to the program counter, so the program
+counter value is subtracted from the expression to generate the displacement.
+If no or two or more labels are used in the displacement expression it is
+assumed that the desired displacement is to be calculated and the program
+counter value is not subtracted from the expression.<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-family:Arial'>move
+pcreltbl+5(pc),d0 ; this will calculate the displacement by subtracting the PC
+value<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-family:Arial'>move
+pcreltbl2-pcreltbl+5(pc),d0 ; this will not subtract the PC value from the
+calculated displacement<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>pcreltbl: dc.l
+1,2,3,4<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>pcreltbl2: dc.l
+1,2,3,4<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=RegisterLists><b><span style='font-family:Arial'>Register Lists</span></b></a><span
+style='mso-bookmark:RegisterLists'></span><span style='font-family:Arial'>:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Register
+lists used with the movem instruction may be specified in several manners. The
+'REGS' keyword is optional.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span><o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>as
+a range of register as in<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:2'>                        </span>movem.l
+regs d0-7,[--a7]<span style='mso-tab-count:2'>                  </span>; save
+data regs on stack<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:2'>                        </span>movem.l
+a0-7d0-7,[--a7]<span style='mso-tab-count:1'>       </span>; save all regs on
+stack<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span><o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Address
+and data register ranges must be done separately. The register type 'a' for
+address or 'd' for data must precede the range. The range is specified as #-#.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+following methods allow registers to be identified in any order. For doing a
+small group of registers use the register type, then desired register numbers
+in any order. Note the 68000 will always store registers in the same order,
+regardless of the order you specify. If you require a specific order you must
+use independent move instructions.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:2'>                        </span>movem.l
+regs d012,[--a7]<span style='mso-tab-count:2'>                 </span>; saves
+d0, d1, d2 on stack<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:2'>                        </span>movem.l
+regs d725,[a0]<span style='mso-tab-count:2'>                   </span>; store
+d7, d2, and d5<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Lastly
+registers can also be individually identified by specifying the type then
+register number.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:2'>                        </span>movem.l
+[a7++],regs d0d1d2d3a1a2<span style='mso-tab-count:1'>         </span>; get d0
+to d3 and a1,a2 <span style='mso-tab-count:4'>                                          </span><span
+style='mso-tab-count:4'>                                                </span>;
+from stack<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Note
+each register is named individually with no spaces or commas in between.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Some
+assemblers use the '/' to separate a sequence of registers. If the assembler encounters
+a '/' or space character in the register list, it will be ignored.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span><b>Address
+Mode Summary<o:p></o:p></b></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Register
+Direct<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>d0<span
+style='mso-tab-count:3'>                                </span>data register
+direct<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>a0<span
+style='mso-tab-count:3'>                                </span>address register
+direct<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>fp0 floating point
+register<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Register
+Indirect<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>[a0]<span
+style='mso-tab-count:3'>                              </span>address register
+indirect<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(a0)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>[a0++]<span
+style='mso-tab-count:2'>             </span>indirect post incremented<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>[a0]++<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(a0)+<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>[--a0]<span
+style='mso-tab-count:2'>               </span>pre decremented indirect<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>--[a0]<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>-(a0)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>32767[a0]<span
+style='mso-tab-count:2'>                  </span>indirect with 16 bit
+displacement<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>32767(a0)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>127[a0+d0.w]<span
+style='mso-tab-count:1'>            </span>indexed indirect 8 bit displacement<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(127,a0,a1.l)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(a0,a1.w)<span
+style='mso-tab-count:2'>                    </span>indexed indirect zero
+displacement<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>[a0+d1.l]<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Absolute<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(AbsoluteLong).l<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>AbsoluteLong
+or AbsoluteLong.l<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(AbsoluteShort).w<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>AbsoluteShort.w<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Program
+Counter Relative<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>32767[pc]<span
+style='mso-tab-count:2'>                   </span>16 bit displacement<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(32767,pc)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(pc)<span
+style='mso-tab-count:3'>                             </span>displacement = -2<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>127[pc+d0.w]<span
+style='mso-tab-count:1'> </span>indexed 8 bit displacement<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(127,pc,a1.l)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>(pc,a2.w)<span
+style='mso-tab-count:2'>                    </span>indexed displacement = zero<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Immediate<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>#1234<span
+style='mso-tab-count:2'>             </span>immediate value<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Based<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>(bd,An,Xn)<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>(An, Xn)<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>(Xn)<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Memory Indirect
+Forms<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd,An,Xn],od)
+Pre indexed<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd,An,Xn])<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd,An],Xn,od)
+Post indexed<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd,An],Xn) <o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd,An],od)
+Suppressed index<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd,Xn],od)
+Suppressed base<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd],Xn,od)<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([An,Xn],od) base
+displacement = 0<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([An],Xn,od)<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd,An]) outer
+displacement = 0<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd,Xn])<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([An,Xn])<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd],Xn) <o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd],od)
+suppressed base and index<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([An],Xn)<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([An],od)<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([Xn],od)<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([bd]) <o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([An])<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>([Xn])<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=Branches><b><span style='font-family:Arial'>Branches</span></b></a><b><span
+style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+assembler always uses the short form (8 bit) branch displacements unless
+explicitly overridden by appending a '.l' to the branch mnemonic. However this
+default is reversed for the branch subroutine (bsr) instruction. Bsr defaults
+to using long form (16 bit) displacements unless overridden by appending a '.s'
+to the branch mnemonic.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>bra<span
+style='mso-tab-count:2'>                  </span>elsewhere<span
+style='mso-tab-count:1'>      </span>; this will always be a shot branch<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>bsr
+elsewhere ; this is a long branch.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>bra.l<span
+style='mso-tab-count:2'>                 </span>elsewhere<span
+style='mso-tab-count:1'>      </span>; '.l' forces a long branch<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>elsewhere:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=Expressions><b><span style='font-family:Arial;color:blue'>Expressions</span></b></a><b><span
+style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Expressions
+must always evaluate to constant values. Values within round brackets are
+calculated first.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+'$' is used to represent the value of the location counter, at that point in
+code, within an expression.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>bra.s<span
+style='mso-tab-count:2'>               </span>$+4<span style='mso-tab-count:
+1'>     </span>; skip over 4 bytes<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>{
+4 bytes of code }<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>add.w<span
+style='mso-tab-count:2'>              </span>#123,d0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>...<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The result size of
+an expression can be forced by appending a size specifier character to the end.
+No warning or error is given if the result won't fit into the forced size. The
+result is simply truncated.<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=Functions><u><span style='font-family:Arial'>Functions</span></u></a><u><span
+style='font-family:Arial'><o:p></o:p></span></u></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+assembler supports three functions used within expressions:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>defined(&lt;symbol&gt;)<span
+style='mso-tab-count:1'>    </span>returns 1 if the symbol is defined,
+otherwise 0,<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>size(&lt;symbol&gt;)<span
+style='mso-tab-count:2'>                      </span>returns the size of the
+symbol (1,2, or 4)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>not(&lt;expression&gt;)<span
+style='mso-tab-count:1'>     </span>returns the logical not of the expression<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=OperatorPrecedence><u><span style='font-family:Arial'>Operator
+Precedence</span></u></a><u><span style='font-family:Arial'><o:p></o:p></span></u></p>
+
+<p><span style='font-family:Arial'>Listed highest to lowest<o:p></o:p></span></p>
+
+<table border=1 cellpadding=0 width=638 style='width:478.5pt;mso-cellspacing:
+ 1.5pt;border:outset black .75pt;mso-padding-alt:5.25pt 5.25pt 5.25pt 5.25pt'>
+ <tr>
+  <td width="37%" valign=top style='width:37.0%;border:inset black .75pt;
+  background:white;padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>Operator</span></p>
+  </td>
+  <td width="63%" valign=top style='width:63.0%;border:inset black .75pt;
+  background:white;padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>Description</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width="37%" valign=top style='width:37.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>-,~,!,symbol,number,(), defined(), size(),
+  not()</span></p>
+  </td>
+  <td width="63%" valign=top style='width:63.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>negative, ones complement, logical not, a
+  label or equate, number, or bracketed expression</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width="37%" valign=top style='width:37.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>*, /, %, &lt;&lt;, &gt;&gt;</span></p>
+  </td>
+  <td width="63%" valign=top style='width:63.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>multiply, divide, modulus, left shift,
+  right shift</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width="37%" valign=top style='width:37.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>+, -, &amp;, |</span></p>
+  </td>
+  <td width="63%" valign=top style='width:63.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>addition, subtraction, bitwise and,
+  bitwise or</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width="37%" valign=top style='width:37.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>&amp;&amp;</span></p>
+  </td>
+  <td width="63%" valign=top style='width:63.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>logical and</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width="37%" valign=top style='width:37.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>||</span></p>
+  </td>
+  <td width="63%" valign=top style='width:63.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>logical or</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width="37%" valign=top style='width:37.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>&lt;,&gt;,=,&lt;=,&gt;=,&lt;&gt;,!=</span></p>
+  </td>
+  <td width="63%" valign=top style='width:63.0%;border:inset black .75pt;
+  padding:5.25pt 5.25pt 5.25pt 5.25pt'>
+  <p><span style='font-family:Arial'>less than, greater than, equal, less than
+  or equal, greater than or equal, not equal, not equal</span></p>
+  </td>
+ </tr>
+</table>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Note that right shift is a signed operation,
+preserving the sign bit.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Numbers<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Numbers
+are represented using a 'C' style convention. Numbers with a leading zero are
+assumed to be octal, see chart below.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>0x&lt;hexadecimal
+digits&gt;<span style='mso-tab-count:1'>       </span>- hexadecimal number<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>0b&lt;binary
+(0 or 1) digits&gt;<span style='mso-tab-count:1'>     </span>- binary number<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>0&lt;octal
+digits&gt;<span style='mso-tab-count:3'>                                   </span>-
+octal number<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>0d&lt;decimal
+digits&gt;<span style='mso-tab-count:2'>               </span>- decimal number<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>&lt;0-9&gt;<span
+style='mso-tab-count:4'>                                      </span>- decimal
+number (first digit can't be zero)<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>'&lt;character&gt;'<span
+style='mso-tab-count:3'>                          </span>- character constant<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Examples:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>0xffffffff<span
+style='mso-tab-count:1'>            </span>- -1L in hex<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>1234<span
+style='mso-tab-count:2'>               </span>- 1234 decimal<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>0b11111111<span
+style='mso-tab-count:1'>  </span>- 255 in binary<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>'\r'<span
+style='mso-tab-count:2'>                    </span>- carriage return<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>'c'<span
+style='mso-tab-count:2'>                     </span>- the letter c<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=Sections><b><span style='font-family:Arial;color:blue'>Sections</span></b></a><b><span
+style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+assembler currently supports two distinct sections and a keyword is reserved
+for a third section. The Two sections supported are the .bss (uninitialized
+data) and .code sections. The reason for this level of support is that the
+assembler currently does not support grouping or reordering of section data.
+Data is processed as it is encountered. The reason the .bss section can be
+supported in addition to the code section is that no binary data is output for
+the .bss section. The bss section is simply used to update the address of
+variable data. This allows the code section to be output as a continuous block.
+Future versions of the assembler may support grouping and reordering
+operations. See a description of the org pseudo-op on how to set the location
+of sections.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>There
+are no restrictions on how sections are used. You can put code in the .bss
+section (but it won't output to the binary file) or data in the code section.
+Actually you need to be able to put data in the code section sometimes for tables.
+Note if you are putting the code section in ROM be careful not to define any
+variables in this section that should be in the .bss section.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=Macros><b><span style='font-family:Arial;color:blue'>Macros</span></b></a><b><span
+style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Multiline
+parameterized macros may be defined via the 'macro' statement. The macro
+consists of text between the macro and endm statements. The endm statement must
+be the first statement on the line. A macro may have a maximum of 10
+parameters. The maximum expanded size of the macro is 2k bytes. Macros may
+include other macros (as long as they're defined prior to use) but the maximum
+expansion size cannot be exceeded. To create branch addresses and variables
+that are local to a particular instance of the macro use the '@' character. The
+'@' character will be replaced by the macro instance number (which is unique
+for all macro instances) when the macro is instantiated. Note be careful to use
+local labels that won't exceed the maximum symbol length(31 chars) <u>including</u>
+the instance number. To document the macro using comments, use a single
+semi-colon (';') to indicate a comment that may be stripped out for macro
+expansions. To preserve comments for an expansion use a double semi-colon
+(';;'). Note that preserved comments will use up some of the buffer space for
+expansion and reduce the amount of code you can put in the macro. Comments that
+are stripped out will reduce the amount of expansion space required.<o:p></o:p></span></p>
+
+<p><u><span style='font-family:Arial'>Macro Limits<o:p></o:p></span></u></p>
+
+<p><span style='font-family:Arial'>Number of parameters<span style='mso-tab-count:
+2'>                     </span>10<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Maximum macro expansion<span
+style='mso-tab-count:1'> </span>2k<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>macro mSomeInlineFn parm1,parm2<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.l<span
+style='mso-tab-count:1'> </span>parm1,d0<span style='mso-tab-count:1'>       </span>;
+this comment will be removed and not show in expansions<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>add.l
+parm2,d0<span style='mso-tab-count:2'>                      </span>;; this
+comment will be preserved<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>beq
+mj@<span style='mso-tab-count:2'>                    </span>;; local to
+instance lable<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>bsr
+globalroutine<span style='mso-tab-count:1'>       </span>;; non local<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>mj@:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>endm<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=SymbolManagement><b><span style='font-family:Arial;color:blue'>Symbol
+Management&nbsp;</span></b></a><b><span style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><a name=SummaryOfPseudoOps><span style='font-family:Arial'>A global symbol
+table is assigned for the root source file. All symbols encountered in the root
+file are globally accessible. A separate local symbol table is assigned to each
+file included from the root file and below. Symbols from lower level source
+files are local to that source file only. The same symbol may be used in
+another lower level source file with no conflict. However, a symbol from a
+lower level file may be made globally accessible with the use of the 'public'
+keyword.<o:p></o:p></span></a></p>
+
+<p><span style='mso-bookmark:SummaryOfPseudoOps'><span style='font-family:Arial'>global.s<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><span
+style='font-family:Arial'>gVar dc.l 1234 ; a globally accessible var<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><span
+style='font-family:Arial'>.include lowerfile.s<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><span
+style='font-family:Arial'>&nbsp;<o:p></o:p></span></span></p>
+
+<p><span style='mso-bookmark:SummaryOfPseudoOps'><span style='font-family:Arial'>lowerfile.s<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><span
+style='font-family:Arial'>public subrout: ; 'subrout' symbol globally
+accessible<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><span
+style='font-family:Arial'>&lt;some code&gt;<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><span
+style='font-family:Arial'>bra locsym<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><span
+style='font-family:Arial'>&lt;some code&gt;<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><span
+style='font-family:Arial'>locsym: ; 'locsym' is local to this file<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><span
+style='font-family:Arial'>&lt;some more code&gt;<o:p></o:p></span></span></p>
+
+<p style='margin-left:1.0in'><span style='mso-bookmark:SummaryOfPseudoOps'><b><span
+style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></span></p>
+
+<p><span style='mso-bookmark:SummaryOfPseudoOps'><b><span style='font-family:
+Arial;color:blue'>Summary of Pseudo-Ops </span></b></span><b><span
+style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>align<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>bss<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>code<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>cpu<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>data<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>dc<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>end<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>endm<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>equ<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>even<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>ffp<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>fill<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>include<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>macro<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>org<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Any
+pseudo-op may also be preceded with a period ('.').<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=align><b><span style='font-family:Arial'>align</span></b></a><span
+style='mso-bookmark:align'></span><span style='font-family:Arial'>
+&lt;expression&gt;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Aligns the current location counter on a
+boundary specified by the expression. Padding bytes (0xff) are output to move
+the location counter up to the desired alignment address.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.bss<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.align<span
+style='mso-tab-count:1'>   </span>4<span style='mso-tab-count:1'>          </span>;
+align on longword boundary<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>var1:<span style='mso-tab-count:1'>    </span>dc.l<span
+style='mso-tab-count:1'>      </span>0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>var2:<span style='mso-tab-count:1'>    </span>dc.b<span
+style='mso-tab-count:1'>     </span>0xff<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=bss><b><span style='font-family:Arial'>bss</span></b></a><b><span
+style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Indicates
+that subsequent output is to the bss section (uninitialized data space). The
+bss location counter will be updated as data is encountered. Note that no
+binary information is output to the .bin file for the bss section. Use the org
+statement to set the base address of the .bss section.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>; output to bss section<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>; actually nothing gets output, but the
+symbol addresses still get updated<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.bss<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.org<span
+style='mso-tab-count:1'>     </span>RAMSTART<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>var1:<span style='mso-tab-count:1'>    </span>dc.l<span
+style='mso-tab-count:1'>      </span>0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>var2:<span style='mso-tab-count:1'>    </span>dc.b<span
+style='mso-tab-count:1'>     </span>0xff<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=code><b><span style='font-family:Arial'>code</span></b></a><b><span
+style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Indicates
+that subsequent output is to the code section (program space). The code
+location counter will be updated as program code / data is encountered. Data
+for the code section will be output to the binary file on the last pass of the
+assembler. Use the org statement to set the base address of the .code section.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>; output to code section<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.code<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.org<span
+style='mso-tab-count:1'>     </span>ROMSTART<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>jmp
+main<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=cpu><b><span style='font-family:Arial'>cpu</span></b></a><b><span
+style='font-family:Arial'> </span></b><span style='font-family:Arial'>&lt;expression&gt;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+cpu statement sets the instruction set that the assembler allows to be assembled
+without errors/warnings. Valid settings are<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>00,08,10,20,30,40,CPU32,EC030,EC040,LC040,mmu,+mmu,-mmu,fp,+fp,-fp.<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>When specifying
+coprocessor support the default coprocessor id may be overridden by appending a
+single digit coprocessor id number to the option.<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>mmu or +mmu -
+enable mmu support (68851) default is enabled<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>-mmu - disable mmu
+support<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>fp or +fp - enable
+floating point (68881/68882) default is enabled<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>-fp - disable
+floating point<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Examples:<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>cpu mmu2 ; enable
+mmu support with a coprocessor id of 2<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>cpu<span
+style='mso-tab-count:1'>      </span>68010,+fp3 ; 68010 instruction set with
+floating point support, coprocessor id of 3<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>or<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>cpu<span
+style='mso-tab-count:1'>      </span>00<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>or<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>PROCESSOR<span style='mso-tab-count:1'>           </span>equ.l<span
+style='mso-tab-count:1'>    </span>68000<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>cpu
+<span style='mso-tab-count:1'>     </span>PROCESSOR<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=data><b><span style='font-family:Arial'>data</span></b></a><b><span
+style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Indicates
+that subsequent output is to the initialized data section (initialized data
+space). The data location counter will be updated as data is encountered.
+Binary information is output to the .bin file for the data section. Use the org
+statement to set the base address of the .data section. This statement is most
+useful when using the s-record output file type because the s-record output
+allows the location of the data to be indentified for loading. <i>If planning
+to use binary output for burning into a ROM this statement should not be used</i>
+as it will cause binary data output for the code section to be shifted. Instead
+place the data in the code section.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>; output to data section<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.data<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.org<span
+style='mso-tab-count:1'>     </span>ROMSTART<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>var1:<span style='mso-tab-count:1'>    </span>dc.l<span
+style='mso-tab-count:1'>      </span>0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>var2:<span style='mso-tab-count:1'>    </span>dc.b<span
+style='mso-tab-count:1'>     </span>0xff<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=dc><b><span style='font-family:Arial'>dc</span></b></a><span
+style='mso-bookmark:dc'></span><span style='font-family:Arial'>.&lt;size&gt;<span
+style='mso-tab-count:1'>       </span>[Data values][&quot;Hello there&quot;]<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>dc
+stands for define constant. Data values are separated by commas. Strings may be
+used enclosed within quotes. A maximum of 50 data values may be listed
+separated by commas for a single dc statement. When the dc statement is used in
+the .bss section no data is output (the data values are ignored), however the
+.bss location counter is updated by the amount of data present. This is useful
+for reserving variables in the .bss section.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>dc.w<span
+style='mso-tab-count:1'>    </span>'Hello there',0<span style='mso-tab-count:
+1'> </span>; generate UNICODE string.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Would
+generate the following bytes in the binary file.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>00
+48 00 65 00 6C 00 6C 00 ....<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Note
+that each character in the string is converted to the size specified in the
+data statement.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>; dc example<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>msg:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>dc.b<span
+style='mso-tab-count:1'>     </span>'Hi mom!', 0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>jmptbl:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>dc.l<span
+style='mso-tab-count:1'>      </span>StartOfCode, EndOfCode<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>org
+0xffe000<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>StartOfCode:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>lea
+msg,a0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>...<o:p></o:p></span></p>
+
+<p><a name=end><b><span style='font-family:Arial'>end</span></b></a><b><span
+style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>When the assembler
+encounters the end keyword in the source file it reacts as if the end of the
+file has been reached and stops processing the file. End is optional. It is
+useful for limiting the source that is assembled.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>.end<span
+style='mso-tab-count:1'>     </span>; end of source<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=endm><b><span style='font-family:Arial'>endm</span></b></a><b><span
+style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Indicates
+the end of a macro definition.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>macro macro1<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>;
+some source code in the macro<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>endm<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&lt;symbol&gt;<b><span style='mso-tab-count:
+1'>       </span><a name=equ>equ</a></b><span style='mso-bookmark:equ'></span>.&lt;size&gt;<span
+style='mso-tab-count:1'>    </span>&lt;expression&gt;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+equ statement evaluates the expression and assigns it to symbol. The size specifier
+is associated with the symbol.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>CNTRL_WORD1<span style='mso-tab-count:1'>      </span>equ.w<span
+style='mso-tab-count:1'>  </span>0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>CNTRL_WORD2<span style='mso-tab-count:1'>      </span>equ.w<span
+style='mso-tab-count:1'>  </span>CNTRL_WORD1+2<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>CNTRL_WORD3<span style='mso-tab-count:1'>      </span>equ.w<span
+style='mso-tab-count:1'>  </span>CNTRL_WORD2+2<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>CNTRL_BUFF<span style='mso-tab-count:1'>          </span>equ.w<span
+style='mso-tab-count:1'>  </span>CNTRL_WORD3+2<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>CNTRL_CODE<span style='mso-tab-count:1'>         </span>equ.w<span
+style='mso-tab-count:1'>  </span>CNTRL_BUFF+1024; add buffer for offset<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>CNTRL_STRUCSIZE<span style='mso-tab-count:
+1'>           </span>equ<span style='mso-tab-count:1'>      </span>CNTRL_CODE+2<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>TABLE_SIZE<span style='mso-tab-count:1'> </span>equ.w<span
+style='mso-tab-count:1'>  </span>1024<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=even><b><span style='font-family:Arial'>even</span></b></a><b><span
+style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>If
+the output location is not at an even address 'even' causes the output to be
+padded by one byte so that the address is at an even byte boundary. Use before
+starting a block of code so that code is assembled to an even boundary. Code
+must be assembled on even byte boundaries for the 68000 processor.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+padding byte used is 0xff.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>even<span
+style='mso-tab-count:2'>                </span>; make sure code starts at even
+byte boundary<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>start:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.l<span
+style='mso-tab-count:1'> </span>d0,a0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>...<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=ffp><b><span style='font-family:Arial'>ffp</span></b></a><b><span
+style='font-family:Arial'><o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Indicates to use
+fast floating point format when generating constants, as opposed to IEEE format
+which is the default.<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p style='margin-left:1.0in'><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=fill><b><span style='font-family:Arial'>fill</span></b></a><span
+style='mso-bookmark:fill'></span><span style='font-family:Arial'>.&lt;size&gt;
+&lt;expression&gt;,&lt;expression&gt;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+fill command is used for initializing an area of memory. (Or reserving a block
+in the .bss section).<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>fill.l<span
+style='mso-tab-count:1'>       </span>192,0xffffffff<span style='mso-tab-count:
+1'>    </span>; fill 192 long words in table<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=include><b><span style='font-family:Arial'>include</span></b></a><span
+style='mso-bookmark:include'></span><span style='font-family:Arial'>
+&lt;path&gt;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Include
+includes another source file within the current one. Nested includes are
+allowed until your system runs out of file handles. The path name of the file
+must be specified.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>include
+..\kern\math.s<span style='mso-tab-count:1'>            </span>; include source
+for math routines<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>include
+..\kern\string.s<span style='mso-tab-count:1'>           </span>; include
+string routines<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>start:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>move.l<span
+style='mso-tab-count:1'> </span>d0,a0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>....<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span><o:p></o:p></span></p>
+
+<p><a name=macro><b><span style='font-family:Arial'>macro</span></b></a><span
+style='mso-bookmark:macro'></span><span style='font-family:Arial'> &lt;name&gt;
+[parm1][,Parm2]…[parm10]<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>Indicates
+the start of a multiline parameterized macro. (Parameters are optional, max 10
+params) See the description of macros in the documentation above.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=org><b><span style='font-family:Arial'>org</span></b></a><span
+style='mso-bookmark:org'></span><span style='font-family:Arial'><span
+style='mso-tab-count:1'>      </span>&lt;expression&gt;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+first time the 'org' statement is hit (within a section) it sets the value of
+the location counter for which labels are referenced. Subsequent encounters of
+the org statement are treated like a 'fill' statement. On subsequent encounters
+the output is padded from the current output position to the new one specified
+by org. It is possible to create extremely large files this way so be careful !
+'0xff' is used as the padding byte. This value was chosen since it is the blank
+state of most popular EPROMS.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Example:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>org<span
+style='mso-tab-count:1'>      </span>0xf00000<span style='mso-tab-count:1'>        </span>;
+start of ROM first time encounter<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>romstart:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>moveq<span
+style='mso-tab-count:1'>            </span>#0,d0<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>....<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>endcode:<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>org<span
+style='mso-tab-count:1'>      </span>romstart+0x800<span style='mso-tab-count:
+1'>         </span>; output between 'endcode' and new org <span
+style='mso-tab-count:5'>                                                   </span>;
+location is padded with '0xff' bytes.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><a name=Errors><b><span style='font-family:Arial;color:blue'>Errors</span></b></a><b><span
+style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>Errors are output to stderr in the following
+form. Error numbers begin at 2000 and work upwards. Not all error numbers are
+in use as some numbers were used by prior versions of the assembler.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>[E|W]xxx (line &lt;line number&gt;):
+description<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E/W<span style='mso-tab-count:1'>     </span>-
+<b>E</b>rror or <b>W</b>arning<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>xxx<span style='mso-tab-count:1'>       </span>-
+error number<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2001 &quot;unbalanced parentheses&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>An
+expression contains an odd number of parentheses<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2002 &quot;division by zero&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+denominator of expression is equal to zero <o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2003 &quot;undefined symbol
+'&lt;symbol&gt;'&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+symbol is not defined anywhere within program<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2004 &quot;'&lt;symbol&gt;' already
+defined&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+symbol has already been assigned a value<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2005 &quot;wrong length&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+size specifier is not allowed for the instruction or operand.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2006 &quot;expecting a register&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>A register specification
+was expected but not found.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2008 &quot;invalid instruction or
+argument&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+assembler hit something it couldn't recognize<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2011 &quot;phasing error - '&lt;symbol&gt;'
+value different on second pass&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>During
+the second pass of the assembler the value of the symbol was different than
+that of the first pass.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2012 &quot;unknown command line switch
+'&lt;argument&gt;' ignored&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The only valid
+command line switches are /o and /G. Switches are case-sensitive<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2013 &quot;unable to open file
+'&lt;filename&gt;'&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2014 &quot;no closing quotes&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2015 &quot;can not calculate mod(0)&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2016 &quot;invalid register number
+&lt;reg&gt;&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2018 &quot;more memory required than is
+available&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2026 &quot;operand addressing mode '%s' not
+supported by selected processor&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2027 &quot;extra ')'&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2028 &quot;branch out of range displacement
+&lt;displacement&gt;&quot;,<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>A
+short branch was specified but the destination is out of range or the
+displacement is too great for a long branch.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2029 &quot;word assembled on odd address -
+output padded with zero byte&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+location counter for the code segment was at an odd address when attempting to
+output code. This could be due to the use of tables in the code section. Use
+'even' pseudo-op to align the location counter on an even address.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2030 &quot;&lt;value&gt; too big for
+immediate data - truncated&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The immediate
+value supplied to the breakpoint instruction was too large.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2031 &quot;&lt;value&gt; too big for shift
+count - truncated&quot;,<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The immediate
+value specified for a shift count was too large. Only values from 1 to 8 are
+acceptable.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2033 &quot;quick immediate data
+(&lt;value&gt;) truncated&quot;,<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The immediate
+value specified for addq/subq/moveq instructions was out of range. Allowable
+values are from 1 to 8 for addq/subq and -128 to 127 for moveq.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2034 &quot;error writing output&quot;,<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2035 &quot;invalid label '&lt;label&gt;' -
+ignored&quot;,<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2036 &quot;byte size not supported with
+address registers&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>An attempt was
+made to perform a byte size operation on an address register. Address registers
+support only word or long word operations.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2037 &quot;'&lt;size code&gt;' illegal size
+for status register operation - assuming word size&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Only word and byte
+size operations are allowed on the status register.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2038 &quot;'&lt;size code&gt;' only byte
+operations allowed on ccr - assuming byte size&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2039 &quot;invalid operand
+'&lt;operand&gt;'&quot;,<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+operand is not valid for use with the instruction or it is an unrecognizable
+operand.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2040 &quot;only long ('l') size
+supported&quot;,<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+moveq instruction and move to/from USP only support long operation sizes. The
+assembler will generate code for a long size operation.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2041 &quot;instruction
+'&lt;instruction&gt;' not supported by selected processor&quot;,<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'><span style='mso-tab-count:1'>            </span>The
+assembler encountered an instruction that is not supported by the selected
+processor level.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2042 &quot;displacement %lx too large&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The displacement
+specified for a register indirect operand is too large.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2043 &quot;assembler does not support %ld
+processor&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The CPU directive
+specified a processor not supported by this assembler.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2046 &quot;source operand '&lt;source
+operand&gt;' must be immediate&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>An immediate mode
+instruction was specified (eg addq / andi) but an immediate operand was not supplied.
+You must use the '#' to indicate an immediate value.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2048 &quot;expecting &lt;number of
+operands&gt; operand(s)&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The number of
+operands supplied does not match the number required by the instruction.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2049 &quot;only byte ('.B') size
+supported&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The abcd / sbcd /
+set instructions only support byte operations.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2050 &quot;too many operands - extra
+operands ignored&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>There is a maximum
+of 60 operands (used for dc directive).<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2051 &quot;no assembler output for shift of
+zero count&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>An immediate shift
+count of 0 was specified so the assembler bypasses generation of code for the
+shift.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2052 &quot;only word ('.W') size
+supported&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>A memory shift
+operation was specified. Memory shifts only support word size.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2053 &quot;index scaling '&lt;scale&gt;'
+not supported on selected processor&quot;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2054 &quot;expecting a macro name&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The name of the
+macro is expected after the macro directive, but a valid name was not found.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2055 &quot;expecting ',' separator in macro
+definition&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>An unknown
+character was encountered in the macro parameter list where a comma was
+expected.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2056 &quot;too many files.&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>A maximum of 255
+files may be processed by the assembler.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2057 &quot;defined needs a symbol
+name&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The
+defined(&lt;symbol name&gt;) function (expression evaluation) requires a symbol
+name.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2058 &quot;error in expression&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Something was
+encountered in an expression that the expression parser was unable to resolve.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>W2059 &quot;extra '.' ignored&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>A dot indicating a
+pseudo-op was encountered, however it was not followed by a pseudo-op.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2060 &quot;size needs a symbolic name&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The size()
+function (expression evaluation) needs a symbol name and one was not supplied.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2061 &quot;public needs an address
+label&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The public
+directive needs an address label to declare public.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2063 &quot;too many macro parameters&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Too many
+parameters were encountered in a macro parameter list.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2064 &quot;incorrect number of macro
+arguments were passed&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>A macro
+substitution was indicated in source code, but the number of parameters passed
+did not match the number of parameters in the macro definition.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2066 &quot;macro too large&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The macro
+definition or expansion is too large. A maximum expansion of 2048 characters is
+allowed.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2067 &quot;unrecognized characters on
+line&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Extra characters
+were encountered in the input line that could not be processed as part of a
+valid instruction or directive. Use a semi-colon to indicate comments on a
+line.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2068 &quot;extra 'endm' encountered&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>An endm was
+encountered without a corresponding macro directive.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2081 &quot;only bits 0-%d available for
+operation&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>The bit number
+specified is greater than the number of bits that can be processed by the bit
+instruction. If the destination is a data register only the long size is
+supported which is bits 0 to 31. If the destination is memory then only byte
+operations are supported meaning bits 0 to 7.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>E2082 &quot;invalid register list '%s'&quot;<o:p></o:p></span></p>
+
+<p style='margin-left:1.0in'><span style='font-family:Arial'>Something that
+could not be parsed as part of a register list was encountered.<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=SplitUtility><b><span style='font-family:Arial;color:blue'>Split
+Utility</span></b></a><b><span style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>Split.exe is a small utility that takes a
+binary ('.bin') file as input and generates two binary files as output ('.odd'
+and '.evn'). This is useful for splitting the binary data so that it may be
+programmed into a pair of EPROMS.<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><a name=Dissassembler><b><span style='font-family:Arial;color:blue'>Dissassembler</span></b></a><b><span
+style='font-family:Arial;color:blue'><o:p></o:p></span></b></p>
+
+<p><span style='font-family:Arial'>dasm68.exe dissassembles binary files into
+68000 assembler language code. This is useful for seeing where the assembler
+selected an alternate instruction form such as moveq instead of move. It can
+also be used for checking the output of the assembler. What is output by the
+dissassembler should correspond to the source listing.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>dasm68 does not check for all invalid
+encodings of instructions. For instance an instruction may have a restriction
+on the address modes available but if an illegal mode is encoded in the
+instruction dasm68 will output dissassembly for the instruction as if the
+encoding were legal. dasm68 assumes it is being given a valid instruction
+stream, however if it encounters something it can't decode it will output it as
+constant.<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>Currently dasm68 only supports decoding for
+68000/08/10/20 processors.<o:p></o:p></span></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><b><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></b></p>
+
+<p><b><span style='font-family:Arial'>Index<o:p></o:p></span></b></p>
+
+<p><span style='font-size:10.0pt;font-family:Arial'>Branches</span><span
+style='font-size:10.0pt'>'13<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>Comments</span><span
+style='font-size:10.0pt'>'6<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>end</span><span
+style='font-size:10.0pt'>'24<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>endm</span><span
+style='font-size:10.0pt'>'25<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>equ</span><span
+style='font-size:10.0pt'>'26<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><b><span style='font-size:10.0pt;font-family:Arial'>Errors</span></b><span
+style='font-size:10.0pt'>'32<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>even</span><span
+style='font-size:10.0pt'>'27<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>Expressions</span><span
+style='font-size:10.0pt'>'14<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><b><span style='font-size:10.0pt;font-family:Arial'>Files</span></b><span
+style='font-size:10.0pt'>'5<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>fill</span><span
+style='font-size:10.0pt'>'28<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>include</span><span
+style='font-size:10.0pt'>'29<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><b><span style='font-size:10.0pt;font-family:Arial'>Mnemonics</span></b><span
+style='font-size:10.0pt'>'31<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>Numbers</span><span
+style='font-size:10.0pt'>'14<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>org</span><span
+style='font-size:10.0pt'>'30<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>Precedence</span><span
+style='font-size:10.0pt'>'14<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>Register<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>list</span><span
+style='font-size:10.0pt'>'11<o:p></o:p></span></p>
+
+<p style='margin-left:2.0in'><span style='font-size:10.0pt;font-family:Arial'>Section</span><span
+style='font-size:10.0pt'>'16<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+<p><span style='font-family:Arial'>&nbsp;<o:p></o:p></span></p>
+
+</div>
+
+</body>
+
+</html>
